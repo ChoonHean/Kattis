@@ -11,10 +11,10 @@ struct ST {
     int n;                                         // n = (int)A.size()
     vi A, st, lazy;                                // the arrays
 
-    int l(int p) { return p << 1; }                 // go to left child
-    int r(int p) { return (p << 1) + 1; }              // go to right child
+    inline int l(int p) { return p << 1; }                 // go to left child
+    inline int r(int p) { return (p << 1) + 1; }              // go to right child
 
-    int conquer(int a, int b) {
+    inline int conquer(int a, int b) {
         if (a == -1) return b;                       // corner case
         if (b == -1) return a;
         return min(a, b);                            // RMQ
@@ -31,7 +31,7 @@ struct ST {
         }
     }
 
-    void propagate(int p, int L, int R) {
+    inline void propagate(int p, int L, int R) {
         if (lazy[p] != -1) {                         // has a lazy flag
             st[p] = lazy[p];                           // [L..R] has same value
             if (L != R)                                // not a leaf
@@ -67,14 +67,14 @@ struct ST {
         }
     }
 
-    SegmentTree(int sz) : n(sz), A(n), st(4 * n), lazy(4 * n, -1) {}
+    ST(int sz) : n(sz), A(n), st(4 * n), lazy(4 * n, -1) {}
 
-    SegmentTree(const vi &initialA) : SegmentTree((int) initialA.size()) {
+    ST(const vi &initialA) : ST((int) initialA.size()) {
         A = initialA;
         build(1, 0, n - 1);
     }
 
-    void update(int i, int j, int val) { update(1, 0, n - 1, i, j, val); }
+    inline void update(int i, int j, int val) { update(1, 0, n - 1, i, j, val); }
 
-    int RMQ(int i, int j) { return RMQ(1, 0, n - 1, i, j); }
+    inline int RMQ(int i, int j) { return RMQ(1, 0, n - 1, i, j); }
 };
