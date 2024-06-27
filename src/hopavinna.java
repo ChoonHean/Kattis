@@ -3,32 +3,7 @@ import java.io.*;
 
 public class Main {
     static Reader io = new Reader();
-    /*static int[][]mat;
-    static int r,c,maxq,n,size,min,max;
-    static int[] ans;
-
-    public static void main(String[] args) {
-        r = io.nextInt();
-        c = io.nextInt();
-        mat = new int[r][];
-        for (int i = 0; i < r; i++) mat[i] = io.nextIntLine();
-        int q = io.nextInt();
-        List<Integer> ls = new ArrayList<>(q);
-        maxq = 0;
-        for (int i = 0; i < q; i++) {
-            int curr = io.nextInt();
-            maxq = Integer.max(maxq, curr);
-            ls.add(curr);
-        }
-        n = r * c;
-        boolean[] visited = new boolean[n];
-        ans = new int[n + 1];
-        Arrays.fill(ans, Integer.MAX_VALUE);
-        ans[0] = 0;
-        for (int i : ls) io.println(ans[i]);
-        io.flush();
-    }*/
-    public static void main(String[] args) {
+        public static void main(String[] args) {
         int n=io.nextInt();
         int[][] dp=new int[2][n+1];
         int[] a= io.nextIntLine();
