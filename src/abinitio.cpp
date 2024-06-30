@@ -5,10 +5,13 @@
 #include <algorithm>
 
 using namespace std;
+
 int main() {
     int v, e, q;
     cin >> v >> e >> q;
-    vector<vector<int>> mat(4000, vector<int>(4000, 0)), t(4000, vector<int>(4000, 0)), c(4000, vector<int>(4000, 0)), tc(4000, vector<int>(4000, 0));
+    vector<vector<int>> mat(4000, vector<int>(4000, 0)), t(4000, vector<int>(4000, 0)), c(4000,
+                                                                                          vector<int>(4000, 0)), tc(
+            4000, vector<int>(4000, 0));
     while (e--) {
         int a, b;
         cin >> a >> b;

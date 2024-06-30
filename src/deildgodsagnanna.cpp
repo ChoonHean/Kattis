@@ -34,21 +34,20 @@ inline void print_p(T v) {
 }
 
 
-
 inline void solve() {
     ll n;
-    cin>>n;
-    n%=mod;
-    ll res=n--;
-    forloop(0,6)res=(res*n--)%mod;
-    forloop(0,2){
-        res=(res*((n*(n-1)/2)%mod))%mod;
-        n-=2;
+    cin >> n;
+    n %= mod;
+    ll res = n--;
+    forloop(0, 6)res = (res * n--) % mod;
+    forloop(0, 2) {
+        res = (res * ((n * (n - 1) / 2) % mod)) % mod;
+        n -= 2;
     }
-    forloop(0,6)res=(res*n--)%mod;
-    res=(res*((n*(n-1)/2)%mod))%mod;
-    n-=2;
-    cout<<(res*n)%mod;
+    forloop(0, 6)res = (res * n--) % mod;
+    res = (res * ((n * (n - 1) / 2) % mod)) % mod;
+    n -= 2;
+    cout << (res * n) % mod;
 }
 
 int main() {

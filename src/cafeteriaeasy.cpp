@@ -1,11 +1,13 @@
 #include <bits/stdc++.h>
+
 using namespace std;
 typedef vector<int> vi;
 typedef vector<double> vd;
 typedef vector<string> vs;
 typedef long long ll;
 typedef vector<ll> vl;
-typedef pair<int,int>pii;
+typedef pair<int, int> pii;
+
 template<typename T>
 void print(T it) {
     for (auto i = it.begin(); i != it.end(); i++) {
@@ -13,17 +15,18 @@ void print(T it) {
     }
     cout << endl;
 }
+
 int main() {
-    vector<vs>counts(5,vs(4));
-    for(int j=0;j<3;j+=2){
-        for(int i=0;i<5;i++){
-            for(int k=0;k<2;k++){
-                cin>>counts[i][j+k];
+    vector<vs> counts(5, vs(4));
+    for (int j = 0; j < 3; j += 2) {
+        for (int i = 0; i < 5; i++) {
+            for (int k = 0; k < 2; k++) {
+                cin >> counts[i][j + k];
             }
         }
     }
-    vector<vd>ratios(4,vd(4));
-    for(int h=0;h<4;h++) {
+    vector<vd> ratios(4, vd(4));
+    for (int h = 0; h < 4; h++) {
         for (int k = 0; k < 5; k++) {
             for (int i = 0; i < 4; i++) {
                 if (counts[k][i] == "_")continue;
@@ -51,13 +54,13 @@ int main() {
             }
         }
     }
-    for(int i=0;i<3;i+=2){
-        for(int j=0;j<5;j++){
-            for(int k=0;k<2;k++){
-                cout<<counts[j][i+k]<<" ";
+    for (int i = 0; i < 3; i += 2) {
+        for (int j = 0; j < 5; j++) {
+            for (int k = 0; k < 2; k++) {
+                cout << counts[j][i + k] << " ";
             }
         }
-        cout<<endl;
+        cout << endl;
     }
     return 0;
 }

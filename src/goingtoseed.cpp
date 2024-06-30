@@ -28,75 +28,75 @@ void print_p(T v) {
 }
 
 inline void solve() {
-    int hi,lo=1,first,second,isfirst,issecond,split,remain,third,fourth;
-    cin>>hi;
-    int n=hi;
-    while(true){
-        if(hi-lo==1){
-            cout<<"Q "<<lo<<' '<<lo<<' '<<hi<<' '<<hi<<endl;
+    int hi, lo = 1, first, second, isfirst, issecond, split, remain, third, fourth;
+    cin >> hi;
+    int n = hi;
+    while (true) {
+        if (hi - lo == 1) {
+            cout << "Q " << lo << ' ' << lo << ' ' << hi << ' ' << hi << endl;
             cout.flush();
-            cin>>isfirst>>issecond;
-            if(isfirst)cout<<"A "<<lo;
-            else cout<<"A "<<hi;
+            cin >> isfirst >> issecond;
+            if (isfirst)cout << "A " << lo;
+            else cout << "A " << hi;
             return;
-        }else if(hi-lo==2){
-            cout<<"Q "<<lo<<' '<<lo<<' '<<hi<<' '<<hi<<endl;
+        } else if (hi - lo == 2) {
+            cout << "Q " << lo << ' ' << lo << ' ' << hi << ' ' << hi << endl;
             cout.flush();
-            cin>>isfirst>>issecond;
-            if(isfirst)cout<<"A "<<lo;
-            else if(issecond)cout<<"A "<<hi;
-            else cout<<"A "<<hi-1;
+            cin >> isfirst >> issecond;
+            if (isfirst)cout << "A " << lo;
+            else if (issecond)cout << "A " << hi;
+            else cout << "A " << hi - 1;
             return;
-        }else if(hi-lo==3){
-            cout<<"Q "<<lo<<' '<<lo+1<<' '<<lo+1<<' '<<lo+2<<endl;
+        } else if (hi - lo == 3) {
+            cout << "Q " << lo << ' ' << lo + 1 << ' ' << lo + 1 << ' ' << lo + 2 << endl;
             cout.flush();
-            cin>>isfirst>>issecond;
-            if(isfirst){
-                if(issecond){
-                    cout<<"A "<<lo+1;
-                }else cout<<"A "<<lo;
-            }else if(issecond){
-                cout<<"A "<<lo+2;
-            }else cout<<"A "<<hi;
+            cin >> isfirst >> issecond;
+            if (isfirst) {
+                if (issecond) {
+                    cout << "A " << lo + 1;
+                } else cout << "A " << lo;
+            } else if (issecond) {
+                cout << "A " << lo + 2;
+            } else cout << "A " << hi;
             return;
         }
-        split=(hi-lo+1)>>2;
-        remain=(hi-lo+1)%4;
-        first=lo;
-        second=lo+(split<<1);
-        third=lo+split;
-        fourth=hi-split;
-        if(remain){
+        split = (hi - lo + 1) >> 2;
+        remain = (hi - lo + 1) % 4;
+        first = lo;
+        second = lo + (split << 1);
+        third = lo + split;
+        fourth = hi - split;
+        if (remain) {
             third++;
         }
-        if(remain>1){
+        if (remain > 1) {
             fourth--;
         }
         //cout<<lo<<' '<<hi<<endl;
-        cout<<"Q "<<first<<' '<<second<<' '<<third<<' '<<fourth<<endl;
+        cout << "Q " << first << ' ' << second << ' ' << third << ' ' << fourth << endl;
         cout.flush();
-        cin>>isfirst>>issecond;
-        if(isfirst){
-            if(issecond){
-                lo=third-1;
-                hi=second+1;
-            }else{
-                lo=max(1,lo-1);
-                hi=third;
+        cin >> isfirst >> issecond;
+        if (isfirst) {
+            if (issecond) {
+                lo = third - 1;
+                hi = second + 1;
+            } else {
+                lo = max(1, lo - 1);
+                hi = third;
             }
-        }else if(issecond){
-            lo=second;
-            hi=fourth+1;
-        }else{
-            lo=fourth;
-            hi=min(n,hi+1);
+        } else if (issecond) {
+            lo = second;
+            hi = fourth + 1;
+        } else {
+            lo = fourth;
+            hi = min(n, hi + 1);
         }
     }
 }
 
 
 int main() {
-    int t=1;
+    int t = 1;
     //cin >> t;
     while (t--) {
         solve();

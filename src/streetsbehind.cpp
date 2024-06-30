@@ -34,32 +34,31 @@ void print_p(T v) {
 }
 
 
-
 inline void solve() {
-    ll n,k;
-    double a,b;
-    cin>>n>>k>>a>>b;
-    if(floor(n*b/a-n)<=0){
-        cout<<-1<<endl;
+    ll n, k;
+    double a, b;
+    cin >> n >> k >> a >> b;
+    if (floor(n * b / a - n) <= 0) {
+        cout << -1 << endl;
         return;
     }
-    int res=0;
-    while(k>0){
-        double shift=floor(n*b/a-n);
-        int next=ceil(a*(shift+1)/(b-a));
-        int tonext=next-n;
+    int res = 0;
+    while (k > 0) {
+        double shift = floor(n * b / a - n);
+        int next = ceil(a * (shift + 1) / (b - a));
+        int tonext = next - n;
         //cout<<n<<' '<<k<<' '<<shift<<' '<<next<<endl;
-        if(tonext>k) {
-            res+=ceil(k/shift);
+        if (tonext > k) {
+            res += ceil(k / shift);
             break;
         }
-        int runs=ceil(tonext/shift);
-        shift*=runs;
-        res+=runs;
-        n+=shift;
-        k-=shift;
+        int runs = ceil(tonext / shift);
+        shift *= runs;
+        res += runs;
+        n += shift;
+        k -= shift;
     }
-    cout<<res<<endl;
+    cout << res << endl;
 }
 
 int main() {

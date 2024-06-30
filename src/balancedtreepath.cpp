@@ -72,7 +72,7 @@ inline void solve() {
     forloop(0, n)arr[i] = s[i];
     adj.resize(n);
     int u, v;
-    int res=0;
+    int res = 0;
     forloop(1, n) {
         cin >> u >> v;
         adj[u - 1].push_back(v - 1);
@@ -80,9 +80,9 @@ inline void solve() {
     }
     forloop(0, n) {
         visited.assign(n, false);
-        res+=dfs(i);
+        res += dfs(i);
     }
-    cout<<res;
+    cout << res;
 }
 
 int main() {

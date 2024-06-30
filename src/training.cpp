@@ -12,8 +12,8 @@ typedef pair<ll, ll> pll;
 int inf = 1e9;
 int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
-#define read(n,arr) for(int i=0;i<n;i++)cin>>arr[i]
-#define forloop(a,n) for(int i=a;i<n;i++)
+#define read(n, arr) for(int i=0;i<n;i++)cin>>arr[i]
+#define forloop(a, n) for(int i=a;i<n;i++)
 
 template<typename T>
 void print(T it) {
@@ -32,19 +32,19 @@ void print_p(T v) {
 }
 
 inline void solve() {
-    int n,s;
-    cin>>n>>s;
-    vi a(n),b(n);
-    forloop(0,n)cin>>a[i]>>b[i];
-    forloop(0,n){
-        if(a[i]<=s&&s<=b[i])s++;
+    int n, s;
+    cin >> n >> s;
+    vi a(n), b(n);
+    forloop(0, n)cin >> a[i] >> b[i];
+    forloop(0, n) {
+        if (a[i] <= s && s <= b[i])s++;
     }
-    cout<<s;
+    cout << s;
 }
 
 
 int main() {
-    int t=1;
+    int t = 1;
     //cin >> t;
     while (t--) {
         solve();

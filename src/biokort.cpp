@@ -34,34 +34,33 @@ inline void print_p(T v) {
 }
 
 
-
 inline void solve() {
-    int n,m,k;
-    cin>>n>>m>>k;
+    int n, m, k;
+    cin >> n >> m >> k;
     string s;
     vi arr(n);
-    ll tix=0;
-    forloop(0,n){
-        cin>>s>>arr[i];
-        tix+=arr[i];
+    ll tix = 0;
+    forloop(0, n) {
+        cin >> s >> arr[i];
+        tix += arr[i];
     }
     sort(all(arr));
-    auto curr=arr.begin();
-    ll pass=0;
-    int pass_ans=0;
-    ll res=m*tix;
-    while(curr<arr.end()){
-        int inc=*curr-pass;
-        pass=*curr;
-        tix-=inc*(arr.end()-curr);
-        ll total=tix*m+pass*k;
-        if(total<res){
-            res=total;
-            pass_ans=pass;
+    auto curr = arr.begin();
+    ll pass = 0;
+    int pass_ans = 0;
+    ll res = m * tix;
+    while (curr < arr.end()) {
+        int inc = *curr - pass;
+        pass = *curr;
+        tix -= inc * (arr.end() - curr);
+        ll total = tix * m + pass * k;
+        if (total < res) {
+            res = total;
+            pass_ans = pass;
         }
-        curr=upper_bound(curr,arr.end(),pass);
+        curr = upper_bound(curr, arr.end(), pass);
     }
-    cout<<pass_ans<<' '<<res;
+    cout << pass_ans << ' ' << res;
 }
 
 int main() {

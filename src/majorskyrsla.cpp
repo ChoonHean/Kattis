@@ -16,11 +16,11 @@ int main() {
     while (k) {
         auto it = *(--pages.upper_bound(k));
         ans[it] = count++;
-        used[it]=true;
+        used[it] = true;
         pages.erase(it);
         k -= it;
     }
-    for (int i=0;i<n;i++)if(!used[i])ans[i]=count++;
+    for (int i = 0; i < n; i++)if (!used[i])ans[i] = count++;
     for (auto i: ans)cout << i << " ";
     return 0;
 }

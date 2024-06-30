@@ -29,19 +29,19 @@ void print_p(T v) {
 
 inline void solve() {
     int n;
-    cin>>n;
+    cin >> n;
     vi arr(n);
-    for(int i=0;i<n;i++)cin>>arr[i];
-    sort(arr.begin(),arr.end());
-    int res=0;
-    for(int i=0;i<(n+1)/2;i++)res+=arr[i]/2;
-    for(int i=(n+1)/2;i<n;i++)res+=arr[i];
-    cout<<res;
+    for (int i = 0; i < n; i++)cin >> arr[i];
+    sort(arr.begin(), arr.end());
+    int res = 0;
+    for (int i = 0; i < (n + 1) / 2; i++)res += arr[i] / 2;
+    for (int i = (n + 1) / 2; i < n; i++)res += arr[i];
+    cout << res;
 }
 
 
 int main() {
-    int t=1;
+    int t = 1;
     //cin >> t;
     while (t--) {
         solve();

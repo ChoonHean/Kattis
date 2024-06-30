@@ -35,27 +35,27 @@ inline void print_p(T v) {
 }
 
 inline void solve() {
-    int n,t;
-    cin>>n;
-    string s,s2;
-    unordered_map<string,vs>mapper;
-    unordered_map<string,int>counts,counts2;
-    forloop(0,n){
-        cin>>s>>t;
-        counts2[s]=0;
-        while(t--){
-            cin>>s2;
+    int n, t;
+    cin >> n;
+    string s, s2;
+    unordered_map<string, vs> mapper;
+    unordered_map<string, int> counts, counts2;
+    forloop(0, n) {
+        cin >> s >> t;
+        counts2[s] = 0;
+        while (t--) {
+            cin >> s2;
             mapper[s2].push_back(s);
         }
     }
-    while(cin>>s)counts[s]++;
-    for(auto [x,y]:counts)for(string s3:mapper[x])counts2[s3]+=y;
-    int mx=0;
-    for(auto [x,y]:counts2)mx=max(mx,y);
+    while (cin >> s)counts[s]++;
+    for (auto [x, y]: counts)for (string s3: mapper[x])counts2[s3] += y;
+    int mx = 0;
+    for (auto [x, y]: counts2)mx = max(mx, y);
     vs ans;
-    for(auto [x,y]:counts2)if(y==mx)ans.push_back(x);
+    for (auto [x, y]: counts2)if (y == mx)ans.push_back(x);
     sort(all(ans));
-    for(string s3:ans)cout<<s3<<nl;
+    for (string s3: ans)cout << s3 << nl;
 }
 
 int main() {

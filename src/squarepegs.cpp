@@ -35,29 +35,29 @@ inline void print_p(T v) {
 }
 
 inline void solve() {
-    int n,m,k;
-    cin>>n>>m>>k;
-    vi circle(m),square(k);
+    int n, m, k;
+    cin >> n >> m >> k;
+    vi circle(m), square(k);
     read(n);
-    readarr(m,circle);
-    readarr(k,square);
+    readarr(m, circle);
+    readarr(k, square);
     sort(all(arr));
-    for(int i=0;i<k;i++)square[i]=floor(sqrt(square[i]*square[i]/2.0));
+    for (int i = 0; i < k; i++)square[i] = floor(sqrt(square[i] * square[i] / 2.0));
     vi houses;
-    houses.reserve(m+k);
-    for(int i:circle)houses.push_back(i);
-    for(int i:square)houses.push_back(i);
+    houses.reserve(m + k);
+    for (int i: circle)houses.push_back(i);
+    for (int i: square)houses.push_back(i);
     sort(all(houses));
-    int j=0;
-    int res=0;
-    forloop(0,n){
-        if(houses[j]<arr[i]){
+    int j = 0;
+    int res = 0;
+    forloop(0, n) {
+        if (houses[j] < arr[i]) {
             res++;
             j++;
-            if(j>=houses.size())break;
+            if (j >= houses.size())break;
         }
     }
-    cout<<res;
+    cout << res;
 }
 
 int main() {

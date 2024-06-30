@@ -13,7 +13,7 @@ int inf = 1e9;
 int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
-#define readarr(n,arr) for(int i=0;i<n;i++)cin>>arr[i]
+#define readarr(n, arr) for(int i=0;i<n;i++)cin>>arr[i]
 #define forloop(a, n) for(int i=a;i<n;i++)
 
 template<typename T>
@@ -33,21 +33,20 @@ void print_p(T v) {
 }
 
 
-
 inline void solve() {
     int n, d;
     cin >> n >> d;
     read(n);
     sort(all(arr));
-    int pointer=0;
-    int curr=arr[0];
-    int res=0;
-    while(pointer<n){
+    int pointer = 0;
+    int curr = arr[0];
+    int res = 0;
+    while (pointer < n) {
         res++;
-        pointer=upper_bound(all(arr),curr+d)-arr.begin();
-        curr=arr[pointer];
+        pointer = upper_bound(all(arr), curr + d) - arr.begin();
+        curr = arr[pointer];
     }
-    cout<<res;
+    cout << res;
 }
 
 int main() {

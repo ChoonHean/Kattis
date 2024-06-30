@@ -36,23 +36,23 @@ inline void print_p(T v) {
 
 inline void solve() {
     int n;
-    cin>>n;
-    int res=(1<<(n+1))-1;
-    read(1<<n);
-    vi tree(1<<n);
-    for(int i=0;i<1<<n;i++){
-        int j=0;
-        for(int k=0;k<n;k++)j|=((i>>k)&1)<<(n-k-1);
-        tree[j]=arr[i];
+    cin >> n;
+    int res = (1 << (n + 1)) - 1;
+    read(1 << n);
+    vi tree(1 << n);
+    for (int i = 0; i < 1 << n; i++) {
+        int j = 0;
+        for (int k = 0; k < n; k++)j |= ((i >> k) & 1) << (n - k - 1);
+        tree[j] = arr[i];
     }
-    int counter=2;
-    for(int i=0;i<n;i++){
-        for(int j=0;j<1<<n;j+=1<<(i+1)){
-            if(tree[j]==tree[j+(1<<i)])res-=2;
-            else tree[j]=counter++;
+    int counter = 2;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < 1 << n; j += 1 << (i + 1)) {
+            if (tree[j] == tree[j + (1 << i)])res -= 2;
+            else tree[j] = counter++;
         }
     }
-    cout<<res;
+    cout << res;
 }
 
 int main() {

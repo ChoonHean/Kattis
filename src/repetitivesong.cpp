@@ -30,23 +30,23 @@ void print_p(T v) {
 
 inline void solve() {
     int n;
-    cin>>n;
+    cin >> n;
     vs arr(n);
-    for(int i=0;i<n;i++)cin>>arr[i];
-    unordered_map<string,int> table;
-    int mn=INT_MAX;
-    for(int i=0;i<n;i++){
-        if(table.contains(arr[i])){
-            mn=min(mn,i-table[arr[i]]);
+    for (int i = 0; i < n; i++)cin >> arr[i];
+    unordered_map<string, int> table;
+    int mn = INT_MAX;
+    for (int i = 0; i < n; i++) {
+        if (table.contains(arr[i])) {
+            mn = min(mn, i - table[arr[i]]);
         }
-        table[arr[i]]=i;
+        table[arr[i]] = i;
     }
-    mn==INT_MAX?cout<<0:cout<<n-mn;
+    mn == INT_MAX ? cout << 0 : cout << n - mn;
 }
 
 
 int main() {
-    int t=1;
+    int t = 1;
     //cin >> t;
     while (t--) {
         solve();

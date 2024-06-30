@@ -26,12 +26,13 @@ void print_p(T v) {
     }
     cout << endl;
 }
+
 struct SegmentTree {                              // OOP style
     int n;                                         // n = (int)A.size()
     vi A, st, lazy;                                // the arrays
 
-    inline int l(int p) { return  p<<1; }                 // go to left child
-    inline int r(int p) { return (p<<1)+1; }              // go to right child
+    inline int l(int p) { return p << 1; }                 // go to left child
+    inline int r(int p) { return (p << 1) + 1; }              // go to right child
 
     inline int conquer(int a, int b) {
         return a + b;                            // RMQ
@@ -41,9 +42,9 @@ struct SegmentTree {                              // OOP style
         if (L == R)
             st[p] = A[L];                              // base case
         else {
-            int m = (L+R)/2;
-            build(l(p), L  , m);
-            build(r(p), m+1, R);
+            int m = (L + R) / 2;
+            build(l(p), L, m);
+            build(r(p), m + 1, R);
             st[p] = conquer(st[l(p)], st[r(p)]);
         }
     }
@@ -54,8 +55,7 @@ struct SegmentTree {                              // OOP style
             if (L != R) {                               // not a leaf
                 lazy[l(p)] += lazy[p];       // propagate downwards
                 lazy[r(p)] += lazy[p];
-            }
-            else                                       // L == R, a single index
+            } else                                       // L == R, a single index
                 A[L] = lazy[p];                          // time to update this
             lazy[p] = 0;                              // erase lazy flag
         }
@@ -65,9 +65,9 @@ struct SegmentTree {                              // OOP style
         propagate(p, L, R);                          // lazy propagation
         if (i > j) return 0;                        // infeasible
         if ((L >= i) && (R <= j)) return st[p];      // found the segment
-        int m = (L+R)/2;
-        return conquer(RMQ(l(p), L  , m, i          , min(m, j)),
-                       RMQ(r(p), m+1, R, max(i, m+1), j        ));
+        int m = (L + R) / 2;
+        return conquer(RMQ(l(p), L, m, i, min(m, j)),
+                       RMQ(r(p), m + 1, R, max(i, m + 1), j));
     }
 
     void update(int p, int L, int R, int i, int j, int val) { // O(log n)
@@ -76,28 +76,28 @@ struct SegmentTree {                              // OOP style
         if ((L >= i) && (R <= j)) {                  // found the segment
             lazy[p] += val;                             // update this
             propagate(p, L, R);                        // lazy propagation
-        }
-        else {
-            int m = (L+R)/2;
-            update(l(p), L  , m, i          , min(m, j), val);
-            update(r(p), m+1, R, max(i, m+1), j        , val);
+        } else {
+            int m = (L + R) / 2;
+            update(l(p), L, m, i, min(m, j), val);
+            update(r(p), m + 1, R, max(i, m + 1), j, val);
         }
     }
 
-    SegmentTree(int sz) : n(sz), A(n), st(4*n), lazy(4*n) {}
+    SegmentTree(int sz) : n(sz), A(n), st(4 * n), lazy(4 * n) {}
 
-    SegmentTree(const vi &initialA) : SegmentTree((int)initialA.size()) {
+    SegmentTree(const vi &initialA) : SegmentTree((int) initialA.size()) {
         A = initialA;
-        build(1, 0, n-1);
+        build(1, 0, n - 1);
     }
 
-    void update(int i, int j, int val) { update(1, 0, n-1, i, j, val); }
+    void update(int i, int j, int val) { update(1, 0, n - 1, i, j, val); }
 
-    int RMQ(int i, int j) { return RMQ(1, 0, n-1, i, j); }
+    int RMQ(int i, int j) { return RMQ(1, 0, n - 1, i, j); }
 };
-int counts=0;
-void bubbleSort(vi arr, int n)
-{
+
+int counts = 0;
+
+void bubbleSort(vi arr, int n) {
     int i, j;
     bool swapped;
     for (i = 0; i < n - 1; i++) {
@@ -116,37 +116,38 @@ void bubbleSort(vi arr, int n)
             break;
     }
 }
+
 inline void solve() {
     int n;
-    cin>>n;
+    cin >> n;
     vi arr(n);
-    unordered_map<int,int> positions(n);
-    for(int i=0;i<n;i++){
-        cin>>arr[i];
-        positions[arr[i]]=i;
+    unordered_map<int, int> positions(n);
+    for (int i = 0; i < n; i++) {
+        cin >> arr[i];
+        positions[arr[i]] = i;
     }
-    ll curr=0;
+    ll curr = 0;
     SegmentTree st(n);
     vi sorted(arr);
-    sort(sorted.begin(),sorted.end());
-    for(int i=0;i<n-1;i++){
-        int pos=positions[sorted[i]];
-        int add = st.RMQ(pos,pos);
-        int loc=pos+add;
+    sort(sorted.begin(), sorted.end());
+    for (int i = 0; i < n - 1; i++) {
+        int pos = positions[sorted[i]];
+        int add = st.RMQ(pos, pos);
+        int loc = pos + add;
         //cout<<sorted[i]<<' '<<loc<<' '<<i<<' ';
-        if(loc==i)continue;
-        curr+=loc-i;
-        st.update(0,loc-add,1);
+        if (loc == i)continue;
+        curr += loc - i;
+        st.update(0, loc - add, 1);
         //cout<<curr<<' '<<endl;
     }
-    cout<<curr<<' ';
+    cout << curr << ' ';
     //bubbleSort(arr,n);
     //cout<<counts;
 }
 
 
 int main() {
-    int t=1;
+    int t = 1;
     //cin >> t;
     while (t--) {
         solve();

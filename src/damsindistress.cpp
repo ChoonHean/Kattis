@@ -28,38 +28,38 @@ void print_p(T v) {
 }
 
 inline void solve() {
-    int n,l;
-    cin>>n>>l;
+    int n, l;
+    cin >> n >> l;
     n++;
-    vi adj(n),req(n),curr(n),indeg(n);
-    for(int u=1;u<n;u++){
-        cin>>adj[u]>>req[u]>>curr[u];
+    vi adj(n), req(n), curr(n), indeg(n);
+    for (int u = 1; u < n; u++) {
+        cin >> adj[u] >> req[u] >> curr[u];
         indeg[adj[u]]++;
     }
-    int res=l;
+    int res = l;
     vi topo;
     queue<int> q;
-    for(int i=0;i<n;i++)if(indeg[i]==0)q.push(i);
-    while(!q.empty()){
+    for (int i = 0; i < n; i++)if (indeg[i] == 0)q.push(i);
+    while (!q.empty()) {
         topo.push_back(q.front());
-        int next=adj[q.front()];
+        int next = adj[q.front()];
         indeg[next]--;
-        if(indeg[next]==0)q.push(next);
+        if (indeg[next] == 0)q.push(next);
         q.pop();
     }
     vi dp(n);
-    dp[0]=l;
-    for(auto it=topo.rbegin();it!=topo.rend();it++){
-        int i=*it;
-        dp[i]=max(req[i],dp[adj[i]])-curr[i];
-        res=min(res,dp[i]);
+    dp[0] = l;
+    for (auto it = topo.rbegin(); it != topo.rend(); it++) {
+        int i = *it;
+        dp[i] = max(req[i], dp[adj[i]]) - curr[i];
+        res = min(res, dp[i]);
     }
-    cout<<res;
+    cout << res;
 }
 
 
 int main() {
-    int t=1;
+    int t = 1;
     //cin >> t;
     while (t--) {
         solve();

@@ -34,88 +34,87 @@ inline void print_p(T v) {
 }
 
 
-
 inline void solve() {
-    int n=300,k,q;
-    cin>>k>>q;
-    vi arr(n),percent(n);
-    if(k==2){
-        percent[0]=1;
+    int n = 300, k, q;
+    cin >> k >> q;
+    vi arr(n), percent(n);
+    if (k == 2) {
+        percent[0] = 1;
         print(percent);
-        cin>>arr[0];
-        forloop(1,n){
-            percent[i-1]=0;
-            percent[i]=1;
+        cin >> arr[0];
+        forloop(1, n) {
+            percent[i - 1] = 0;
+            percent[i] = 1;
             print(percent);
-            cin>>arr[i];
+            cin >> arr[i];
         }
-    }else if(k==4){
-        percent[0]=100;
-        percent[1]=1;
+    } else if (k == 4) {
+        percent[0] = 100;
+        percent[1] = 1;
         print(percent);
         int x;
-        cin>>x;
-        arr[0]=x/100;
-        arr[1]=x%100;
-        for(int i=2;i<n;i+=2){
-            percent[i-2]=0;
-            percent[i-1]=0;
-            percent[i]=100;
-            percent[i+1]=1;
+        cin >> x;
+        arr[0] = x / 100;
+        arr[1] = x % 100;
+        for (int i = 2; i < n; i += 2) {
+            percent[i - 2] = 0;
+            percent[i - 1] = 0;
+            percent[i] = 100;
+            percent[i + 1] = 1;
             print(percent);
-            cin>>x;
-            arr[i]=x/100;
-            arr[i+1]=x%100;
+            cin >> x;
+            arr[i] = x / 100;
+            arr[i + 1] = x % 100;
         }
-    }else{
-        percent[0]=1;
-        percent[1]=100;
+    } else {
+        percent[0] = 1;
+        percent[1] = 100;
         print(percent);
-        int x,a,b,c;
-        cin>>x;
-        a=x%100;
-        b=x/100;
-        percent[0]=0;
-        percent[1]=10;
-        percent[2]=1;
+        int x, a, b, c;
+        cin >> x;
+        a = x % 100;
+        b = x / 100;
+        percent[0] = 0;
+        percent[1] = 10;
+        percent[2] = 1;
         print(percent);
-        cin>>x;
-        c=x%100-b*10;
-        if(c<0){
-            c+=100;
-            b+=(x/100-1)*10;
-        }else{
-            b+=x/100*10;
+        cin >> x;
+        c = x % 100 - b * 10;
+        if (c < 0) {
+            c += 100;
+            b += (x / 100 - 1) * 10;
+        } else {
+            b += x / 100 * 10;
         }
-        if(b<0)b+=100;
-        arr[0]=a;
-        arr[1]=b;
-        arr[2]=c;
-        for(int i=3;i<n;i+=3){
-            percent[i-2]=0;
-            percent[i-1]=0;
-            percent[i]=1;
-            percent[i+1]=100;
+        if (b < 0)b += 100;
+        arr[0] = a;
+        arr[1] = b;
+        arr[2] = c;
+        for (int i = 3; i < n; i += 3) {
+            percent[i - 2] = 0;
+            percent[i - 1] = 0;
+            percent[i] = 1;
+            percent[i + 1] = 100;
             print(percent);
-            cin>>x;
-            a=x%100;
-            b=x/100;
-            percent[i]=0;
-            percent[i+1]=10;
-            percent[i+2]=1;
+            cin >> x;
+            a = x % 100;
+            b = x / 100;
+            percent[i] = 0;
+            percent[i + 1] = 10;
+            percent[i + 2] = 1;
             print(percent);
-            cin>>x;
-            c=x%100-b*10;
-            if(c<0){
-                c+=100;
-                b+=(x/100-1)*10;
-            }else{
-                b+=x/100*10;
+            cin >> x;
+            c = x % 100 - b * 10;
+            if (c < 0) {
+                c += 100;
+                b += (x / 100 - 1) * 10;
+            } else {
+                b += x / 100 * 10;
             }
-            if(b<0)b+=100;
-            arr[i]=a;
-            arr[i+1]=b;
-            arr[i+2]=c;
+            if (b < 0)b += 100;
+            arr[i] = a;
+            arr[i + 1] = b;
+            arr[i + 2] = c;
         }
     }
     print(arr);

@@ -36,42 +36,45 @@ struct UFDS {
         p[y] = x;
     }
 };
-vi dist,adj;
-int dfs(int n){
-    if(n==-1)return 0;
-    if(dist[n]!=INT_MAX)return dist[n];
-    dist[n]=1+dfs(adj[n]);
+
+vi dist, adj;
+
+int dfs(int n) {
+    if (n == -1)return 0;
+    if (dist[n] != INT_MAX)return dist[n];
+    dist[n] = 1 + dfs(adj[n]);
     return dist[n];
 }
+
 int main() {
-    int n,q;
-    cin>>n;
+    int n, q;
+    cin >> n;
     adj.resize(n);
     UFDS ufds(n);
-    for(int i=0;i<n;i++){
-        cin>>adj[i];
-        if(adj[i]!=-1)ufds.unionSet(i, adj[i]);
+    for (int i = 0; i < n; i++) {
+        cin >> adj[i];
+        if (adj[i] != -1)ufds.unionSet(i, adj[i]);
     }
-    dist.resize(n,INT_MAX);
-    for(int i=0;i<n;i++)dfs(i);
-    vector<pii>res(n,pair(INT_MAX,INT_MAX));
-    vector<bool> ispipe(n,true);
-    for(int i=0;i<n;i++){
-        if(adj[i]==-1)continue;
-        ispipe[adj[i]]=false;
+    dist.resize(n, INT_MAX);
+    for (int i = 0; i < n; i++)dfs(i);
+    vector<pii> res(n, pair(INT_MAX, INT_MAX));
+    vector<bool> ispipe(n, true);
+    for (int i = 0; i < n; i++) {
+        if (adj[i] == -1)continue;
+        ispipe[adj[i]] = false;
     }
-    for(int i=0;i<n;i++){
-        if(!ispipe[i])continue;
-        int location=ufds.find(i);
-        pii curr=res[location];
-        if(dist[i]<curr.first)res[location]=pair(dist[i],i);
-        else if(dist[i]==curr.first)res[location]=pair(dist[i],min(i,curr.second));
+    for (int i = 0; i < n; i++) {
+        if (!ispipe[i])continue;
+        int location = ufds.find(i);
+        pii curr = res[location];
+        if (dist[i] < curr.first)res[location] = pair(dist[i], i);
+        else if (dist[i] == curr.first)res[location] = pair(dist[i], min(i, curr.second));
     }
-    cin>>q;
+    cin >> q;
     int x;
-    while(q--){
-        cin>>x;
-        cout<<res[ufds.find(x)].second<<endl;
+    while (q--) {
+        cin >> x;
+        cout << res[ufds.find(x)].second << endl;
     }
     return 0;
 }

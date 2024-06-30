@@ -35,42 +35,42 @@ inline void print_p(T v) {
 }
 
 inline void solve() {
-    int n,x,t;
+    int n, x, t;
     double c;
-    cin>>n>>c;
-    map<int,int>tree;
-    forloop(0,n){
-        cin>>x>>t;
-        tree[x]+=t;
+    cin >> n >> c;
+    map<int, int> tree;
+    forloop(0, n) {
+        cin >> x >> t;
+        tree[x] += t;
     }
-    int res=0;
-    for(auto it=tree.begin();it->first<0&&it!=tree.end();){
-        int trips=ceil(it->second/c);
-        res+=trips*-it->first;
-        int remainder=trips*c-it->second;
-        if(remainder==0)it++;
-        while(remainder>0){
+    int res = 0;
+    for (auto it = tree.begin(); it->first < 0 && it != tree.end();) {
+        int trips = ceil(it->second / c);
+        res += trips * -it->first;
+        int remainder = trips * c - it->second;
+        if (remainder == 0)it++;
+        while (remainder > 0) {
             it++;
-            if(it->first>0||it==tree.end())break;
-            int dec=min(remainder,it->second);
-            it->second-=dec;
-            remainder-=dec;
+            if (it->first > 0 || it == tree.end())break;
+            int dec = min(remainder, it->second);
+            it->second -= dec;
+            remainder -= dec;
         }
     }
-    for(auto it=tree.rbegin();it->first>0&&it!=tree.rend();){
-        int trips=ceil(it->second/c);
-        res+=trips*it->first;
-        int remainder=trips*c-it->second;
-        if(remainder==0)it++;
-        while(remainder>0){
+    for (auto it = tree.rbegin(); it->first > 0 && it != tree.rend();) {
+        int trips = ceil(it->second / c);
+        res += trips * it->first;
+        int remainder = trips * c - it->second;
+        if (remainder == 0)it++;
+        while (remainder > 0) {
             it++;
-            if(it->first<0||it==tree.rend())break;
-            int dec=min(remainder,it->second);
-            it->second-=dec;
-            remainder-=dec;
+            if (it->first < 0 || it == tree.rend())break;
+            int dec = min(remainder, it->second);
+            it->second -= dec;
+            remainder -= dec;
         }
     }
-    cout<<(res<<1);
+    cout << (res << 1);
 }
 
 int main() {
