@@ -35,11 +35,18 @@ inline void print_p(T v) {
 }
 
 inline void solve() {
+    int n;
+    cin>>n;
+    read(3*n);
+    sort(all(arr));
+    int res=0;
+    for(int i=n;i<3*n;i+=2)res+=arr[i];
+    cout<<res<<nl;
 }
 
 int main() {
     int t = 1;
-    //cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }
