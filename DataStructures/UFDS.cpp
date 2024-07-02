@@ -4,13 +4,14 @@ using namespace std;
 typedef vector<int> vi;
 
 struct UFDS {
-    vi p;
+    vi p, size;
     int sets;
 
     UFDS(int n) {
-        p.reserve(n + 1);
-        sets = n + 1;
-        for (int i = 0; i <= n; i++)p.push_back(i);
+        p.reserve(n);
+        sets = n;
+        for (int i = 0; i < n; i++)p.push_back(i);
+        size.assign(n, 1);
     }
 
     int find(int n) {
@@ -22,6 +23,11 @@ struct UFDS {
 
     inline void unionset(int x, int y) {
         sets--;
-        p[find(x)] = p[find(y)];
+        x = find(x);
+        y = find(y);
+        p[y] = x;
+        size[x] += size[y];
     }
+
+    inline int sz(int n) { return size[find(n)]; }
 };
