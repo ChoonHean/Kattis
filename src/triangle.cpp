@@ -35,45 +35,27 @@ inline void print_p(T v) {
     cout << nl;
 }
 
+const int N = 10001;
+vi arr(N);
+
 inline void solve() {
-    int n, x, y;
-    cin >> n >> x >> y;
-    vector<pii> arr(n + 1);
-    forloop(0, n + 1) {
-        cin >> arr[i].first >> arr[i].second;
+    double curr = 3;
+    arr[0] = 1;
+    for (int i = 1; i < N; i++) {
+        curr *= 1.5;
+        if (curr >= 10) {
+            arr[i] = arr[i - 1] + 1;
+            curr /= 10;
+        } else arr[i] = arr[i - 1];
     }
-    queue<int> q;
-    vb visited(n + 1);
-    for (int i = 0; i <= n; i++) {
-        pii p = arr[i];
-        int dist = abs(x - p.first) + abs(y - p.second);
-        if (dist <= 1000) {
-            q.push(i);
-            visited[i] = true;
-        }
-    }
-    while (!q.empty() && !visited[n]) {
-        int curr = q.front();
-        x = arr[curr].first, y = arr[curr].second;
-        q.pop();
-        for (int i = 0; i <= n; i++) {
-            if (!visited[i]) {
-                pii p = arr[i];
-                int dist = abs(x - p.first) + abs(y - p.second);
-                if (dist <= 1000) {
-                    q.push(i);
-                    visited[i] = true;
-                }
-            }
-        }
-    }
-    if (visited[n])cout << "happy" << nl;
-    else cout << "sad" << nl;
+    int n;
+    int cnt = 1;
+    while (cin >> n)cout << "Case " << cnt++ << ": " << arr[n] << nl;
 }
 
 int main() {
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--) {
         solve();
     }

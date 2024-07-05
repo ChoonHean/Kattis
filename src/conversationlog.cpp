@@ -36,44 +36,42 @@ inline void print_p(T v) {
 }
 
 inline void solve() {
-    int n, x, y;
-    cin >> n >> x >> y;
-    vector<pii> arr(n + 1);
-    forloop(0, n + 1) {
-        cin >> arr[i].first >> arr[i].second;
-    }
-    queue<int> q;
-    vb visited(n + 1);
-    for (int i = 0; i <= n; i++) {
-        pii p = arr[i];
-        int dist = abs(x - p.first) + abs(y - p.second);
-        if (dist <= 1000) {
-            q.push(i);
-            visited[i] = true;
+    int n;
+    cin >> n;
+    unordered_set<string> users;
+    unordered_map<string, int> cnts;
+    unordered_map<string, unordered_set<string>> usages;
+    string user, words, word;
+    while (n--) {
+        cin >> user;
+        getline(cin, words);
+        istringstream iss(words);
+        users.insert(user);
+        while (iss >> word) {
+            cnts[word]++;
+            usages[word].insert(user);
         }
     }
-    while (!q.empty() && !visited[n]) {
-        int curr = q.front();
-        x = arr[curr].first, y = arr[curr].second;
-        q.pop();
-        for (int i = 0; i <= n; i++) {
-            if (!visited[i]) {
-                pii p = arr[i];
-                int dist = abs(x - p.first) + abs(y - p.second);
-                if (dist <= 1000) {
-                    q.push(i);
-                    visited[i] = true;
-                }
-            }
+    vector<pair<int, string>> arr;
+    for (auto it: cnts)arr.push_back(pair(it.second, it.first));
+    sort(all(arr), [](pair<int, string> a, pair<int, string> b) {
+        if (a.first == b.first)return a.second < b.second;
+        return a.first > b.first;
+    });
+    int num = users.size();
+    bool clear = true;
+    for (auto it = arr.begin(); it != arr.end(); it++) {
+        if (usages[it->second].size() == num) {
+            cout << it->second << nl;
+            clear = false;
         }
     }
-    if (visited[n])cout << "happy" << nl;
-    else cout << "sad" << nl;
+    if (clear)cout << "ALL CLEAR";
 }
 
 int main() {
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--) {
         solve();
     }

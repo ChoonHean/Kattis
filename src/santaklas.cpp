@@ -34,46 +34,23 @@ inline void print_p(T v) {
     }
     cout << nl;
 }
-
 inline void solve() {
-    int n, x, y;
-    cin >> n >> x >> y;
-    vector<pii> arr(n + 1);
-    forloop(0, n + 1) {
-        cin >> arr[i].first >> arr[i].second;
-    }
-    queue<int> q;
-    vb visited(n + 1);
-    for (int i = 0; i <= n; i++) {
-        pii p = arr[i];
-        int dist = abs(x - p.first) + abs(y - p.second);
-        if (dist <= 1000) {
-            q.push(i);
-            visited[i] = true;
+    int h,a;
+    cin>>h>>a;
+    if(a<=180)cout<<"safe";
+    else{
+        if(a==270)cout<<h;
+        else {
+            if (a < 270)a -= 180;
+            else if (a > 270)a = 360 - a;
+            cout << floor(h / sin(M_PI/180*a));
         }
     }
-    while (!q.empty() && !visited[n]) {
-        int curr = q.front();
-        x = arr[curr].first, y = arr[curr].second;
-        q.pop();
-        for (int i = 0; i <= n; i++) {
-            if (!visited[i]) {
-                pii p = arr[i];
-                int dist = abs(x - p.first) + abs(y - p.second);
-                if (dist <= 1000) {
-                    q.push(i);
-                    visited[i] = true;
-                }
-            }
-        }
-    }
-    if (visited[n])cout << "happy" << nl;
-    else cout << "sad" << nl;
 }
 
 int main() {
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--) {
         solve();
     }

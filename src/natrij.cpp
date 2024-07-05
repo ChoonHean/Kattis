@@ -36,44 +36,23 @@ inline void print_p(T v) {
 }
 
 inline void solve() {
-    int n, x, y;
-    cin >> n >> x >> y;
-    vector<pii> arr(n + 1);
-    forloop(0, n + 1) {
-        cin >> arr[i].first >> arr[i].second;
-    }
-    queue<int> q;
-    vb visited(n + 1);
-    for (int i = 0; i <= n; i++) {
-        pii p = arr[i];
-        int dist = abs(x - p.first) + abs(y - p.second);
-        if (dist <= 1000) {
-            q.push(i);
-            visited[i] = true;
-        }
-    }
-    while (!q.empty() && !visited[n]) {
-        int curr = q.front();
-        x = arr[curr].first, y = arr[curr].second;
-        q.pop();
-        for (int i = 0; i <= n; i++) {
-            if (!visited[i]) {
-                pii p = arr[i];
-                int dist = abs(x - p.first) + abs(y - p.second);
-                if (dist <= 1000) {
-                    q.push(i);
-                    visited[i] = true;
-                }
-            }
-        }
-    }
-    if (visited[n])cout << "happy" << nl;
-    else cout << "sad" << nl;
+    string s1, s2;
+    cin >> s1 >> s2;
+    int a = stoi(s1.substr(0, 2)) * 3600 + stoi(s1.substr(3, 2)) * 60 + stoi(s1.substr(6, 2));
+    int b = stoi(s2.substr(0, 2)) * 3600 + stoi(s2.substr(3, 2)) * 60 + stoi(s2.substr(6, 2));
+    b -= a;
+    if (b < 0)b += 86400;
+    int secs = b % 60;
+    b /= 60;
+    int mins = b % 60;
+    b /= 60;
+    if (secs == 0 && mins == 0 && b == 0)b = 24;
+    printf("%02d:%02d:%02d", b, mins, secs);
 }
 
 int main() {
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--) {
         solve();
     }

@@ -35,46 +35,26 @@ inline void print_p(T v) {
     cout << nl;
 }
 
+bool z = true;
+
 inline void solve() {
-    int n, x, y;
-    cin >> n >> x >> y;
-    vector<pii> arr(n + 1);
-    forloop(0, n + 1) {
-        cin >> arr[i].first >> arr[i].second;
+    int a, b, c, d;
+    cin >> a >> b >> c >> d;
+    if (b + c == 0) {
+        z = false;
+        return;
     }
-    queue<int> q;
-    vb visited(n + 1);
-    for (int i = 0; i <= n; i++) {
-        pii p = arr[i];
-        int dist = abs(x - p.first) + abs(y - p.second);
-        if (dist <= 1000) {
-            q.push(i);
-            visited[i] = true;
-        }
-    }
-    while (!q.empty() && !visited[n]) {
-        int curr = q.front();
-        x = arr[curr].first, y = arr[curr].second;
-        q.pop();
-        for (int i = 0; i <= n; i++) {
-            if (!visited[i]) {
-                pii p = arr[i];
-                int dist = abs(x - p.first) + abs(y - p.second);
-                if (dist <= 1000) {
-                    q.push(i);
-                    visited[i] = true;
-                }
-            }
-        }
-    }
-    if (visited[n])cout << "happy" << nl;
-    else cout << "sad" << nl;
+    int res = 0;
+    res += (a - b + 40) % 40;
+    res += (c - b + 40) % 40;
+    res += (c - d + 40) % 40;
+    cout << res * 9 + 1080 << nl;
 }
 
 int main() {
     int t = 1;
-    cin >> t;
-    while (t--) {
+    //cin >> t;
+    while (z) {
         solve();
     }
     return 0;

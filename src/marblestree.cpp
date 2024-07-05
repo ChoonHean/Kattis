@@ -35,46 +35,48 @@ inline void print_p(T v) {
     cout << nl;
 }
 
+bool b = true;
+const int N = 10001;
+vi marbles(N), p(N), indeg(N);
+
 inline void solve() {
-    int n, x, y;
-    cin >> n >> x >> y;
-    vector<pii> arr(n + 1);
-    forloop(0, n + 1) {
-        cin >> arr[i].first >> arr[i].second;
+    int n, t, v;
+    cin >> n;
+    if (n == 0) {
+        b = false;
+        return;
     }
+    vector<vi> adj(n);
     queue<int> q;
-    vb visited(n + 1);
-    for (int i = 0; i <= n; i++) {
-        pii p = arr[i];
-        int dist = abs(x - p.first) + abs(y - p.second);
-        if (dist <= 1000) {
-            q.push(i);
-            visited[i] = true;
+    forloop(0, n) {
+        cin >> t >> marbles[i] >> t;
+        indeg[i] = t;
+        if (t == 0)q.push(i);
+        while (t--) {
+            cin >> v;
+            adj[--v].push_back(i);
+            p[v] = i;
         }
     }
-    while (!q.empty() && !visited[n]) {
+    int res = 0;
+    while (!q.empty()) {
         int curr = q.front();
-        x = arr[curr].first, y = arr[curr].second;
         q.pop();
-        for (int i = 0; i <= n; i++) {
-            if (!visited[i]) {
-                pii p = arr[i];
-                int dist = abs(x - p.first) + abs(y - p.second);
-                if (dist <= 1000) {
-                    q.push(i);
-                    visited[i] = true;
-                }
-            }
+        int xfer = marbles[curr] - 1;
+        marbles[p[curr]] += xfer;
+        res += abs(xfer);
+        for (int i: adj[curr]) {
+            if (indeg[i] == 1)q.push(i);
+            else indeg[i]--;
         }
     }
-    if (visited[n])cout << "happy" << nl;
-    else cout << "sad" << nl;
+    cout << res << nl;
 }
 
 int main() {
     int t = 1;
-    cin >> t;
-    while (t--) {
+    //cin >> t;
+    while (b) {
         solve();
     }
     return 0;

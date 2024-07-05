@@ -35,40 +35,26 @@ inline void print_p(T v) {
     cout << nl;
 }
 
+vi cs;
+
 inline void solve() {
-    int n, x, y;
-    cin >> n >> x >> y;
-    vector<pii> arr(n + 1);
-    forloop(0, n + 1) {
-        cin >> arr[i].first >> arr[i].second;
+    double n, m;
+    int t;
+    cin >> n >> m;
+    cs.resize(n);
+    ll a = 0, b = 0;
+    forloop(0, n) {
+        cin >> cs[i];
+        a += cs[i];
     }
-    queue<int> q;
-    vb visited(n + 1);
-    for (int i = 0; i <= n; i++) {
-        pii p = arr[i];
-        int dist = abs(x - p.first) + abs(y - p.second);
-        if (dist <= 1000) {
-            q.push(i);
-            visited[i] = true;
-        }
+    forloop(0, m) {
+        cin >> t;
+        b += t;
     }
-    while (!q.empty() && !visited[n]) {
-        int curr = q.front();
-        x = arr[curr].first, y = arr[curr].second;
-        q.pop();
-        for (int i = 0; i <= n; i++) {
-            if (!visited[i]) {
-                pii p = arr[i];
-                int dist = abs(x - p.first) + abs(y - p.second);
-                if (dist <= 1000) {
-                    q.push(i);
-                    visited[i] = true;
-                }
-            }
-        }
-    }
-    if (visited[n])cout << "happy" << nl;
-    else cout << "sad" << nl;
+    double avgcs = a / n, avge = b / m;
+    int res = 0;
+    for (int i: cs)if (i < avgcs && i > avge)res++;
+    cout << res << nl;
 }
 
 int main() {

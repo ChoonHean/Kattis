@@ -35,46 +35,42 @@ inline void print_p(T v) {
     cout << nl;
 }
 
+bool b = true;
+
 inline void solve() {
-    int n, x, y;
-    cin >> n >> x >> y;
-    vector<pii> arr(n + 1);
-    forloop(0, n + 1) {
-        cin >> arr[i].first >> arr[i].second;
+    string s;
+    cin >> s;
+    if (s == "0") {
+        b = false;
+        return;
     }
-    queue<int> q;
-    vb visited(n + 1);
-    for (int i = 0; i <= n; i++) {
-        pii p = arr[i];
-        int dist = abs(x - p.first) + abs(y - p.second);
-        if (dist <= 1000) {
-            q.push(i);
-            visited[i] = true;
-        }
+    vc operators, operands;
+    int n = 0;
+    for (char c: s) {
+        if (isupper(c)) {
+            if (c == 'N')n++;
+            else operators.push_back(c);
+        } else operands.push_back(c);
     }
-    while (!q.empty() && !visited[n]) {
-        int curr = q.front();
-        x = arr[curr].first, y = arr[curr].second;
-        q.pop();
-        for (int i = 0; i <= n; i++) {
-            if (!visited[i]) {
-                pii p = arr[i];
-                int dist = abs(x - p.first) + abs(y - p.second);
-                if (dist <= 1000) {
-                    q.push(i);
-                    visited[i] = true;
-                }
-            }
-        }
+    if (operands.size() == 0) {
+        cout << "no WFF possible" << nl;
+        return;
     }
-    if (visited[n])cout << "happy" << nl;
-    else cout << "sad" << nl;
+    string res = string(n, 'N') + operands.back();
+    operands.pop_back();
+    while (!operands.empty() && !operators.empty()) {
+        res.insert(0, 1, operands.back());
+        res.insert(0, 1, operators.back());
+        operands.pop_back();
+        operators.pop_back();
+    }
+    cout << res << nl;
 }
 
 int main() {
     int t = 1;
-    cin >> t;
-    while (t--) {
+    //cin >> t;
+    while (b) {
         solve();
     }
     return 0;
