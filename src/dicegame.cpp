@@ -89,16 +89,13 @@ inline void p(stack<T> s) {
 }
 
 inline void solve() {
-    int n, x;
-    cin >> n;
-    vector<bool> arr(13);
-    forloop(0, n) {
-        cin >> x;
-        arr[x] = true;
-    }
-    double res = 0;
-    for (int i = 1; i <= 6; i++)for (int j = 1; j <= 6; j++)if (arr[i + j])res++;
-    pnl(res / 36);
+    int a, b, c, d, w, x, y, z;
+    cin >> a >> b >> c >> d >> w >> x >> y >> z;
+    int n = a + b + c + d;
+    int m = w + x + y + z;
+    if (n == m)pnl("Tie");
+    else if (n > m)pnl("Gunnar");
+    else pnl("Emma");
 }
 
 int main() {

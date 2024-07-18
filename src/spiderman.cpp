@@ -89,21 +89,41 @@ inline void p(stack<T> s) {
 }
 
 inline void solve() {
-    int n, x;
+    int n;
     cin >> n;
-    vector<bool> arr(13);
-    forloop(0, n) {
-        cin >> x;
-        arr[x] = true;
+    read(n);
+    map<int, map<int, ll>> dp, ndp;
+    vi post(n);
+    post.back() = arr.back();
+    for (int i = n - 2; i > 0; i--)post[i] = post[i + 1] + arr[i];
+    dp[arr[0]][arr[0]] = 1;
+    for (int i = 1; i < n; i++) {
+        for (auto [x, m]: dp) {
+            if (x > post[i])break;
+            int up = x + arr[i];
+            pair<int, ll> p = *m.begin();
+            ndp[up][max(p.first, up)] = p.second | (1ll << i);
+            if (arr[i] <= x)ndp[x - arr[i]][p.first] = p.second;
+        }
+        dp.clear();
+        swap(dp, ndp);
     }
-    double res = 0;
-    for (int i = 1; i <= 6; i++)for (int j = 1; j <= 6; j++)if (arr[i + j])res++;
-    pnl(res / 36);
+    if (!dp.contains(0)) {
+        pnl("IMPOSSIBLE");
+        return;
+    }
+    string res;
+    ll order = dp[0].begin()->second;
+    for (int i = 0; i < n; i++) {
+        if ((order >> i) & 1)res.pb('U');
+        else res.pb('D');
+    }
+    pnl(res);
 }
 
 int main() {
     int t = 1;
-    //cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }

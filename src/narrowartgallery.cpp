@@ -88,23 +88,42 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
+bool c = true;
+
 inline void solve() {
-    int n, x;
-    cin >> n;
-    vector<bool> arr(13);
-    forloop(0, n) {
-        cin >> x;
-        arr[x] = true;
+    int n, k;
+    cin >> n >> k;
+    if ((n | k) == 0) {
+        c = false;
+        return;
     }
-    double res = 0;
-    for (int i = 1; i <= 6; i++)for (int j = 1; j <= 6; j++)if (arr[i + j])res++;
-    pnl(res / 36);
+    vector<vi> arr(n, vi(2));
+    forloop(0, n)cin >> arr[i][0] >> arr[i][1];
+    vector<vector<vi>> dp(k + 1, vector<vi>(n, vi(2)));
+    dp[0][0][0] = dp[0][0][1] = arr[0][0] + arr[0][1];
+    if (k > 0) {
+        dp[1][0][0] = arr[0][0];
+        dp[1][0][1] = arr[0][1];
+    }
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j <= min(i + 1, k - 1); j++) {
+            dp[j + 1][i + 1][0] = max(dp[j + 1][i + 1][0], dp[j][i][0] + arr[i + 1][0]);
+            dp[j + 1][i + 1][1] = max(dp[j + 1][i + 1][1], dp[j][i][1] + arr[i + 1][1]);
+            int x = max(dp[j][i][0], dp[j][i][1]) + arr[i + 1][0] + arr[i + 1][1];
+            dp[j][i + 1][0] = max(dp[j][i + 1][0], x);
+            dp[j][i + 1][1] = max(dp[j][i + 1][1], x);
+        }
+        if (i + 1 >= k)dp[k][i + 1][0] = dp[k][i + 1][1] = max(max(dp[k][i + 1][0], dp[k][i + 1][1]),
+                                                               max(dp[k][i][0], dp[k][i][1]) + arr[i + 1][0] +
+                                                               arr[i + 1][1]);
+    }
+    pnl(max(dp[k][n - 1][0], dp[k][n - 1][1]));
 }
 
 int main() {
     int t = 1;
     //cin >> t;
-    while (t--) {
+    while (c) {
         solve();
     }
     return 0;

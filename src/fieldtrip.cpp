@@ -4,13 +4,13 @@ using namespace std;
 typedef vector<int> vi;
 typedef vector<double> vd;
 typedef vector<bool> vb;
-typedef vector<string> vs;
+typedef vector <string> vs;
 typedef vector<char> vc;
 typedef long long ll;
-typedef vector<ll> vl;
+typedef vector <ll> vl;
 typedef pair<int, int> pii;
 typedef pair<double, double> pdd;
-typedef pair<ll, ll> pll;
+typedef pair <ll, ll> pll;
 const int inf = 1e9;
 const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
@@ -22,7 +22,7 @@ const int mod = 1e9 + 7;
 #define pb push_back
 
 template<typename T, typename U>
-inline void p(pair<T, U> p) { cout << '(' << p.first << ',' << p.second << ") "; }
+inline void p(pair <T, U> p) { cout << '(' << p.first << ',' << p.second << ") "; }
 
 template<typename T>
 inline void p(T t) { cout << t << ' '; }
@@ -34,43 +34,43 @@ inline void pnl(T t) {
 }
 
 template<typename T>
-inline void p(vector<T> v) {
+inline void p(vector <T> v) {
     for (auto i: v) p(i);
     cout << nl;
 }
 
 template<typename T>
-inline void p(vector<vector<T>> v) {
+inline void p(vector <vector<T>> v) {
     for (auto row: v) p(row);
 }
 
 template<typename T>
-inline void p(set<T> s) {
+inline void p(set <T> s) {
     for (auto t: s)p(t);
     cout << nl;
 }
 
 template<typename T>
-inline void p(unordered_set<T> s) {
+inline void p(unordered_set <T> s) {
     for (auto t: s)p(t);
     cout << nl;
 }
 
 template<typename T, typename U>
-inline void p(map<T, U> m) {
+inline void p(map <T, U> m) {
     for (auto t: m)p(t);
     cout << nl;
 }
 
 template<typename T, typename U>
-inline void p(unordered_map<T, U> m) {
+inline void p(unordered_map <T, U> m) {
     for (auto t: m)p(t);
     cout << nl;
 }
 
 template<typename T>
-inline void p(queue<T> q) {
-    queue<T> copy(q);
+inline void p(queue <T> q) {
+    queue <T> copy(q);
     while (!copy.empty()) {
         p(copy.front());
         copy.pop();
@@ -79,8 +79,8 @@ inline void p(queue<T> q) {
 }
 
 template<typename T>
-inline void p(stack<T> s) {
-    stack<T> copy(s);
+inline void p(stack <T> s) {
+    stack <T> copy(s);
     while (!copy.empty()) {
         p(copy.top());
         copy.pop();
@@ -89,16 +89,28 @@ inline void p(stack<T> s) {
 }
 
 inline void solve() {
-    int n, x;
+    int n;
     cin >> n;
-    vector<bool> arr(13);
-    forloop(0, n) {
-        cin >> x;
-        arr[x] = true;
+    read(n);
+    vi pre(n);
+    pre[0] = arr[0];
+    forloop(1, n)pre[i] = pre[i - 1] + arr[i];
+    if (pre.back() % 3 != 0) {
+        pnl(-1);
+        return;
     }
-    double res = 0;
-    for (int i = 1; i <= 6; i++)for (int j = 1; j <= 6; j++)if (arr[i + j])res++;
-    pnl(res / 36);
+    int tot = pre.back();
+    auto it = lower_bound(all(pre), tot / 3);
+    if (*it * 3 != tot) {
+        pnl(-1);
+        return;
+    }
+    auto it2 = lower_bound(all(pre), tot / 3 * 2);
+    if (*it2 * 3 / 2 != tot) {
+        pnl(-1);
+        return;
+    }
+    cout << it - pre.begin() + 1 << ' ' << it2 - pre.begin() + 1;
 }
 
 int main() {
