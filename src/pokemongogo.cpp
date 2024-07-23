@@ -88,30 +88,43 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
-    int n, c, x, y;
-    cin >> n >> c;
-    map<pii, int> dp, ndp;
-    dp[pair(0, 0)] = 0;
-    forloop(0, n) {
-        cin >> x >> y;
-        for (auto [p, h]: dp) {
-            int w = p.first, curr = p.second;
-            if (w + x <= c) {
-                pii next = pair(w + x, max(curr, y));
-                if (ndp.contains(next))ndp[next] = min(ndp[next], h);
-                else ndp[next] = h;
-            }
-            pii next = pair(x, y);
-            if (ndp.contains(next))ndp[next] = min(ndp[next], curr + h);
-            else ndp[next] = curr + h;
-        }
-        dp.clear();
-        swap(dp, ndp);
-    }
+vector<vi> dp;
+int n, b, done;
+vector<vector<pair<int, pii>>> arr;
+
+inline int dist(pii p1, pii p2) { return abs(p1.first - p2.first) + abs(p1.second - p2.second); }
+
+int f(int i, int mask, pii curr) {
+    if (mask == done)return dist(pair(0, 0), curr);
+    if (dp[i][mask] != -1)return dp[i][mask];
     int res = INT_MAX;
-    for (auto [p, h]: dp)res = min(res, p.second + h);
-    p(res);
+    for (int j = 0; j < n; j++)
+        if (((mask >> j) & 1) == 0) {
+            for (auto [k, next]: arr[j]) {
+                res = min(res, dist(next, curr) + f(k, mask | 1 << j, next));
+            }
+        }
+    return dp[i][mask] = res;
+}
+
+inline void solve() {
+    cin >> b;
+    int x, y, counter = 0, stations = 0;
+    string s;
+    unordered_map<string, int> m;
+    arr.resize(15);
+    forloop(0, b) {
+        cin >> x >> y >> s;
+        if (m.contains(s))arr[m[s]].emplace_back(stations++, pair(x, y));
+        else {
+            arr[counter].emplace_back(stations++, pair(x, y));
+            m[s] = counter++;
+        }
+    }
+    n = sz(m);
+    done = (1 << n) - 1;
+    dp.assign(b + 1, vi(1 << n, -1));
+    p(f(b, 0, pair(0, 0)));
 }
 
 int main() {

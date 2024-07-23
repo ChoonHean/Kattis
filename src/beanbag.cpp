@@ -88,30 +88,44 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
-    int n, c, x, y;
-    cin >> n >> c;
-    map<pii, int> dp, ndp;
-    dp[pair(0, 0)] = 0;
-    forloop(0, n) {
-        cin >> x >> y;
-        for (auto [p, h]: dp) {
-            int w = p.first, curr = p.second;
-            if (w + x <= c) {
-                pii next = pair(w + x, max(curr, y));
-                if (ndp.contains(next))ndp[next] = min(ndp[next], h);
-                else ndp[next] = h;
-            }
-            pii next = pair(x, y);
-            if (ndp.contains(next))ndp[next] = min(ndp[next], curr + h);
-            else ndp[next] = curr + h;
-        }
-        dp.clear();
-        swap(dp, ndp);
+vector<vi> dp;
+vi arr;
+vi types;
+int n, b;
+
+int f(int i, int mask) {
+    if (dp[i][mask] != -1)return dp[i][mask];
+    if (i == n) {
+        int res = 0;
+        for (int j = 0; j < b; j++)if (((mask >> j) & 1) == 0)res += types[j];
+        return dp[i][mask] = res;
     }
-    int res = INT_MAX;
-    for (auto [p, h]: dp)res = min(res, p.second + h);
-    p(res);
+    int res = 0;
+    for (int j = 0; j < b; j++)if ((mask >> j) & (arr[i] >> j) & 1)return f(i + 1, mask);
+    for (int j = 0; j < b; j++)if ((arr[i] >> j) & 1)res = max(res, f(i + 1, mask | 1 << j));
+    return dp[i][mask] = res;
+}
+
+inline void solve() {
+    int t, x;
+    cin >> b;
+    arr.resize(b);
+    forloop(0, b) {
+        cin >> x;
+        types.pb(x);
+    }
+    cin >> n;
+    arr.resize(n);
+    forloop(0, n) {
+        cin >> t;
+        while (t--) {
+            cin >> x;
+            x--;
+            arr[i] |= 1 << x;
+        }
+    }
+    dp.assign(n + 1, vi(1 << b, -1));
+    p(f(0, 0));
 }
 
 int main() {
