@@ -95,29 +95,21 @@ inline void p(stack<T> s) {
 }
 
 void solve() {
-    string s, name;
-    int n, val;
-    cin >> n >> name;
-    unordered_map<string, int> dict;
-    range(0, n) {
-        cin >> s >> val;
-        dict[s] = val;
-    }
-    map<int, ll> dp;
-    dp[0] = 1;
-    while (dp.begin()->first < sz(name) && !dp.empty()) {
-        int i = dp.begin()->first;
-        ll num = dp.begin()->second;
-        if (num != 0) {
-            string curr;
-            for (int j = i; j < min(i + 32, sz(name)); j++) {
-                curr.pb(name[j]);
-                dp[j + 1] += (num * dict[curr]) % mod;
-            }
+    int n, m;
+    cin >> n >> m;
+    double curr;
+    vd dp(n + 1), ndp(n + 1);
+    dp.back() = 1;
+    range(0, n + m - 1) {
+        cin >> curr;
+        ndp[0] = dp[0];
+        for (int j = 1; j <= n; j++) {
+            ndp[j - 1] += dp[j] * (1 - curr);
+            ndp[j] = dp[j] * curr;
         }
-        dp.erase(dp.begin());
+        swap(dp, ndp);
     }
-    p(dp[sz(name)] % mod);
+    cout << fixed << setprecision(6) << 1 - dp[0];
 }
 
 int main() {

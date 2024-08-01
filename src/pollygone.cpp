@@ -16,10 +16,13 @@ const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
 #define readarr(n, arr) for(int i=0;i<n;i++)cin>>arr[i]
-#define range(a, n) for(int i=a;i<n;i++)
+#define forloop(a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define pb push_back
+
+template<typename T, typename U>
+inline void p(pair<T, U> p) { cout << '(' << p.first << ',' << p.second << ") "; }
 
 template<typename T>
 inline void p(T t) { cout << t << ' '; }
@@ -28,15 +31,6 @@ template<typename T>
 inline void pnl(T t) {
     p(t);
     cout << nl;
-}
-
-template<typename T, typename U>
-inline void p(pair<T, U> pa) {
-    cout << '(';
-    p(pa.first);
-    cout << ',';
-    p(pa.second);
-    cout << ") ";
 }
 
 template<typename T>
@@ -94,30 +88,45 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-void solve() {
-    string s, name;
-    int n, val;
-    cin >> n >> name;
-    unordered_map<string, int> dict;
-    range(0, n) {
-        cin >> s >> val;
-        dict[s] = val;
+inline void solve() {
+    int n, p;
+    string s;
+    cin >> n >> s;
+    if (stod(s) == 0) {
+        cout << 0;
+        return;
     }
-    map<int, ll> dp;
-    dp[0] = 1;
-    while (dp.begin()->first < sz(name) && !dp.empty()) {
-        int i = dp.begin()->first;
-        ll num = dp.begin()->second;
-        if (num != 0) {
-            string curr;
-            for (int j = i; j < min(i + 32, sz(name)); j++) {
-                curr.pb(name[j]);
-                dp[j + 1] += (num * dict[curr]) % mod;
-            }
+    s = s.substr(s.find('.') + 1);
+    while (sz(s) < 4)s.pb('0');
+    p = stoi(s);
+    if (p == 0) {
+        int res = 0;
+        forloop(0, n) {
+            cin >> p;
+            res += p;
+            cin >> s;
         }
-        dp.erase(dp.begin());
+        cout << res;
+        return;
     }
-    p(dp[sz(name)] % mod);
+    vector<pii> arr(n);
+    forloop(0, n) {
+        cin >> arr[i].first >> s;
+        if (stod(s) == 0)continue;
+        s = s.substr(s.find('.') + 1);
+        while (sz(s) < 4)s.pb('0');
+        arr[i].second = stoi(s);
+    }
+    vi dp(1e5 + 1, inf);
+    dp[0] = 0;
+    for (auto [cost, val]: arr) {
+        for (int i = 1e5 - val; i >= 0; i--) {
+            dp[i + val] = min(dp[i + val], dp[i] + cost);
+        }
+    }
+    int res = INT_MAX;
+    for (int i = p; i <= 1e5; i++)res = min(res, dp[i]);
+    cout << res;
 }
 
 int main() {

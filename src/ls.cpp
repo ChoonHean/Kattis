@@ -95,29 +95,40 @@ inline void p(stack<T> s) {
 }
 
 void solve() {
-    string s, name;
-    int n, val;
-    cin >> n >> name;
-    unordered_map<string, int> dict;
-    range(0, n) {
-        cin >> s >> val;
-        dict[s] = val;
-    }
-    map<int, ll> dp;
-    dp[0] = 1;
-    while (dp.begin()->first < sz(name) && !dp.empty()) {
-        int i = dp.begin()->first;
-        ll num = dp.begin()->second;
-        if (num != 0) {
-            string curr;
-            for (int j = i; j < min(i + 32, sz(name)); j++) {
-                curr.pb(name[j]);
-                dp[j + 1] += (num * dict[curr]) % mod;
+    string s, p;
+    int n;
+    cin >> p >> n;
+    while (n--) {
+        cin >> s;
+        if (p[0] != '*')if (p[0] != s[0])continue;
+        vector<vb> dp(sz(s), vb(sz(p)));
+        dp[0][0] = 1;
+        if (p[0] == '*') {
+            range(1, sz(s))dp[i][0] = 1;
+        }
+        bool can = true;
+        for (int j = 1; j < sz(p); j++) {
+            if (p[j] == '*') {
+                dp[0][j] = dp[0][j - 1];
+            } else {
+                if (p[j] == s[0]) {
+                    if (!can)break;
+                    dp[0][j] = dp[0][j - 1];
+                    can = false;
+                }
             }
         }
-        dp.erase(dp.begin());
+        range(1, sz(s)) {
+            for (int j = 1; j < sz(p); j++) {
+                if (p[j] == '*') {
+                    dp[i][j] = dp[i][j - 1] | dp[i - 1][j];
+                } else {
+                    dp[i][j] = dp[i - 1][j - 1] & (s[i] == p[j]);
+                }
+            }
+        }
+        if (dp.back().back())pnl(s);
     }
-    p(dp[sz(name)] % mod);
 }
 
 int main() {
