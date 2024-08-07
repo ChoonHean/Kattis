@@ -95,26 +95,26 @@ inline void p(stack<T> s) {
 }
 
 inline void solve() {
-    int d,x,y;
-    cin>>d;
-    vector<pii>arr;
-    while(cin>>x){
-        cin>>y;
-        arr.pb(pair(x,y));
+    int n, t;
+    cin >> t >> n;
+    read(n);
+    vi dp(2e5 + 1, inf);
+    for (int i: arr) {
+        for (int j = t - 1; j > 0; j--)dp[j + i] = min(dp[j + i], dp[j] + 1);
+        dp[i] = 1;
     }
-    int n=sz(arr);
-    vector<unordered_map<int,int>>dp(n);
-    unordered_map<int,int>res;
-    rep(0,n){
-        if(arr[i].first>100)break;
-        dp[i][100-arr[i].first]=0;
+    rep(t, 2e5) {
+        if (dp[i] != inf) {
+            p(i);
+            pnl(dp[i]);
+            return;
+        }
     }
-
 }
 
 int main() {
     int t = 1;
-    //cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }

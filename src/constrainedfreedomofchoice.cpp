@@ -94,28 +94,43 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
-    int d,x,y;
-    cin>>d;
-    vector<pii>arr;
-    while(cin>>x){
-        cin>>y;
-        arr.pb(pair(x,y));
-    }
-    int n=sz(arr);
-    vector<unordered_map<int,int>>dp(n);
-    unordered_map<int,int>res;
-    rep(0,n){
-        if(arr[i].first>100)break;
-        dp[i][100-arr[i].first]=0;
-    }
+bool _ = true;
+int r, c;
+vs grid(10);
+vector<vector<vi>> dp;
 
+int f(int x, int y, int prev) {
+    if (dp[x][y][prev] != -1)return dp[x][y][prev];
+    if (grid[x][y] == '#')return dp[x][y][prev] = 0;
+    int res = 0;
+    if (y < c - 1)res += f(x, y + 1, 2);
+    if (prev == 0) {
+        if (x > 0)res += f(x - 1, y, 0);
+    } else if (prev == 1) {
+        if (x < r - 1)res += f(x + 1, y, 1);
+    } else {
+        if (x > 0)res += f(x - 1, y, 0);
+        if (x < r - 1)res += f(x + 1, y, 1);
+    }
+    return dp[x][y][prev] = res;
+}
+
+inline void solve() {
+    cin >> r >> c;
+    if ((r | c) == 0) {
+        _ = false;
+        return;
+    }
+    rep(0, r)cin >> grid[i];
+    dp.assign(r, vector<vi>(c, vi(3, -1)));
+    dp[0][c - 1].assign(3, 1);
+    pnl(f(r - 1, 0, 2));
 }
 
 int main() {
     int t = 1;
     //cin >> t;
-    while (t--) {
+    while (_) {
         solve();
     }
     return 0;
