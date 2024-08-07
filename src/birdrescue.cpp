@@ -88,26 +88,52 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
-    int n;
-    cin >> n;
-    read(n);
-    int res = 0;
-    forloop(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
-        }
-        res = max(res, sz(tree));
+inline int LSOne(int i) { return i & -i; }
+
+struct FT {                              // index 0 is not used
+    vi ft;                                        // internal FT is an array
+    FT(int m) { ft.assign(m + 1, 0); }      // create an empty FT
+
+    inline int rsq(int j) {                                // returns RSQ(1, j)
+        int sum = 0;
+        for (; j; j -= LSOne(j))
+            sum += ft[j];
+        return sum;
     }
-    p(res);
+
+    // updates value of the i-th element by v (v can be +ve/inc or -ve/dec)
+    inline void update(int i, int v) {
+        for (; i < (int) ft.size(); i += LSOne(i))
+            ft[i] += v;
+    }
+};
+
+inline void solve() {
+    int n, q, a, b, x1, x2, y1, y2, mn, mx;
+    cin >> n >> q >> a >> b;
+    FT ft(2e6);
+    forloop(0, n) {
+        cin >> x1 >> y1 >> x2 >> y2;
+        if (x1 > x2)swap(x1, x2);
+        if (y1 > y2)swap(y1, y2);
+        int x3 = abs(x1 - a);
+        int x4 = abs(x2 - a);
+        int y3 = abs(y1 - b);
+        int y4 = abs(y2 - b);
+        int d = x3 + y3, f = x3 + y4, g = x4 + y3, h = x4 + y4;
+        if (x1 <= a && a <= x2) {
+            if (y1 <= b && b <= y2)mn = 0;
+            else mn = min(y3, y4);
+        } else if (y1 <= b && b <= y2)mn = min(x3, x4);
+        else mn = min(min(d, f), min(g, h));
+        mx = max(max(d, f), max(g, h));
+        ft.update(mn + 1, 1);
+        ft.update(mx + 2, -1);
+    }
+    while (q--) {
+        cin >> a;
+        pnl(ft.rsq(a + 1));
+    }
 }
 
 int main() {
