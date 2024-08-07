@@ -94,26 +94,50 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
+void solve() {
     int n;
     cin >> n;
-    read(n);
-    int res = 0;
+    unordered_set<string> words;
+    string s, curr;
     range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
-        }
-        res = max(res, sz(tree));
+        cin >> s;
+        words.insert(s);
     }
-    p(res);
+    getline(cin, s);
+    for (int _ = 0; _ < 3; _++) {
+        getline(cin, s);
+        vector<set<int>> dp(sz(s));
+        curr = "";
+        for (int i = 0; i < min(7, sz(s)); i++) {
+            if (s[i] == ' ')break;
+            curr += s[i];
+            if (words.contains(curr))dp[i].insert(1);
+        }
+        for (int i = 0; i < sz(s) - 1; i++) {
+            if (s[i] == ' ')dp[i] = dp[i - 1];
+            if (dp[i].empty())continue;
+            curr = "";
+            for (int j = i + 1; j < min(i + 8, sz(s)); j++) {
+                if (s[j] == ' ')break;
+                curr += s[j];
+                if (words.contains(curr)) {
+                    for (int k: dp[i])dp[j].insert(k + 1);
+                }
+            }
+        }
+        if (_ & 1) {
+            if (!dp.back().contains(7)) {
+                cout << "come back next year";
+                return;
+            }
+        } else {
+            if (!dp.back().contains(5)) {
+                cout << "come back next year";
+                return;
+            }
+        }
+    }
+    cout << "haiku";
 }
 
 int main() {

@@ -16,10 +16,13 @@ const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
 #define readarr(n, arr) for(int i=0;i<n;i++)cin>>arr[i]
-#define range(a, n) for(int i=a;i<n;i++)
+#define forloop(a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define pb push_back
+
+template<typename T, typename U>
+inline void p(pair<T, U> p) { cout << '(' << p.first << ',' << p.second << ") "; }
 
 template<typename T>
 inline void p(T t) { cout << t << ' '; }
@@ -28,15 +31,6 @@ template<typename T>
 inline void pnl(T t) {
     p(t);
     cout << nl;
-}
-
-template<typename T, typename U>
-inline void p(pair<T, U> pa) {
-    cout << '(';
-    p(pa.first);
-    cout << ',';
-    p(pa.second);
-    cout << ") ";
 }
 
 template<typename T>
@@ -95,25 +89,16 @@ inline void p(stack<T> s) {
 }
 
 inline void solve() {
-    int n;
+    int n, x;
     cin >> n;
-    read(n);
-    int res = 0;
-    range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
-        }
-        res = max(res, sz(tree));
+    vector<bool> arr(13);
+    forloop(0, n) {
+        cin >> x;
+        arr[x] = true;
     }
-    p(res);
+    double res = 0;
+    for (int i = 1; i <= 6; i++)for (int j = 1; j <= 6; j++)if (arr[i + j])res++;
+    pnl(res / 36);
 }
 
 int main() {

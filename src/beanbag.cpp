@@ -16,10 +16,13 @@ const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
 #define readarr(n, arr) for(int i=0;i<n;i++)cin>>arr[i]
-#define range(a, n) for(int i=a;i<n;i++)
+#define forloop(a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define pb push_back
+
+template<typename T, typename U>
+inline void p(pair<T, U> p) { cout << '(' << p.first << ',' << p.second << ") "; }
 
 template<typename T>
 inline void p(T t) { cout << t << ' '; }
@@ -28,15 +31,6 @@ template<typename T>
 inline void pnl(T t) {
     p(t);
     cout << nl;
-}
-
-template<typename T, typename U>
-inline void p(pair<T, U> pa) {
-    cout << '(';
-    p(pa.first);
-    cout << ',';
-    p(pa.second);
-    cout << ") ";
 }
 
 template<typename T>
@@ -94,26 +88,44 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
-    int n;
-    cin >> n;
-    read(n);
-    int res = 0;
-    range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
-        }
-        res = max(res, sz(tree));
+vector<vi> dp;
+vi arr;
+vi types;
+int n, b;
+
+int f(int i, int mask) {
+    if (dp[i][mask] != -1)return dp[i][mask];
+    if (i == n) {
+        int res = 0;
+        for (int j = 0; j < b; j++)if (((mask >> j) & 1) == 0)res += types[j];
+        return dp[i][mask] = res;
     }
-    p(res);
+    int res = 0;
+    for (int j = 0; j < b; j++)if ((mask >> j) & (arr[i] >> j) & 1)return f(i + 1, mask);
+    for (int j = 0; j < b; j++)if ((arr[i] >> j) & 1)res = max(res, f(i + 1, mask | 1 << j));
+    return dp[i][mask] = res;
+}
+
+inline void solve() {
+    int t, x;
+    cin >> b;
+    arr.resize(b);
+    forloop(0, b) {
+        cin >> x;
+        types.pb(x);
+    }
+    cin >> n;
+    arr.resize(n);
+    forloop(0, n) {
+        cin >> t;
+        while (t--) {
+            cin >> x;
+            x--;
+            arr[i] |= 1 << x;
+        }
+    }
+    dp.assign(n + 1, vi(1 << b, -1));
+    p(f(0, 0));
 }
 
 int main() {

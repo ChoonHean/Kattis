@@ -4,22 +4,25 @@ using namespace std;
 typedef vector<int> vi;
 typedef vector<double> vd;
 typedef vector<bool> vb;
-typedef vector<string> vs;
+typedef vector <string> vs;
 typedef vector<char> vc;
 typedef long long ll;
-typedef vector<ll> vl;
+typedef vector <ll> vl;
 typedef pair<int, int> pii;
 typedef pair<double, double> pdd;
-typedef pair<ll, ll> pll;
+typedef pair <ll, ll> pll;
 const int inf = 1e9;
 const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
 #define readarr(n, arr) for(int i=0;i<n;i++)cin>>arr[i]
-#define range(a, n) for(int i=a;i<n;i++)
+#define forloop(a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define pb push_back
+
+template<typename T, typename U>
+inline void p(pair <T, U> p) { cout << '(' << p.first << ',' << p.second << ") "; }
 
 template<typename T>
 inline void p(T t) { cout << t << ' '; }
@@ -30,53 +33,44 @@ inline void pnl(T t) {
     cout << nl;
 }
 
-template<typename T, typename U>
-inline void p(pair<T, U> pa) {
-    cout << '(';
-    p(pa.first);
-    cout << ',';
-    p(pa.second);
-    cout << ") ";
-}
-
 template<typename T>
-inline void p(vector<T> v) {
+inline void p(vector <T> v) {
     for (auto i: v) p(i);
     cout << nl;
 }
 
 template<typename T>
-inline void p(vector<vector<T>> v) {
+inline void p(vector <vector<T>> v) {
     for (auto row: v) p(row);
 }
 
 template<typename T>
-inline void p(set<T> s) {
+inline void p(set <T> s) {
     for (auto t: s)p(t);
     cout << nl;
 }
 
 template<typename T>
-inline void p(unordered_set<T> s) {
+inline void p(unordered_set <T> s) {
     for (auto t: s)p(t);
     cout << nl;
 }
 
 template<typename T, typename U>
-inline void p(map<T, U> m) {
+inline void p(map <T, U> m) {
     for (auto t: m)p(t);
     cout << nl;
 }
 
 template<typename T, typename U>
-inline void p(unordered_map<T, U> m) {
+inline void p(unordered_map <T, U> m) {
     for (auto t: m)p(t);
     cout << nl;
 }
 
 template<typename T>
-inline void p(queue<T> q) {
-    queue<T> copy(q);
+inline void p(queue <T> q) {
+    queue <T> copy(q);
     while (!copy.empty()) {
         p(copy.front());
         copy.pop();
@@ -85,8 +79,8 @@ inline void p(queue<T> q) {
 }
 
 template<typename T>
-inline void p(stack<T> s) {
-    stack<T> copy(s);
+inline void p(stack <T> s) {
+    stack <T> copy(s);
     while (!copy.empty()) {
         p(copy.top());
         copy.pop();
@@ -95,25 +89,19 @@ inline void p(stack<T> s) {
 }
 
 inline void solve() {
-    int n;
-    cin >> n;
-    read(n);
-    int res = 0;
-    range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
-        }
-        res = max(res, sz(tree));
+    int n, m, res=0,curr=0;
+    cin >> n >> m;
+    vi arr(n);
+    forloop(0,n){
+        cin>>arr[i];
+        arr[i]-=m;
     }
-    p(res);
+    forloop(0,n){
+        curr+=arr[i];
+        if(curr<0)curr=0;
+        else res=max(curr,res);
+    }
+    pnl(res);
 }
 
 int main() {

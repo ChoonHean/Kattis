@@ -94,26 +94,22 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
-    int n;
-    cin >> n;
-    read(n);
-    int res = 0;
-    range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
+void solve() {
+    int n, m;
+    cin >> n >> m;
+    double curr;
+    vd dp(n + 1), ndp(n + 1);
+    dp.back() = 1;
+    range(0, n + m - 1) {
+        cin >> curr;
+        ndp[0] = dp[0];
+        for (int j = 1; j <= n; j++) {
+            ndp[j - 1] += dp[j] * (1 - curr);
+            ndp[j] = dp[j] * curr;
         }
-        res = max(res, sz(tree));
+        swap(dp, ndp);
     }
-    p(res);
+    cout << fixed << setprecision(6) << 1 - dp[0];
 }
 
 int main() {

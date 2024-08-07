@@ -12,7 +12,7 @@ typedef pair<int, int> pii;
 typedef pair<double, double> pdd;
 typedef pair<ll, ll> pll;
 const int inf = 1e9;
-const int mod = 1e9 + 7;
+int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
 #define readarr(n, arr) for(int i=0;i<n;i++)cin>>arr[i]
@@ -94,26 +94,47 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
-    int n;
-    cin >> n;
-    read(n);
-    int res = 0;
-    range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
-        }
-        res = max(res, sz(tree));
+void solve() {
+    mod = 1000003;
+    int n, m, init, x = -1, y = -1;
+    cin >> n >> m >> init;
+    vs arr(n);
+    for (int i = 0; i < n; i++)cin >> arr[i];
+    for (int i = 0; i < n && x == -1; i++) {
+        for (int j = 0; j < m; j++)
+            if (arr[i][j] == '@') {
+                x = i;
+                y = j;
+                break;
+            }
     }
-    p(res);
+    vector<vi> dp(n, vi(m, -1));
+    dp.back()[init] = 1;
+    for (int i = n - 1; i >= max(1, x); i--) {
+        for (int j = 0; j < m; j++) {
+            if (dp[i][j] == -1)continue;
+            if (arr[i][j] == '>')dp[i][j + 1] = (max(dp[i][j + 1], 0) + dp[i][j]) % mod;
+        }
+        for (int j = m - 1; j > 0; j--) {
+            if (dp[i][j] == -1)continue;
+            if (arr[i][j] == '<')dp[i][j - 1] = (max(dp[i][j - 1], 0) + dp[i][j]) % mod;
+        }
+        for (int j = 0; j < m; j++) {
+            if (dp[i][j] == -1)continue;
+            if (arr[i][j] != '#')dp[i - 1][j] = dp[i][j];
+        }
+    }
+    if (x == 0) {
+        for (int j = 0; j < m; j++) {
+            if (dp[0][j] == -1)continue;
+            if (arr[0][j] == '>')dp[0][j + 1] = (max(dp[0][j + 1], 0) + dp[0][j]) % mod;
+        }
+        for (int j = m - 1; j > 0; j--) {
+            if (dp[0][j] == -1)continue;
+            if (arr[0][j] == '<')dp[0][j - 1] = (max(dp[0][j - 1], 0) + dp[0][j]) % mod;
+        }
+    }
+    dp[x][y] == -1 ? pnl("begin repairs") : pnl(dp[x][y]);
 }
 
 int main() {

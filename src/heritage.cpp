@@ -94,26 +94,30 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
-    int n;
-    cin >> n;
-    read(n);
-    int res = 0;
+void solve() {
+    string s, name;
+    int n, val;
+    cin >> n >> name;
+    unordered_map<string, int> dict;
     range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
-        }
-        res = max(res, sz(tree));
+        cin >> s >> val;
+        dict[s] = val;
     }
-    p(res);
+    map<int, ll> dp;
+    dp[0] = 1;
+    while (dp.begin()->first < sz(name) && !dp.empty()) {
+        int i = dp.begin()->first;
+        ll num = dp.begin()->second;
+        if (num != 0) {
+            string curr;
+            for (int j = i; j < min(i + 32, sz(name)); j++) {
+                curr.pb(name[j]);
+                dp[j + 1] += (num * dict[curr]) % mod;
+            }
+        }
+        dp.erase(dp.begin());
+    }
+    p(dp[sz(name)] % mod);
 }
 
 int main() {

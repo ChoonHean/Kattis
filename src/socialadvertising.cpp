@@ -94,31 +94,38 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
-    int n;
+void solve() {
+    int n, t, v;
     cin >> n;
-    read(n);
-    int res = 0;
+    bitset<20> orig, visited;
+    range(0, n)orig.set(i);
+    vector<vi> adj(n);
     range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
+        cin >> t;
+        while (t--) {
+            cin >> v;
+            if (--v > i) {
+                adj[i].pb(v);
+                adj[v].pb(i);
+            }
         }
-        res = max(res, sz(tree));
     }
-    p(res);
+    int res = n;
+    range(1, 1 << n) {
+        visited |= orig;
+        for (int j = 0; j < n; j++)
+            if ((i >> j) & 1) {
+                visited.reset(j);
+                for (int k: adj[j])visited.reset(k);
+            }
+        if (visited.none())res = min(res, __builtin_popcount(i));
+    }
+    pnl(res);
 }
 
 int main() {
     int t = 1;
-    //cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }

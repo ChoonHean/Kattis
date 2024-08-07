@@ -16,10 +16,13 @@ const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
 #define readarr(n, arr) for(int i=0;i<n;i++)cin>>arr[i]
-#define range(a, n) for(int i=a;i<n;i++)
+#define forloop(a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define pb push_back
+
+template<typename T, typename U>
+inline void p(pair<T, U> p) { cout << '(' << p.first << ',' << p.second << ") "; }
 
 template<typename T>
 inline void p(T t) { cout << t << ' '; }
@@ -28,15 +31,6 @@ template<typename T>
 inline void pnl(T t) {
     p(t);
     cout << nl;
-}
-
-template<typename T, typename U>
-inline void p(pair<T, U> pa) {
-    cout << '(';
-    p(pa.first);
-    cout << ',';
-    p(pa.second);
-    cout << ") ";
 }
 
 template<typename T>
@@ -94,32 +88,42 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
+bool c = true;
+
 inline void solve() {
-    int n;
-    cin >> n;
-    read(n);
-    int res = 0;
-    range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
-        }
-        res = max(res, sz(tree));
+    int n, k;
+    cin >> n >> k;
+    if ((n | k) == 0) {
+        c = false;
+        return;
     }
-    p(res);
+    vector<vi> arr(n, vi(2));
+    forloop(0, n)cin >> arr[i][0] >> arr[i][1];
+    vector<vector<vi>> dp(k + 1, vector<vi>(n, vi(2)));
+    dp[0][0][0] = dp[0][0][1] = arr[0][0] + arr[0][1];
+    if (k > 0) {
+        dp[1][0][0] = arr[0][0];
+        dp[1][0][1] = arr[0][1];
+    }
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j <= min(i + 1, k - 1); j++) {
+            dp[j + 1][i + 1][0] = max(dp[j + 1][i + 1][0], dp[j][i][0] + arr[i + 1][0]);
+            dp[j + 1][i + 1][1] = max(dp[j + 1][i + 1][1], dp[j][i][1] + arr[i + 1][1]);
+            int x = max(dp[j][i][0], dp[j][i][1]) + arr[i + 1][0] + arr[i + 1][1];
+            dp[j][i + 1][0] = max(dp[j][i + 1][0], x);
+            dp[j][i + 1][1] = max(dp[j][i + 1][1], x);
+        }
+        if (i + 1 >= k)dp[k][i + 1][0] = dp[k][i + 1][1] = max(max(dp[k][i + 1][0], dp[k][i + 1][1]),
+                                                               max(dp[k][i][0], dp[k][i][1]) + arr[i + 1][0] +
+                                                               arr[i + 1][1]);
+    }
+    pnl(max(dp[k][n - 1][0], dp[k][n - 1][1]));
 }
 
 int main() {
     int t = 1;
     //cin >> t;
-    while (t--) {
+    while (c) {
         solve();
     }
     return 0;

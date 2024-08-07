@@ -16,10 +16,13 @@ const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
 #define readarr(n, arr) for(int i=0;i<n;i++)cin>>arr[i]
-#define range(a, n) for(int i=a;i<n;i++)
+#define forloop(a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define pb push_back
+
+template<typename T, typename U>
+inline void p(pair<T, U> p) { cout << '(' << p.first << ',' << p.second << ") "; }
 
 template<typename T>
 inline void p(T t) { cout << t << ' '; }
@@ -28,15 +31,6 @@ template<typename T>
 inline void pnl(T t) {
     p(t);
     cout << nl;
-}
-
-template<typename T, typename U>
-inline void p(pair<T, U> pa) {
-    cout << '(';
-    p(pa.first);
-    cout << ',';
-    p(pa.second);
-    cout << ") ";
 }
 
 template<typename T>
@@ -98,27 +92,38 @@ inline void solve() {
     int n;
     cin >> n;
     read(n);
-    int res = 0;
-    range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
+    map<int, map<int, ll>> dp, ndp;
+    vi post(n);
+    post.back() = arr.back();
+    for (int i = n - 2; i > 0; i--)post[i] = post[i + 1] + arr[i];
+    dp[arr[0]][arr[0]] = 1;
+    for (int i = 1; i < n; i++) {
+        for (auto [x, m]: dp) {
+            if (x > post[i])break;
+            int up = x + arr[i];
+            pair<int, ll> p = *m.begin();
+            ndp[up][max(p.first, up)] = p.second | (1ll << i);
+            if (arr[i] <= x)ndp[x - arr[i]][p.first] = p.second;
         }
-        res = max(res, sz(tree));
+        dp.clear();
+        swap(dp, ndp);
     }
-    p(res);
+    if (!dp.contains(0)) {
+        pnl("IMPOSSIBLE");
+        return;
+    }
+    string res;
+    ll order = dp[0].begin()->second;
+    for (int i = 0; i < n; i++) {
+        if ((order >> i) & 1)res.pb('U');
+        else res.pb('D');
+    }
+    pnl(res);
 }
 
 int main() {
     int t = 1;
-    //cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }

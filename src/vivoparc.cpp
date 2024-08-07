@@ -94,26 +94,49 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
+vector<set<int>> adj;
+vi arr;
+
+bool f(int i) {
+    if (arr[i]) {
+        for (int j: adj[i])if (arr[j] == arr[i])return false;
+        return true;
+    }
+    for (int a = 1; a < 5; a++) {
+        bool can = true;
+        for (int j: adj[i])if (arr[j] == a)can = false;
+        if (!can)continue;
+        arr[i] = a;
+        for (int j: adj[i]) {
+            if (!f(j)) {
+                can = false;
+                break;
+            }
+        }
+        if (can)return can;
+    }
+    arr[i] = 0;
+    return false;
+}
+
+void solve() {
     int n;
     cin >> n;
-    read(n);
-    int res = 0;
-    range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
-        }
-        res = max(res, sz(tree));
+    string s;
+    adj.resize(n);
+    arr.resize(n);
+    while (cin >> s) {
+        int pos = s.find('-');
+        int u = stoi(s.substr(0, pos)) - 1;
+        int v = stoi(s.substr(pos + 1, sz(s))) - 1;
+        adj[u].insert(v);
+        adj[v].insert(u);
     }
-    p(res);
+    f(0);
+    range(1, n + 1) {
+        p(i);
+        pnl(arr[i - 1]);
+    }
 }
 
 int main() {

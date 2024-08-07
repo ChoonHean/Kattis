@@ -16,10 +16,13 @@ const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
 #define readarr(n, arr) for(int i=0;i<n;i++)cin>>arr[i]
-#define range(a, n) for(int i=a;i<n;i++)
+#define forloop(a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define pb push_back
+
+template<typename T, typename U>
+inline void p(pair<T, U> p) { cout << '(' << p.first << ',' << p.second << ") "; }
 
 template<typename T>
 inline void p(T t) { cout << t << ' '; }
@@ -28,15 +31,6 @@ template<typename T>
 inline void pnl(T t) {
     p(t);
     cout << nl;
-}
-
-template<typename T, typename U>
-inline void p(pair<T, U> pa) {
-    cout << '(';
-    p(pa.first);
-    cout << ',';
-    p(pa.second);
-    cout << ") ";
 }
 
 template<typename T>
@@ -95,25 +89,44 @@ inline void p(stack<T> s) {
 }
 
 inline void solve() {
-    int n;
-    cin >> n;
-    read(n);
-    int res = 0;
-    range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
-        }
-        res = max(res, sz(tree));
+    int n, p;
+    string s;
+    cin >> n >> s;
+    if (stod(s) == 0) {
+        cout << 0;
+        return;
     }
-    p(res);
+    s = s.substr(s.find('.') + 1);
+    while (sz(s) < 4)s.pb('0');
+    p = stoi(s);
+    if (p == 0) {
+        int res = 0;
+        forloop(0, n) {
+            cin >> p;
+            res += p;
+            cin >> s;
+        }
+        cout << res;
+        return;
+    }
+    vector<pii> arr(n);
+    forloop(0, n) {
+        cin >> arr[i].first >> s;
+        if (stod(s) == 0)continue;
+        s = s.substr(s.find('.') + 1);
+        while (sz(s) < 4)s.pb('0');
+        arr[i].second = stoi(s);
+    }
+    vi dp(1e5 + 1, inf);
+    dp[0] = 0;
+    for (auto [cost, val]: arr) {
+        for (int i = 1e5 - val; i >= 0; i--) {
+            dp[i + val] = min(dp[i + val], dp[i] + cost);
+        }
+    }
+    int res = INT_MAX;
+    for (int i = p; i <= 1e5; i++)res = min(res, dp[i]);
+    cout << res;
 }
 
 int main() {

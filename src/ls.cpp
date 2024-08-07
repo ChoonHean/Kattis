@@ -94,26 +94,41 @@ inline void p(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
+void solve() {
+    string s, p;
     int n;
-    cin >> n;
-    read(n);
-    int res = 0;
-    range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
+    cin >> p >> n;
+    while (n--) {
+        cin >> s;
+        if (p[0] != '*')if (p[0] != s[0])continue;
+        vector<vb> dp(sz(s), vb(sz(p)));
+        dp[0][0] = 1;
+        if (p[0] == '*') {
+            range(1, sz(s))dp[i][0] = 1;
         }
-        res = max(res, sz(tree));
+        bool can = true;
+        for (int j = 1; j < sz(p); j++) {
+            if (p[j] == '*') {
+                dp[0][j] = dp[0][j - 1];
+            } else {
+                if (p[j] == s[0]) {
+                    if (!can)break;
+                    dp[0][j] = dp[0][j - 1];
+                    can = false;
+                }
+            }
+        }
+        range(1, sz(s)) {
+            for (int j = 1; j < sz(p); j++) {
+                if (p[j] == '*') {
+                    dp[i][j] = dp[i][j - 1] | dp[i - 1][j];
+                } else {
+                    dp[i][j] = dp[i - 1][j - 1] & (s[i] == p[j]);
+                }
+            }
+        }
+        if (dp.back().back())pnl(s);
     }
-    p(res);
 }
 
 int main() {
