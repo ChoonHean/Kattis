@@ -16,7 +16,7 @@ const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
 #define readarr(n, arr) for(int i=0;i<n;i++)cin>>arr[i]
-#define range(a, n) for(int i=a;i<n;i++)
+#define rep(a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define pb push_back
@@ -95,25 +95,6 @@ inline void p(stack<T> s) {
 }
 
 inline void solve() {
-    int n;
-    cin >> n;
-    read(n);
-    int res = 0;
-    range(0, n) {
-        int curr = arr[i];
-        set<int> tree;
-        tree.insert(curr);
-        for (int j = i + 1; j < n; j++) {
-            int next = arr[j];
-            auto it = tree.lower_bound(next);
-            if (next < curr) {
-                if (it != tree.begin())tree.erase(prev(it));
-            } else if (it != tree.end())tree.erase(it);
-            tree.insert(next);
-        }
-        res = max(res, sz(tree));
-    }
-    p(res);
 }
 
 int main() {
