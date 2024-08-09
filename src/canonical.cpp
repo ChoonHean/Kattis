@@ -92,23 +92,30 @@ inline void pr(stack<T> s) {
 }
 
 inline void solve() {
-    int n, m;
-    cin >> n >> m;
+    int n;
+    cin >> n;
     read(n);
-    vector<vector<vi>> dp(n + 1, vector<vi>(n + 1, vi(3)));
-    vi pre{m};
-    rep(0, n - 1)pre.pb(pre.back() * 2 / 3);
-    rep(0, n) {
-        dp[i + 1][1][0] = dp[i][0][2] + min(m, arr[i]);
-        for (int j = 0; j <= i; j++) {
-            dp[i + 1][j + 1][0] = max(dp[i + 1][j + 1][0], max(dp[i][j][0], dp[i][j][1]) + min(pre[j], arr[i]));
-            dp[i + 1][j][1] = dp[i][j + 1][0];
-            dp[i + 1][0][2] = max(dp[i + 1][0][2], dp[i][j][1]);
+    int limit = arr[n - 1] + arr[n - 2];
+    vi dp;
+    dp.reserve(limit);
+    rep(0, limit)dp.pb(i);
+    rep(1, n) {
+        for (int j = arr[i]; j < limit; j++) {
+            dp[j] = min(dp[j], dp[j - arr[i]] + 1);
         }
     }
-    int res = 0;
-    for (auto v: dp[n])res = max(res, v[0]);
-    pr(res);
+    rep(6, limit) {
+        int g = 0, curr = i;
+        for (int j = upper_bound(all(arr), i) - arr.begin() - 1; j > 0; j--) {
+            g += curr / arr[j];
+            curr %= arr[j];
+        }
+        if (g + curr != dp[i]) {
+            pr("non-canonical");
+            return;
+        }
+    }
+    pr("canonical");
 }
 
 int main() {

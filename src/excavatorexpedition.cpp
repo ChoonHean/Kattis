@@ -92,23 +92,34 @@ inline void pr(stack<T> s) {
 }
 
 inline void solve() {
-    int n, m;
-    cin >> n >> m;
-    read(n);
-    vector<vector<vi>> dp(n + 1, vector<vi>(n + 1, vi(3)));
-    vi pre{m};
-    rep(0, n - 1)pre.pb(pre.back() * 2 / 3);
-    rep(0, n) {
-        dp[i + 1][1][0] = dp[i][0][2] + min(m, arr[i]);
-        for (int j = 0; j <= i; j++) {
-            dp[i + 1][j + 1][0] = max(dp[i + 1][j + 1][0], max(dp[i][j][0], dp[i][j][1]) + min(pre[j], arr[i]));
-            dp[i + 1][j][1] = dp[i][j + 1][0];
-            dp[i + 1][0][2] = max(dp[i + 1][0][2], dp[i][j][1]);
-        }
+    int n, e, u, v;
+    string s;
+    cin >> n >> e >> s;
+    vector<vi> adj(n);
+    vi indeg(n);
+    rep(0, e) {
+        cin >> u >> v;
+        indeg[v]++;
+        adj[u].pb(v);
     }
-    int res = 0;
-    for (auto v: dp[n])res = max(res, v[0]);
-    pr(res);
+    queue<int> q, order;
+    rep(0, n)if (!indeg[i])q.push(i);
+    while (!q.empty()) {
+        order.push(q.front());
+        for (int i: adj[q.front()]) {
+            indeg[i]--;
+            if (!indeg[i])q.push(i);
+        }
+        q.pop();
+    }
+    vi dp(n, -inf);
+    dp[0] = 0;
+    while (!order.empty()) {
+        int i = order.front();
+        order.pop();
+        for (int j: adj[i])dp[j] = max(dp[j], dp[i] + (s[j] == 'X' ? 1 : -1));
+    }
+    pr(dp.back() + 1);
 }
 
 int main() {

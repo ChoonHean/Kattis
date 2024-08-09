@@ -91,29 +91,33 @@ inline void pr(stack<T> s) {
     cout << nl;
 }
 
-inline void solve() {
-    int n, m;
-    cin >> n >> m;
-    read(n);
-    vector<vector<vi>> dp(n + 1, vector<vi>(n + 1, vi(3)));
-    vi pre{m};
-    rep(0, n - 1)pre.pb(pre.back() * 2 / 3);
-    rep(0, n) {
-        dp[i + 1][1][0] = dp[i][0][2] + min(m, arr[i]);
-        for (int j = 0; j <= i; j++) {
-            dp[i + 1][j + 1][0] = max(dp[i + 1][j + 1][0], max(dp[i][j][0], dp[i][j][1]) + min(pre[j], arr[i]));
-            dp[i + 1][j][1] = dp[i][j + 1][0];
-            dp[i + 1][0][2] = max(dp[i + 1][0][2], dp[i][j][1]);
-        }
+vector<vector<vi>> dp;
+
+int f(int n, int a, int b, int c) {
+    if (n == 0)return 0;
+    if (dp[n][b][c] != 0)return dp[n][b][c];
+    int res = 8 * n;
+    if (c) {
+        res = min(res, f(n - 1, a + 2, b, c - 1) + 1);
+        if (a >= 3)res = min(res, f(n - 1, a - 3, b + 1, c - 1) + 4);
     }
-    int res = 0;
-    for (auto v: dp[n])res = max(res, v[0]);
-    pr(res);
+    if (b) {
+        if (a >= 3)res = min(res, f(n - 1, a - 3, b - 1, c) + 4);
+        if (b > 1)res = min(res, f(n - 1, a + 2, b - 2, c) + 2);
+    }
+    return dp[n][b][c] = res;
+}
+
+inline void solve() {
+    int n, a, b, c;
+    cin >> n >> a >> b >> c;
+    dp.assign(n + 1, vector<vi>(b + c + 1, vi(c + 1)));
+    pnl(f(n, a, b, c));
 }
 
 int main() {
     int t = 1;
-    //cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }

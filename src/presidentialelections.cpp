@@ -92,23 +92,29 @@ inline void pr(stack<T> s) {
 }
 
 inline void solve() {
-    int n, m;
-    cin >> n >> m;
-    read(n);
-    vector<vector<vi>> dp(n + 1, vector<vi>(n + 1, vi(3)));
-    vi pre{m};
-    rep(0, n - 1)pre.pb(pre.back() * 2 / 3);
+    int n, tot = 0, a, b, c;
+    cin >> n;
+    vi w(n), arr(n);
     rep(0, n) {
-        dp[i + 1][1][0] = dp[i][0][2] + min(m, arr[i]);
-        for (int j = 0; j <= i; j++) {
-            dp[i + 1][j + 1][0] = max(dp[i + 1][j + 1][0], max(dp[i][j][0], dp[i][j][1]) + min(pre[j], arr[i]));
-            dp[i + 1][j][1] = dp[i][j + 1][0];
-            dp[i + 1][0][2] = max(dp[i + 1][0][2], dp[i][j][1]);
+        cin >> w[i] >> a >> b >> c;
+        if (a + c <= b)arr[i] = mod;
+        else {
+            int total = a + b + c;
+            arr[i] = max((total >> 1) + 1 - a, 0);
+        }
+        tot += w[i];
+    }
+    vi dp(tot + 1, mod);
+    dp[0] = 0;
+    rep(0, n) {
+        if (arr[i] == mod)continue;
+        for (int j = tot; j >= w[i]; j--) {
+            dp[j] = min(dp[j], dp[j - w[i]] + arr[i]);
         }
     }
-    int res = 0;
-    for (auto v: dp[n])res = max(res, v[0]);
-    pr(res);
+    int res = mod;
+    rep((tot >> 1) + 1, tot + 1)res = min(res, dp[i]);
+    res == mod ? pr("impossible") : pr(res);
 }
 
 int main() {

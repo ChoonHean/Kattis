@@ -92,23 +92,59 @@ inline void pr(stack<T> s) {
 }
 
 inline void solve() {
-    int n, m;
-    cin >> n >> m;
-    read(n);
-    vector<vector<vi>> dp(n + 1, vector<vi>(n + 1, vi(3)));
-    vi pre{m};
-    rep(0, n - 1)pre.pb(pre.back() * 2 / 3);
-    rep(0, n) {
-        dp[i + 1][1][0] = dp[i][0][2] + min(m, arr[i]);
-        for (int j = 0; j <= i; j++) {
-            dp[i + 1][j + 1][0] = max(dp[i + 1][j + 1][0], max(dp[i][j][0], dp[i][j][1]) + min(pre[j], arr[i]));
-            dp[i + 1][j][1] = dp[i][j + 1][0];
-            dp[i + 1][0][2] = max(dp[i + 1][0][2], dp[i][j][1]);
+    int money, aim, d, p;
+    string s;
+    cin >> s;
+    s.erase(s.find('.'), 1);
+    money = stoi(s);
+    cin >> s >> d;
+    s.erase(s.find('.'), 1);
+    aim = stoi(s) * 6;
+    if (aim % 10 != 0) {
+        pr("IMPOSSIBLE");
+        return;
+    }
+    aim /= 10;
+    vs names(d);
+    vector<pii> arr(d);
+    rep(0, d) {
+        cin >> names[i] >> p >> s;
+        if (s[2] == '1')arr[i].first = p * 6;
+        else if (s[2] == '2')arr[i].first = p * 3;
+        else arr[i].first = p * 2;
+        cin >> s;
+        s.erase(s.find('.'), 1);
+        arr[i].second = stoi(s);
+    }
+    map<int, map<int, unordered_map<int, int>>> dp;
+    rep(0, d) {
+        int units = arr[i].first, cost = arr[i].second;
+        if (!dp[units].contains(cost))dp[units][cost][i] = 1;
+        for (auto it = dp.begin(); it != dp.end(); it++) {
+            int currunits = it->first;
+            auto costmap = it->second;
+            int next = currunits + units;
+            if (next > aim)break;
+            for (auto [currcost, drinks]: costmap) {
+                int nextcost = currcost + cost;
+                if (nextcost > money)break;
+                if (!dp[next].contains(nextcost)) {
+                    dp[next][nextcost] = drinks;
+                    dp[next][nextcost][i]++;
+                }
+            }
         }
     }
-    int res = 0;
-    for (auto v: dp[n])res = max(res, v[0]);
-    pr(res);
+    for (auto it = dp.lower_bound(aim); it != dp.end(); it++) {
+        if (it->second.contains(money)) {
+            for (auto [a, b]: it->second[money]) {
+                pr(names[a]);
+                pnl(b);
+            }
+            return;
+        }
+    }
+    pr("IMPOSSIBLE");
 }
 
 int main() {

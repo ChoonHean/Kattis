@@ -91,30 +91,43 @@ inline void pr(stack<T> s) {
     cout << nl;
 }
 
+bool _ = true;
+
 inline void solve() {
-    int n, m;
-    cin >> n >> m;
+    int n;
+    if (!(cin >> n)) {
+        _ = false;
+        return;
+    }
     read(n);
-    vector<vector<vi>> dp(n + 1, vector<vi>(n + 1, vi(3)));
-    vi pre{m};
-    rep(0, n - 1)pre.pb(pre.back() * 2 / 3);
-    rep(0, n) {
-        dp[i + 1][1][0] = dp[i][0][2] + min(m, arr[i]);
-        for (int j = 0; j <= i; j++) {
-            dp[i + 1][j + 1][0] = max(dp[i + 1][j + 1][0], max(dp[i][j][0], dp[i][j][1]) + min(pre[j], arr[i]));
-            dp[i + 1][j][1] = dp[i][j + 1][0];
-            dp[i + 1][0][2] = max(dp[i + 1][0][2], dp[i][j][1]);
+    vi res{arr[0]};
+    vector<stack<int>> stacks(1);
+    stacks[0].push(0);
+    rep(1, n) {
+        auto pos = lower_bound(all(res), arr[i]);
+        if (pos == res.end()) {
+            res.pb(arr[i]);
+            stacks.pb(stack<int>());
+            stacks.back().push(i);
+        } else if (*pos != arr[i]) {
+            *pos = arr[i];
+            stacks[pos - res.begin()].push(i);
         }
     }
-    int res = 0;
-    for (auto v: dp[n])res = max(res, v[0]);
-    pr(res);
+    pnl(sz(res));
+    stack<int> s;
+    for (auto it = stacks.rbegin(); it != stacks.rend(); it++) {
+        while (it->top() > n)it->pop();
+        n = it->top();
+        s.push(n);
+    }
+    pr(s);
 }
 
 int main() {
     int t = 1;
     //cin >> t;
-    while (t--) {
+    while (_) {
         solve();
     }
     return 0;
