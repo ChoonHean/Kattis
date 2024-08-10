@@ -2,16 +2,12 @@
 
 using namespace std;
 typedef vector<int> vi;
-typedef vector<vi> vvi;
-typedef vector<vvi> vvvi;
 typedef vector<double> vd;
 typedef vector<bool> vb;
 typedef vector<string> vs;
 typedef vector<char> vc;
 typedef long long ll;
 typedef vector<ll> vl;
-typedef vector<vl> vvl;
-typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef pair<double, double> pdd;
 typedef pair<ll, ll> pll;
@@ -96,31 +92,41 @@ inline void pr(stack<T> s) {
     cout << nl;
 }
 
-int n;
-vpii arr;
-vector<vvvl> dp(401, vvvl(401, vvl(40, vl(2, -1))));
-
-ll f(int i, int x, int y, int cnt) {
-    if (x < 0 || y < 0 || x > 400 || y > 400)return 0;
-    if (i == n)return (x == 200) && (y == 200) & cnt;
-    if (dp[x][y][i][cnt] != -1)return dp[x][y][i][cnt];
-    if (x == 200 && y == 200) {
-        if (cnt) {
-            dp[x][y][i][cnt] = 1 + f(i + 1, x + arr[i].first, y + arr[i].second, 1) + f(i + 1, x, y, 0);
-        } else {
-            dp[x][y][i][cnt] = f(i + 1, x + arr[i].first, y + arr[i].second, 1) + f(i + 1, x, y, 0);
-        }
-    } else {
-        dp[x][y][i][cnt] = f(i + 1, x + arr[i].first, y + arr[i].second, 1) + f(i + 1, x, y, 1);
-    }
-    return dp[x][y][i][cnt];
-}
-
 inline void solve() {
-    cin >> n;
-    arr.resize(n);
+    double a, b;
+    int n;
+    cin >> a >> b >> n;
+    vpdd arr(n);
     rep(0, n)cin >> arr[i].first >> arr[i].second;
-    pr(f(0, 200, 200, 0));
+    vector<vd> dist(n + 1, vd(n + 1));
+    rep(0, n) {
+        double x = arr[i].first - a, y = arr[i].second - b;
+        dist[i][n] = sqrt(x * x + y * y);
+        for (int j = i + 1; j < n; j++) {
+            x = arr[i].first - arr[j].first;
+            y = arr[i].second - arr[j].second;
+            dist[i][j] = sqrt(x * x + y * y);
+        }
+    }
+    vd dp(1 << n, inf);
+    dp[0] = 0;
+    int end = (1 << n) - 1;
+    rep(0, 1 << n) {
+        for (int j = 0; j < n; j++)
+            if (!((i >> j) & 1)) {
+                int next = i | (1 << j);
+                if (next == end)dp[next] = min(dp[next], dp[i] + dist[j][n]);
+                else dp[next] = min(dp[next], dp[i] + 2 * dist[j][n]);
+                for (int k = j + 1; k < n; k++)
+                    if (!((i >> k) & 1)) {
+                        int next2 = next | (1 << k);
+                        if (next2 == end)dp[next2] = min(dp[next2], dp[i] + min(dist[j][n], dist[k][n]) + dist[j][k]);
+                        else dp[next2] = min(dp[next2], dp[i] + dist[j][n] + dist[k][n] + dist[j][k]);
+                    }
+            }
+    }
+    cout << fixed << setprecision(10);
+    pr(dp.back());
 }
 
 int main() {
