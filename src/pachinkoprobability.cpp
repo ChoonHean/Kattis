@@ -27,10 +27,6 @@ const int mod = 1e9 + 7;
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define pb push_back
-#define clz(i) __builtin_clz(i)
-#define ctz(i) __builtin_ctz(i)
-#define popcount(i) __builtin_popcount(i)
-#define lsb(i) i&-i
 
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
@@ -100,74 +96,49 @@ inline void pr(stack<T> s) {
     cout << nl;
 }
 
-vvi sets;
-int n, m, c, a, b, done;
-vector<pair<int, vi>> dp;
-
-pair<int, vi> f(int mask) {
-    if (mask == done)return pair(0, vi());
-    if (dp[mask].first != -1)return dp[mask];
-    int i = 0;
-    while (((mask) >> i) & 1)i++;
-    pair<int, vi> res = pair(20, vi());
-    for (int j: sets[i])
-        if ((j & mask) == 0) {
-            pair<int, vi> ret = f(j | mask);
-            if (ret.first < res.first) {
-                res = ret;
-                res.first++;
-                res.second.pb(j);
-            }
-        }
-    return dp[mask] = res;
-}
-
 inline void solve() {
-    string u, v;
-    cin >> n >> m >> c;
-    unordered_map<string, int> mapper;
-    vs names(n);
-    rep(0, n) {
-        cin >> names[i];
-        mapper[names[i]] = i;
-    }
-    vector<unordered_set<int>> adj(n);
+    int n, m, u, v;
+    cin >> n >> m;
+    vvi adj(n);
+    vi indeg(n);
     rep(0, m) {
         cin >> u >> v;
-        a = mapper[u];
-        b = mapper[v];
-        adj[a].insert(b);
-        adj[b].insert(a);
+        adj[u].pb(v);
+        indeg[v]++;
     }
-    sets.resize(n);
-    rep(1, 1 << n) {
-        if (popcount(i) <= c) {
-            bool ok = true;
-            for (int j = 0; j < n; j++)
-                if ((i >> j) & 1) {
-                    for (int k = j + 1; k < n; k++)
-                        if ((i >> k) & 1) {
-                            if (adj[j].contains(k))ok = false;
-                        }
-                }
-            if (ok)
-                for (int j = 0; j < n; j++)
-                    if ((i >> j) & 1) {
-                        sets[j].pb(i);
-                        break;
-                    }
+    vl dp(n);
+    queue<int> q;
+    rep(0, n) {
+        if (!indeg[i]) {
+            dp[i] = 1;
+            q.push(i);
+
         }
     }
-    done = (1 << n) - 1;
-    dp.assign(1 << n, pair(-1, vi()));
-    pair<int, vi> res = f(0);
-    cout << res.first << nl;
-    for (int i: res.second) {
-        string s;
-        for (int j = 0; j < n; j++)if ((i >> j) & 1)s += names[j] + ' ';
-        s.pop_back();
-        cout << s << nl;
+    while (!q.empty()) {
+        int i = q.front();
+        q.pop();
+        for (int j: adj[i]) {
+            dp[j] += dp[i];
+            if (!--indeg[j])q.push(j);
+        }
     }
+    cin >> m;
+    rep(0, m) {
+        cin >> u;
+        indeg[u] = 1;
+    }
+    ll a = 0, b = 0;
+    rep(0, n) {
+        if (adj[i].empty()) {
+            if (indeg[i])a += dp[i];
+            b += dp[i];
+        }
+    }
+    pr("winning paths");
+    pnl(a);
+    pr("total paths");
+    pr(b);
 }
 
 int main() {
