@@ -100,40 +100,90 @@ inline void pr(stack<T> s) {
     cout << nl;
 }
 
-int n, m;
-vvi adj;
-vvi dp;
-bool _ = true;
-
-int f(int i, int mask) {
-    if (i == 0 && mask)return 1;
-    if (dp[mask][i] != -1)return dp[mask][i];
-    int res = 0;
-    for (int j: adj[i])
-        if (!((mask >> j) & 1)) {
-            int next = f(j, mask | (1 << j));
-            if (next > 0)res = max(res, next + 1);
-        }
-    return dp[mask][i] = res;
-}
-
 inline void solve() {
-    int u, v;
-    cin >> n;
-    if (n == 0) {
-        _ = false;
-        return;
+    int n, c, r;
+    cin >> n >> c >> r;
+    vector<vc> grid(n, vc(n));
+    rep(0, n)for (int j = 0; j < n; j++)cin >> grid[i][j];
+    int dir = 2; // up:0, right:1, down:2, left:3
+    for (int x = 0, y = c - 1; x >= 0 && x < n && y >= 0 && y < n;) {
+        if (grid[x][y] == '/') {
+            if (dir == 0) {
+                dir = 1;
+                y++;
+            } else if (dir == 1) {
+                dir = 0;
+                x--;
+            } else if (dir == 2) {
+                dir = 3;
+                y--;
+            } else {
+                dir = 2;
+                x++;
+            }
+        } else if (grid[x][y] == '\\') {
+            if (dir == 0) {
+                dir = 3;
+                y--;
+            } else if (dir == 1) {
+                dir = 2;
+                x++;
+            } else if (dir == 2) {
+                dir = 1;
+                y++;
+            } else {
+                dir = 0;
+                x--;
+            }
+        } else {
+            grid[x][y] = 'o';
+            if (dir == 0)x--;
+            else if (dir == 1)y++;
+            else if (dir == 2)x++;
+            else y--;
+        }
     }
-    cin >> m;
-    adj.assign(n, vi());
-    dp.assign(1 << n, vi(n, -1));
-    rep(0, m) {
-        cin >> u >> v;
-        adj[u].pb(v);
-        adj[v].pb(u);
+    dir = 3;
+    for (int x = r - 1, y = n - 1; x >= 0 && x < n && y >= 0 && y < n;) {
+        if (grid[x][y] == 'o') {
+            pr("YES");
+            return;
+        } else if (grid[x][y] == '/') {
+            if (dir == 0) {
+                dir = 1;
+                y++;
+            } else if (dir == 1) {
+                dir = 0;
+                x--;
+            } else if (dir == 2) {
+                dir = 3;
+                y--;
+            } else {
+                dir = 2;
+                x++;
+            }
+        } else if (grid[x][y] == '\\') {
+            if (dir == 0) {
+                dir = 3;
+                y--;
+            } else if (dir == 1) {
+                dir = 2;
+                x++;
+            } else if (dir == 2) {
+                dir = 1;
+                y++;
+            } else {
+                dir = 0;
+                x--;
+            }
+        } else {
+            if (dir == 0)x--;
+            else if (dir == 1)y++;
+            else if (dir == 2)x++;
+            else y--;
+        }
     }
-    int res = f(0, 0);
-    res == 0 ? pnl(1) : pnl(res - 1);
+    pr("NO");
 }
 
 int main() {
@@ -141,7 +191,7 @@ int main() {
     cin.tie(nullptr);
     int t = 1;
     //cin >> t;
-    while (_) {
+    while (t--) {
         solve();
     }
     return 0;

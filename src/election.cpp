@@ -100,48 +100,34 @@ inline void pr(stack<T> s) {
     cout << nl;
 }
 
-int n, m;
-vvi adj;
-vvi dp;
-bool _ = true;
-
-int f(int i, int mask) {
-    if (i == 0 && mask)return 1;
-    if (dp[mask][i] != -1)return dp[mask][i];
-    int res = 0;
-    for (int j: adj[i])
-        if (!((mask >> j) & 1)) {
-            int next = f(j, mask | (1 << j));
-            if (next > 0)res = max(res, next + 1);
-        }
-    return dp[mask][i] = res;
-}
+const int N = 51;
+vector<vl> ncr(N, vl(N, 1));
+vd pw(N);
 
 inline void solve() {
-    int u, v;
-    cin >> n;
-    if (n == 0) {
-        _ = false;
+    int n, a, b, w;
+    cin >> n >> a >> b >> w;
+    int needed = (n >> 1) + 1, open = n - a - b;
+    double res = 0;
+    if (a >= needed) {
+        pnl("GET A CRATE OF CHAMPAGNE FROM THE BASEMENT!");
         return;
     }
-    cin >> m;
-    adj.assign(n, vi());
-    dp.assign(1 << n, vi(n, -1));
-    rep(0, m) {
-        cin >> u >> v;
-        adj[u].pb(v);
-        adj[v].pb(u);
-    }
-    int res = f(0, 0);
-    res == 0 ? pnl(1) : pnl(res - 1);
+    rep(needed, open + a + 1)res += ncr[open][i - a] * pw[open];
+    if (res == 0)pnl("RECOUNT!");
+    else if (res * 100 > w)pnl("GET A CRATE OF CHAMPAGNE FROM THE BASEMENT!");
+    else pnl("PATIENCE, EVERYONE!");
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
+    rep(2, N)for (int j = 1; j < i; j++)ncr[i][j] = ncr[i - 1][j] + ncr[i - 1][j - 1];
+    pw[1] = 0.5;
+    rep(2, N)pw[i] = pw[i - 1] / 2;
     int t = 1;
-    //cin >> t;
-    while (_) {
+    cin >> t;
+    while (t--) {
         solve();
     }
     return 0;
