@@ -99,42 +99,68 @@ inline void pr(stack<T> s) {
     }
     cout << nl;
 }
-vvi ncr(31,vi(31,1));
+
+const int N = 2000;
+
 inline void solve() {
-    int n,k,t;
-    cin>>n;
-    read(n);
-    cin>>k>>t;
-    vector<unordered_map<int,int>>dp(k+1), ndp(k+1);
-    dp[0][0]=1;
-    rep(0,n){
-        ndp[k]=dp[k];
-        for(int j=min(i,k-1);j>=max(0,k-n+i);j--){
-            for(auto[x,y]:dp[j]){
-                if(x>t)continue;
-                ndp[j+1][x+arr[i]]+=y;
-                ndp[j][x]+=y;
+    int n1, n2, m1, m2, u, v;
+    cin >> n1 >> n2 >> m1 >> m2;
+    vvi adj1(n1), adj2(n2);
+    vi indeg1(n1), indeg2(n2);
+    rep(0, m1) {
+        cin >> u >> v;
+        adj1[--u].pb(--v);
+        indeg1[v]++;
+    }
+    rep(0, m2) {
+        cin >> u >> v;
+        adj2[--u].pb(--v);
+        indeg2[v]++;
+    }
+    queue<int> q;
+    q.push(0);
+    vector<bitset<N>> dp1(n1), dp2(n2);
+    dp1[0][0] = 1;
+    while (!q.empty()) {
+        int i = q.front();
+        q.pop();
+        for (int j: adj1[i]) {
+            dp1[j] |= dp1[i] << 1;
+            if (!--indeg1[j])q.push(j);
+        }
+    }
+    q.push(0);
+    dp2[0][0] = 1;
+    while (!q.empty()) {
+        int i = q.front();
+        q.pop();
+        for (int j: adj2[i]) {
+            dp2[j] |= dp2[i] << 1;
+            if (!--indeg2[j])q.push(j);
+        }
+    }
+    cin >> u;
+    bitset<N> a = dp1.back(), b = dp2.back();
+    while (u--) {
+        cin >> v;
+        bool done = false;
+        rep(0, min(v + 1, n1)) {
+            if (a[i] & b[v - i]) {
+                done = true;
+                pnl("Yes");
+                break;
             }
         }
-        dp=vector<unordered_map<int,int>>(k+1);
-        swap(dp,ndp);
+        if (!done)pnl("No");
     }
-    int win=dp[k][t];
-    cout<<win<<" : "<<ncr[n][k]-win<<nl;
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     int t = 1;
-    rep(2,31){
-        for(int j=1;j<i;j++){
-            ncr[i][j]=ncr[i-1][j]+ncr[i-1][j-1];
-        }
-    }
-    cin >> t;
-    rep(1,t+1) {
-        cout<<"Game "<<i<<" -- ";
+    //cin >> t;
+    while (t--) {
         solve();
     }
     return 0;

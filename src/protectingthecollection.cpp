@@ -99,42 +99,99 @@ inline void pr(stack<T> s) {
     }
     cout << nl;
 }
-vvi ncr(31,vi(31,1));
+
 inline void solve() {
-    int n,k,t;
-    cin>>n;
-    read(n);
-    cin>>k>>t;
-    vector<unordered_map<int,int>>dp(k+1), ndp(k+1);
-    dp[0][0]=1;
-    rep(0,n){
-        ndp[k]=dp[k];
-        for(int j=min(i,k-1);j>=max(0,k-n+i);j--){
-            for(auto[x,y]:dp[j]){
-                if(x>t)continue;
-                ndp[j+1][x+arr[i]]+=y;
-                ndp[j][x]+=y;
+    int n, c, r;
+    cin >> n >> c >> r;
+    vector<vc> grid(n, vc(n));
+    rep(0, n)for (int j = 0; j < n; j++)cin >> grid[i][j];
+    int dir = 2; // up:0, right:1, down:2, left:3
+    for (int x = 0, y = c - 1; x >= 0 && x < n && y >= 0 && y < n;) {
+        if (grid[x][y] == '/') {
+            if (dir == 0) {
+                dir = 1;
+                y++;
+            } else if (dir == 1) {
+                dir = 0;
+                x--;
+            } else if (dir == 2) {
+                dir = 3;
+                y--;
+            } else {
+                dir = 2;
+                x++;
             }
+        } else if (grid[x][y] == '\\') {
+            if (dir == 0) {
+                dir = 3;
+                y--;
+            } else if (dir == 1) {
+                dir = 2;
+                x++;
+            } else if (dir == 2) {
+                dir = 1;
+                y++;
+            } else {
+                dir = 0;
+                x--;
+            }
+        } else {
+            grid[x][y] = 'o';
+            if (dir == 0)x--;
+            else if (dir == 1)y++;
+            else if (dir == 2)x++;
+            else y--;
         }
-        dp=vector<unordered_map<int,int>>(k+1);
-        swap(dp,ndp);
     }
-    int win=dp[k][t];
-    cout<<win<<" : "<<ncr[n][k]-win<<nl;
+    dir = 3;
+    for (int x = r - 1, y = n - 1; x >= 0 && x < n && y >= 0 && y < n;) {
+        if (grid[x][y] == 'o') {
+            pr("YES");
+            return;
+        } else if (grid[x][y] == '/') {
+            if (dir == 0) {
+                dir = 1;
+                y++;
+            } else if (dir == 1) {
+                dir = 0;
+                x--;
+            } else if (dir == 2) {
+                dir = 3;
+                y--;
+            } else {
+                dir = 2;
+                x++;
+            }
+        } else if (grid[x][y] == '\\') {
+            if (dir == 0) {
+                dir = 3;
+                y--;
+            } else if (dir == 1) {
+                dir = 2;
+                x++;
+            } else if (dir == 2) {
+                dir = 1;
+                y++;
+            } else {
+                dir = 0;
+                x--;
+            }
+        } else {
+            if (dir == 0)x--;
+            else if (dir == 1)y++;
+            else if (dir == 2)x++;
+            else y--;
+        }
+    }
+    pr("NO");
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     int t = 1;
-    rep(2,31){
-        for(int j=1;j<i;j++){
-            ncr[i][j]=ncr[i-1][j]+ncr[i-1][j-1];
-        }
-    }
-    cin >> t;
-    rep(1,t+1) {
-        cout<<"Game "<<i<<" -- ";
+    //cin >> t;
+    while (t--) {
         solve();
     }
     return 0;

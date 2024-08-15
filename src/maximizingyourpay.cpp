@@ -99,42 +99,49 @@ inline void pr(stack<T> s) {
     }
     cout << nl;
 }
-vvi ncr(31,vi(31,1));
-inline void solve() {
-    int n,k,t;
-    cin>>n;
-    read(n);
-    cin>>k>>t;
-    vector<unordered_map<int,int>>dp(k+1), ndp(k+1);
-    dp[0][0]=1;
-    rep(0,n){
-        ndp[k]=dp[k];
-        for(int j=min(i,k-1);j>=max(0,k-n+i);j--){
-            for(auto[x,y]:dp[j]){
-                if(x>t)continue;
-                ndp[j+1][x+arr[i]]+=y;
-                ndp[j][x]+=y;
-            }
+
+int n, m;
+vvi adj;
+vvi dp;
+bool _ = true;
+
+int f(int i, int mask) {
+    if (i == 0 && mask)return 1;
+    if (dp[mask][i] != -1)return dp[mask][i];
+    int res = 0;
+    for (int j: adj[i])
+        if (!((mask >> j) & 1)) {
+            int next = f(j, mask | (1 << j));
+            if (next > 0)res = max(res, next + 1);
         }
-        dp=vector<unordered_map<int,int>>(k+1);
-        swap(dp,ndp);
+    return dp[mask][i] = res;
+}
+
+inline void solve() {
+    int u, v;
+    cin >> n;
+    if (n == 0) {
+        _ = false;
+        return;
     }
-    int win=dp[k][t];
-    cout<<win<<" : "<<ncr[n][k]-win<<nl;
+    cin >> m;
+    adj.assign(n, vi());
+    dp.assign(1 << n, vi(n, -1));
+    rep(0, m) {
+        cin >> u >> v;
+        adj[u].pb(v);
+        adj[v].pb(u);
+    }
+    int res = f(0, 0);
+    res == 0 ? pnl(1) : pnl(res - 1);
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     int t = 1;
-    rep(2,31){
-        for(int j=1;j<i;j++){
-            ncr[i][j]=ncr[i-1][j]+ncr[i-1][j-1];
-        }
-    }
-    cin >> t;
-    rep(1,t+1) {
-        cout<<"Game "<<i<<" -- ";
+    //cin >> t;
+    while (_) {
         solve();
     }
     return 0;
