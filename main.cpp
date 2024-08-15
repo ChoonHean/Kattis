@@ -99,42 +99,44 @@ inline void pr(stack<T> s) {
     }
     cout << nl;
 }
-vvi ncr(31,vi(31,1));
+
+vvi ncr(31, vi(31, 1));
+
 inline void solve() {
-    int n,k,t;
-    cin>>n;
+    int n, k, t;
+    cin >> n;
     read(n);
-    cin>>k>>t;
-    vector<unordered_map<int,int>>dp(k+1), ndp(k+1);
-    dp[0][0]=1;
-    rep(0,n){
-        ndp[k]=dp[k];
-        for(int j=min(i,k-1);j>=max(0,k-n+i);j--){
-            for(auto[x,y]:dp[j]){
-                if(x>t)continue;
-                ndp[j+1][x+arr[i]]+=y;
-                ndp[j][x]+=y;
+    cin >> k >> t;
+    vector<unordered_map<int, int>> dp(k + 1), ndp(k + 1);
+    dp[0][0] = 1;
+    rep(0, n) {
+        ndp[k] = dp[k];
+        for (int j = min(i, k - 1); j >= max(0, k - n + i); j--) {
+            for (auto [x, y]: dp[j]) {
+                if (x > t)continue;
+                ndp[j + 1][x + arr[i]] += y;
+                ndp[j][x] += y;
             }
         }
-        dp=vector<unordered_map<int,int>>(k+1);
-        swap(dp,ndp);
+        dp = vector<unordered_map<int, int>>(k + 1);
+        swap(dp, ndp);
     }
-    int win=dp[k][t];
-    cout<<win<<" : "<<ncr[n][k]-win<<nl;
+    int win = dp[k][t];
+    cout << win << " : " << ncr[n][k] - win << nl;
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     int t = 1;
-    rep(2,31){
-        for(int j=1;j<i;j++){
-            ncr[i][j]=ncr[i-1][j]+ncr[i-1][j-1];
+    rep(2, 31) {
+        for (int j = 1; j < i; j++) {
+            ncr[i][j] = ncr[i - 1][j] + ncr[i - 1][j - 1];
         }
     }
     cin >> t;
-    rep(1,t+1) {
-        cout<<"Game "<<i<<" -- ";
+    rep(1, t + 1) {
+        cout << "Game " << i << " -- ";
         solve();
     }
     return 0;
