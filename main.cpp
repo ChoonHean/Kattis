@@ -99,47 +99,59 @@ inline void pr(stack<T> s) {
     }
     cout << nl;
 }
-vvi ncr(31,vi(30,1));
-inline void solve() {
-    int n,k,t;
-    cin>>n;
-    read(n);
-    cin>>k>>t;
-    vector<unordered_map<int,int>>dp(k+2),ndp(k+2);
-    dp[0][0]=1;
-    rep(0,n){
-        for(int j=min(i,k);j>=0;j--){
-            for(auto[x,y]:dp[j]){
-                if(x>t){
-                    ndp[j+1][inf]+=y;
-                    ndp[j][inf]+=y;
-                }else{
-                    ndp[j+1][x+arr[i]]+=y;
-                    ndp[j][x]+=y;
-                }
-            }
-        }
-        dp=vector<unordered_map<int,int>>(k+2);
-        swap(dp,ndp);
+
+int n;
+vi arr;
+vector<map<int, pii>> dp;
+
+pii f(int left, int right) {
+    if (dp[left].contains(right))return dp[left][right];
+    auto it = dp[left].upper_bound(right);
+    if (it != dp[left].begin()) {
+        it--;
+        if (it->second.second >= right)return dp[left][right] = it->second;
     }
-    int tot=0;
-    for(auto[x,y]:dp[k])tot+=y;
-    int win=dp[k][t];
-    cout<<win<<" : "<<tot-win<<nl;
+    int wt = (right - left + 1) * 500;
+    if (left > 0 && right < n - 1) {
+        if (arr[left - 1] >= wt) {
+            if (arr[right + 1] >= wt)return dp[left][right] = pair(left, right);
+            else return dp[left][right] = f(left, right + 1);
+        } else if (arr[right + 1] >= wt) {
+            return dp[left][right] = f(left - 1, right);
+        } else return dp[left][right] = f(left - 1, right + 1);
+    } else if (left == 0) {
+        if (right == n - 1)return dp[left][right] = pair(left, right);
+        if (arr[right + 1] < wt)return dp[left][right] = f(left, right + 1);
+        else return dp[left][right] = pair(left, right);
+    } else {
+        if (arr[left - 1] >= wt)return dp[left][right] = pair(left, right);
+        else return dp[left][right] = f(left - 1, right);
+    }
+}
+
+inline void solve() {
+    cin >> n;
+    arr.resize(n);
+    readarr(n, arr);
+    rep(0, n)arr[i] -= 1000;
+    dp.resize(n);
+    int res = 0, pillar = 0;
+    rep(0, n) {
+        auto [x, y] = f(i, i);
+        if ((y - x + 1) > res) {
+            res = y - x + 1;
+            pillar = i;
+        }
+    }
+    cout << res << ' ' << pillar;
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     int t = 1;
-    rep(1,31){
-        for(int j=1;j<=i;j++){
-
-        }
-    }
-    cin >> t;
-    rep(1,t+1) {
-        cout<<"Game "<<i<<" -- ";
+    //cin >> t;
+    while (t--) {
         solve();
     }
     return 0;
