@@ -49,18 +49,18 @@ struct FT {                              // index 0 is not used
             ft[i] += v;
     }
 
-    inline int select(ll k) {                             // O(log m)
+    int select(ll k) {                             // O(log m)
         int p = 1;
-        while (p * 2 < (int) ft.size()) p *= 2;
+        while (p*2 < (int)ft.size()) p *= 2;
         int i = 0;
         while (p) {
-            if (k > ft[i + p]) {
-                k -= ft[i + p];
+            if (k > ft[i+p]) {
+                k -= ft[i+p];
                 i += p;
             }
             p /= 2;
         }
-        return i + 1;
+        return i+1;
     }
 };
 
