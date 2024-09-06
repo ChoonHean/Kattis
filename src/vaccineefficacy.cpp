@@ -127,74 +127,41 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-vi arr(4096);
-
 inline void solve() {
     int n;
     cin >> n;
-    pnl(arr[n]);
+    int test = 0, control = 0, ca = 0, cb = 0, cc = 0, ta = 0, tb = 0, tc = 0;
+    string s;
+    rep(0, n) {
+        cin >> s;
+        if (s[0] == 'Y') {
+            test++;
+            if (s[1] == 'Y')ta++;
+            if (s[2] == 'Y')tb++;
+            if (s[3] == 'Y')tc++;
+        } else {
+            control++;
+            if (s[1] == 'Y')ca++;
+            if (s[2] == 'Y')cb++;
+            if (s[3] == 'Y')cc++;
+        }
+    }
+    double ft = (double) ta / test, fc = (double) ca / control;
+    if (ft >= fc)pnl("Not Effective");
+    else pnl((1 - ft / fc) * 100);
+    ft = (double) tb / test, fc = (double) cb / control;
+    if (ft >= fc)pnl("Not Effective");
+    else pnl((1 - ft / fc) * 100);
+    ft = (double) tc / test, fc = (double) cc / control;
+    if (ft >= fc)pnl("Not Effective");
+    else pnl((1 - ft / fc) * 100);
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
-    bitset<4096> visited;
-    int n = 4095;
-    visited[0] = 1;
-    queue<int> q;
-    q.push(0);
-    while (!q.empty()) {
-        int curr = q.front();
-        q.pop();
-        int val = arr[curr];
-        rep(1, 16) {
-            int next = curr | i;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-        rep(1, 8) {
-            int next = (curr << i) & n;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-        int temp = (curr << 12) | curr;
-        rep(1, 8) {
-            int next = (temp >> i) & n;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-        int next = (curr + 1) & n;
-        if (!visited[next]) {
-            visited[next] = 1;
-            arr[next] = val + 1;
-            q.push(next);
-        }
-        next = curr ^ n;
-        if (!visited[next]) {
-            visited[next] = 1;
-            arr[next] = val + 1;
-            q.push(next);
-        }
-        rep(1, 8) {
-            next = curr + ((curr << i) & n) & n;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-    }
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--) {
         solve();
     }

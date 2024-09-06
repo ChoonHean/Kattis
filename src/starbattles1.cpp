@@ -127,74 +127,61 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-vi arr(4096);
-
 inline void solve() {
-    int n;
-    cin >> n;
-    pnl(arr[n]);
+    vs grid(10), regions(10);
+    rep(0, 10)cin >> regions[i];
+    rep(0, 10)cin >> grid[i];
+    vi rows(10), cols(10), cnts(10);
+    rep(0, 10)for (int j = 0; j < 10; j++)
+            if (grid[i][j] == '*') {
+                if (i > 0) {
+                    if (j > 0)
+                        if (grid[i - 1][j - 1] == '*') {
+                            pr("invalid");
+                            return;
+                        }
+                    if (j < 9)
+                        if (grid[i - 1][j + 1] == '*') {
+                            pr("invalid");
+                            return;
+                        }
+                    if (grid[i - 1][j] == '*') {
+                        pr("invalid");
+                        return;
+                    }
+                }
+                if (j > 0)
+                    if (grid[i][j - 1] == '*') {
+                        pr("invalid");
+                        return;
+                    }
+                rows[i]++;
+                cols[j]++;
+                cnts[regions[i][j] - '0']++;
+            }
+    for (int i: rows)
+        if (i != 2) {
+            pr("invalid");
+            return;
+        }
+    for (int i: cols)
+        if (i != 2) {
+            pr("invalid");
+            return;
+        }
+    for (int i: cnts)
+        if (i != 2) {
+            pr("invalid");
+            return;
+        }
+    pr("valid");
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
-    bitset<4096> visited;
-    int n = 4095;
-    visited[0] = 1;
-    queue<int> q;
-    q.push(0);
-    while (!q.empty()) {
-        int curr = q.front();
-        q.pop();
-        int val = arr[curr];
-        rep(1, 16) {
-            int next = curr | i;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-        rep(1, 8) {
-            int next = (curr << i) & n;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-        int temp = (curr << 12) | curr;
-        rep(1, 8) {
-            int next = (temp >> i) & n;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-        int next = (curr + 1) & n;
-        if (!visited[next]) {
-            visited[next] = 1;
-            arr[next] = val + 1;
-            q.push(next);
-        }
-        next = curr ^ n;
-        if (!visited[next]) {
-            visited[next] = 1;
-            arr[next] = val + 1;
-            q.push(next);
-        }
-        rep(1, 8) {
-            next = curr + ((curr << i) & n) & n;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-    }
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--) {
         solve();
     }

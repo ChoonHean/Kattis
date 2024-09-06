@@ -127,75 +127,41 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-vi arr(4096);
-
 inline void solve() {
-    int n;
-    cin >> n;
-    pnl(arr[n]);
+    int n, m, l, x, y;
+    string s;
+    cin >> n >> m >> l;
+    vector<pair<int, string>> arr(l);
+    for (int _ = 0; _ < l; _++) {
+        cin >> s;
+        int a = s.find(':'), b = s.find(',');
+        arr[_].second = s.substr(0, a);
+        x = stoi(s.substr(a + 1, b - a - 1));
+        y = stoi(s.substr(b + 1));
+        int cost = 0, curr = n;
+        while (true) {
+            int next = curr >> 1;
+            if (next < m || (curr - next) * x < y)break;
+            cost += y;
+            curr = next;
+        }
+        cost += (curr - m) * x;
+        arr[_].first = cost;
+    }
+    sort(all(arr));
+    for (auto [q, w]: arr) {
+        pr(w);
+        pnl(q);
+    }
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
-    bitset<4096> visited;
-    int n = 4095;
-    visited[0] = 1;
-    queue<int> q;
-    q.push(0);
-    while (!q.empty()) {
-        int curr = q.front();
-        q.pop();
-        int val = arr[curr];
-        rep(1, 16) {
-            int next = curr | i;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-        rep(1, 8) {
-            int next = (curr << i) & n;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-        int temp = (curr << 12) | curr;
-        rep(1, 8) {
-            int next = (temp >> i) & n;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-        int next = (curr + 1) & n;
-        if (!visited[next]) {
-            visited[next] = 1;
-            arr[next] = val + 1;
-            q.push(next);
-        }
-        next = curr ^ n;
-        if (!visited[next]) {
-            visited[next] = 1;
-            arr[next] = val + 1;
-            q.push(next);
-        }
-        rep(1, 8) {
-            next = curr + ((curr << i) & n) & n;
-            if (!visited[next]) {
-                visited[next] = 1;
-                arr[next] = val + 1;
-                q.push(next);
-            }
-        }
-    }
     int t = 1;
     cin >> t;
-    while (t--) {
+    for (int i = 1; i <= t; i++) {
+        cout << "Case " << i << nl;
         solve();
     }
     return 0;
