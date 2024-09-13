@@ -135,48 +135,65 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-vvi g;
-vpii res;
-
-void f(set<int> tree) {
-    int root = *tree.begin();
-    tree.erase(tree.begin());
-    while (!tree.empty()) {
-        set<int> next;
-        next.insert(*tree.begin());
-        auto &row = g[*tree.begin()];
-        tree.erase(tree.begin());
-        for (auto it = tree.begin(); it != tree.end();) {
-            int curr = *it;
-            if (row[curr] != root) {
-                next.insert(*it);
-                it++;
-                tree.erase(prev(it));
-            } else it++;
-        }
-        res.emplace_back(root + 1, *next.begin() + 1);
-        f(next);
-    }
-}
-
 inline void solve() {
     int n;
     cin >> n;
-    g.assign(n, vi(n));
-    rep(0, n)
-        for (int j = 0; j < n; j++) {
-            cin >> g[i][j];
-            g[i][j]--;
+    vpii arr(n);
+    int mnx = inf, mxx = -inf, mny = inf, mxy = -inf;
+    rep(0, n) {
+        cin >> arr[i].first >> arr[i].second;
+        mnx = min(mnx, arr[i].first);
+        mxx = max(mxx, arr[i].first);
+        mny = min(mny, arr[i].second);
+        mxy = max(mxy, arr[i].second);
+    }
+    for (auto [x, y]: arr)
+        if (x != mxx && x != mnx && y != mny && y != mxy) {
+            pr("Impossible");
+            return;
         }
-    set<int> tree;
-    rep(0, n)tree.emplace_hint(tree.end(), i);
-    f(tree);
-    for (auto [x, y]: res) {
-        pr(x);
-        pnl(y);
+    int a = mxx - mnx, b = mxy - mny;
+    if (a == b) {
+        pr(mnx);
+        pr(mxx);
+        pr(mny);
+        pr(mxy);
+    } else if (a > b) { //extend y
+        int cnt1 = 0, cnt2 = 0;
+        for (auto [x, y]: arr) {
+            if (y == mxy && x != mnx && x != mxx)cnt1++;
+            else if (y == mny && x != mnx && x != mxx)cnt2++;
+        }
+        if (cnt1 == 0) {
+            pr(mnx);
+            pr(mxx);
+            pr(mny);
+            pr(mny + a);
+        } else if (cnt2 == 0) {
+            pr(mnx);
+            pr(mxx);
+            pr(mxy - a);
+            pr(mxy);
+        } else pr("Impossible");
+    } else {
+        int cnt1 = 0, cnt2 = 0;
+        for (auto [x, y]: arr) {
+            if (x == mxx & y != mny && y != mxy)cnt1++;
+            else if (x == mnx && y != mny && y != mxy)cnt2++;
+        }
+        if (cnt1 == 0) {
+            pr(mnx);
+            pr(mnx + b);
+            pr(mny);
+            pr(mxy);
+        } else if (cnt2 == 0) {
+            pr(mxx - b);
+            pr(mxx);
+            pr(mny);
+            pr(mxy);
+        } else pr("Impossible");
     }
 }
-
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
