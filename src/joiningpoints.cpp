@@ -135,98 +135,72 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-bool _ = true;
-
 inline void solve() {
-    int n, counter = 0;
+    int n;
     cin >> n;
-    if (!n) {
-        _ = false;
-        return;
-    }
-    char a, b, c, d, e, s;
-    int A, B, C, D, E, S;
-    hmap<char, int> map;
-    vc name;
-    vvi adj;
+    vpii arr(n);
+    int mnx = inf, mxx = -inf, mny = inf, mxy = -inf;
     rep(0, n) {
-        cin >> a >> b >> c >> d >> e >> s;
-        if (map.contains(a))A = map[a];
-        else {
-            A = map[a] = counter++;
-            adj.pb(vi());
-            name.pb(a);
-        }
-        if (map.contains(b))B = map[b];
-        else {
-            B = map[b] = counter++;
-            adj.pb(vi());
-            name.pb(b);
-        }
-        if (map.contains(c))C = map[c];
-        else {
-            C = map[c] = counter++;
-            adj.pb(vi());
-            name.pb(c);
-        }
-        if (map.contains(d))D = map[d];
-        else {
-            D = map[d] = counter++;
-            adj.pb(vi());
-            name.pb(d);
-        }
-        if (map.contains(e))E = map[e];
-        else {
-            E = map[e] = counter++;
-            adj.pb(vi());
-            name.pb(e);
-        }
-        S = map[s];
-        if (A != S)adj[S].pb(A);
-        if (B != S)adj[S].pb(B);
-        if (C != S)adj[S].pb(C);
-        if (D != S)adj[S].pb(D);
-        if (E != S)adj[S].pb(E);
+        cin >> arr[i].first >> arr[i].second;
+        mnx = min(mnx, arr[i].first);
+        mxx = max(mxx, arr[i].first);
+        mny = min(mny, arr[i].second);
+        mxy = max(mxy, arr[i].second);
     }
-    n = sz(adj);
-    stack<int> order;
-    vb visited(n);
-    function<void(int)> topo = [&](int i) {
-        visited[i] = true;
-        for (int j: adj[i])if (!visited[j])topo(j);
-        order.push(i);
-    };
-    rep(0, n)if (!visited[i])topo(i);
-    vvi t(n);
-    rep(0, n)for (int j: adj[i])t[j].pb(i);
-    vector<vc> res;
-    visited.assign(n, false);
-    function<void(int)> dfs = [&](int i) {
-        visited[i] = true;
-        res.back().pb(name[i]);
-        for (int j: t[i])if (!visited[j])dfs(j);
-    };
-    while (!order.empty()) {
-        int i = order.top();
-        order.pop();
-        if (!visited[i]) {
-            res.pb(vc());
-            dfs(i);
+    for (auto [x, y]: arr)
+        if (x != mxx && x != mnx && y != mny && y != mxy) {
+            pr("Impossible");
+            return;
         }
+    int a = mxx - mnx, b = mxy - mny;
+    if (a == b) {
+        pr(mnx);
+        pr(mxx);
+        pr(mny);
+        pr(mxy);
+    } else if (a > b) { //extend y
+        int cnt1 = 0, cnt2 = 0;
+        for (auto [x, y]: arr) {
+            if (y == mxy && x != mnx && x != mxx)cnt1++;
+            else if (y == mny && x != mnx && x != mxx)cnt2++;
+        }
+        if (cnt1 == 0) {
+            pr(mnx);
+            pr(mxx);
+            pr(mny);
+            pr(mny + a);
+        } else if (cnt2 == 0) {
+            pr(mnx);
+            pr(mxx);
+            pr(mxy - a);
+            pr(mxy);
+        } else pr("Impossible");
+    } else {
+        int cnt1 = 0, cnt2 = 0;
+        for (auto [x, y]: arr) {
+            if (x == mxx & y != mny && y != mxy)cnt1++;
+            else if (x == mnx && y != mny && y != mxy)cnt2++;
+        }
+        if (cnt1 == 0) {
+            pr(mnx);
+            pr(mnx + b);
+            pr(mny);
+            pr(mxy);
+        } else if (cnt2 == 0) {
+            pr(mxx - b);
+            pr(mxx);
+            pr(mny);
+            pr(mxy);
+        } else pr("Impossible");
     }
-    rep(0, sz(res))sort(all(res[i]));
-    sort(all(res));
-    for (auto v: res)pr(v);
-    pnl("");
 }
-
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     int t = 1;
     //cin >> t;
-    while (_) {
+    while (t--) {
         solve();
     }
     return 0;
