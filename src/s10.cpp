@@ -135,89 +135,47 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-bool _ = true;
-
 inline void solve() {
-    int n, counter = 0;
-    cin >> n;
-    if (!n) {
-        _ = false;
-        return;
-    }
-    char a, b, c, d, e, s;
-    int A, B, C, D, E, S;
-    hmap<char, int> map;
-    vc name;
-    vvi adj;
-    rep(0, n) {
-        cin >> a >> b >> c >> d >> e >> s;
-        if (map.contains(a))A = map[a];
-        else {
-            A = map[a] = counter++;
-            adj.pb(vi());
-            name.pb(a);
-        }
-        if (map.contains(b))B = map[b];
-        else {
-            B = map[b] = counter++;
-            adj.pb(vi());
-            name.pb(b);
-        }
-        if (map.contains(c))C = map[c];
-        else {
-            C = map[c] = counter++;
-            adj.pb(vi());
-            name.pb(c);
-        }
-        if (map.contains(d))D = map[d];
-        else {
-            D = map[d] = counter++;
-            adj.pb(vi());
-            name.pb(d);
-        }
-        if (map.contains(e))E = map[e];
-        else {
-            E = map[e] = counter++;
-            adj.pb(vi());
-            name.pb(e);
-        }
-        S = map[s];
-        if (A != S)adj[S].pb(A);
-        if (B != S)adj[S].pb(B);
-        if (C != S)adj[S].pb(C);
-        if (D != S)adj[S].pb(D);
-        if (E != S)adj[S].pb(E);
-    }
-    n = sz(adj);
-    stack<int> order;
-    vb visited(n);
-    function<void(int)> topo = [&](int i) {
-        visited[i] = true;
-        for (int j: adj[i])if (!visited[j])topo(j);
-        order.push(i);
-    };
-    rep(0, n)if (!visited[i])topo(i);
-    vvi t(n);
-    rep(0, n)for (int j: adj[i])t[j].pb(i);
-    vector<vc> res;
-    visited.assign(n, false);
-    function<void(int)> dfs = [&](int i) {
-        visited[i] = true;
-        res.back().pb(name[i]);
-        for (int j: t[i])if (!visited[j])dfs(j);
-    };
-    while (!order.empty()) {
-        int i = order.top();
-        order.pop();
-        if (!visited[i]) {
-            res.pb(vc());
-            dfs(i);
+    int n, m, x, q;
+    string s;
+    cin >> n >> m;
+    hmap<string, int> registered;
+    vi lim(m);
+    rep(0, m) {
+        cin >> lim[i] >> x;
+        while (x--) {
+            cin >> s;
+            registered[s] = i;
         }
     }
-    rep(0, sz(res))sort(all(res[i]));
-    sort(all(res));
-    for (auto v: res)pr(v);
-    pnl("");
+    cin >> q;
+    hset<string> lots, outside;
+    set<string> res;
+    vi cnt(m);
+    while (q--) {
+        cin >> s;
+        if (lots.erase(s)) {
+            if (registered.contains(s))cnt[registered[s]]--;
+        } else if (outside.erase(s)) {
+        } else {
+            if (registered.contains(s)) {
+                int pos = registered[s];
+                if (sz(lots) < n) {
+                    lots.insert(s);
+                    if (++cnt[pos] > lim[pos])res.insert(s);
+                } else {
+                    outside.insert(s);
+                    res.insert(s);
+                }
+            } else {
+                res.insert(s);
+                if (sz(lots) < n)lots.insert(s);
+                else outside.insert(s);
+            }
+        }
+    }
+    pnl(sz(res));
+    pr(res);
 }
 
 
@@ -226,7 +184,7 @@ int32_t main() {
     cin.tie(nullptr);
     int t = 1;
     //cin >> t;
-    while (_) {
+    while (t--) {
         solve();
     }
     return 0;
