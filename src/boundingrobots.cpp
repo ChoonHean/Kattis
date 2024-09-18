@@ -134,58 +134,37 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     pr(arr);
     cout << nl;
 }
-
-#define f(a, b)(a)*120+b
-
+bool _ = true;
 inline void solve() {
-    int n;
-    cin >> n;
-    vvi adj(14400);
-    int x = 60, y = 60;
+    int n,m,q;
+    cin>>m>>n;
+    if((n|m)==0){
+        _=false;
+        return;
+    }
+    n--;
+    m--;
+    cin>>q;
+    int x=0,y=0,dist,x2=0,y2=0;
     char c;
-    rep(0, n) {
-        cin >> c;
-        if (c == 'N') {
-            adj[f(x, y)].pb(f(x, ++y));
-            adj[f(x, y)].pb(f(x, y - 1));
-        } else if (c == 'S') {
-            adj[f(x, y)].pb(f(x, --y));
-            adj[f(x, y)].pb(f(x, y + 1));
-        } else if (c == 'E') {
-            adj[f(x, y)].pb(f(++x, y));
-            adj[f(x, y)].pb(f(x - 1, y));
-        } else {
-            adj[f(x, y)].pb(f(--x, y));
-            adj[f(x, y)].pb(f(x + 1, y));
+    while(q--){
+        cin>>c>>dist;
+        if(c=='u'){
+            y+=dist;
+            y2=min(y2+dist,n);
+        }else if(c=='d'){
+            y-=dist;
+            y2=max(y2-dist,0);
+        }else if(c=='r'){
+            x+=dist;
+            x2=min(x2+dist,m);
+        }else{
+            x-=dist;
+            x2=max(x2-dist,0);
         }
     }
-    queue<int> q;
-    x = f(x, y);
-    q.push(f(60, 60));
-    int res = 0;
-    bitset<14400> visited;
-    while (!q.empty()) {
-        int size = sz(q);
-        bool ok = false;
-        while (size--) {
-            int i = q.front();
-            q.pop();
-            if (i == x) {
-                ok = true;
-                break;
-            }
-            for (auto j: adj[i])
-                if (!visited[j]) {
-                    visited[j] = true;
-                    q.push(j);
-                }
-        }
-        if (ok) {
-            pnl(res);
-            return;
-        }
-        res++;
-    }
+    pr("Robot thinks");pr(x);pnl(y);
+    pr("Actually at");pr(x2);pnl(y2);
 }
 
 
@@ -193,8 +172,8 @@ int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     int t = 1;
-    cin >> t;
-    while (t--) {
+    //cin >> t;
+    while (_) {
         solve();
     }
     return 0;
