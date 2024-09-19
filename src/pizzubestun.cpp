@@ -135,93 +135,28 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
-    int xx = y = 0;
-    int yy = x = 1;
-    while (b) { // repeats until b == 0
-        int q = a / b;
-        int t = b;
-        b = a % b;
-        a = t;
-        t = xx;
-        xx = x - q * xx;
-        x = t;
-        t = yy;
-        yy = y - q * yy;
-        y = t;
-    }
-    return a; // returns gcd(a, b)
-}
-
-inline ll binpow(ll a, int p, int m) {
-    ll res = 1;
-    while (p) {
-        if (p & 1)res = (res * a) % m;
-        a = (a * a) % m;
-        p >>= 1;
-    }
-    return res;
-}
-
-vi fac3{1, 1, 2}, fac11(11, 1), fac101(101, 1);
-vl fac(3000301, 1);
-vi arr{3, 11, 101, 3000301}; //1e10+3233 = 3*11*101*3000301
-ll M = 1e10 + 3233;
+#define f(a, b)(a)*120+b
 
 inline void solve() {
-    ll n, k, c;
-    cin >> n >> k >> c;
-    --n;
-    --c;
-    if (c > n) {
-        pnl(0);
-        return;
+    int n;
+    string s;
+    cin >> n;
+    vi arr(n);
+    rep(0, n) {
+        cin >> s >> arr[i];
     }
-    c = min(c, n - c);
-    vi mods;
-    for (ll m: arr) {
-        ll a = n, b = c, res = 1;
-        while (a && b) {
-            int x = a % m, y = b % m;
-            if (y > x) {
-                res = 0;
-                break;
-            }
-            if (m == 3)res = res * fac3[x] * fac3[y] * fac3[x - y] % m;
-            else if (m == 11)res = res * fac11[x] * binpow(fac11[y], m - 2, m) * binpow(fac11[x - y], m - 2, m) % m;
-            else if (m == 101)
-                res = res * fac101[x] % m * binpow(fac101[y], m - 2, m) % m * binpow(fac101[x - y], m - 2, m) % m;
-            else res = res * fac[x] % m * binpow(fac[y], m - 2, m) % m * binpow(fac[x - y], m - 2, m) % m;
-            a /= m, b /= m;
-        }
-        mods.pb(res);
-    }
-    ll res = (mods[1] * 12 - mods[0] * 11) % 33; //4 * 3 - 1 * 11 = 12 - 11 = 1
-    res = (mods[2] * 1617 - res * 1616) % 3333; //49 * 33 - 16 * 101 = 1617 - 1616 = 1
-    res = res * 4908492436LL % M -
-          mods[3] * 4908492435LL % M; //-1472695 * 3333 + 1636 * 3000301 = 4908492436 - 4908492435 = 1
-    while (res < 0)res += M;
-    res %= M;
-    pnl((res << 1) % M);
+    sort(all(arr), greater<int>());
+    ll res = 0;
+    for (int i = 0; i < n; i += 2)res += arr[i];
+    pr(res);
 }
 
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
-    cout.tie(nullptr);
-    rep(2, 11) {
-        fac11[i] = (fac11[i - 1] * i) % 11;
-        fac101[i] = (fac101[i - 1] * i) % 101;
-        fac[i] = (fac[i - 1] * i) % 3000301;
-    }
-    rep(11, 101) {
-        fac101[i] = (fac101[i - 1] * i) % 101;
-        fac[i] = (fac[i - 1] * i) % 3000301;
-    }
-    rep(101, 3000301)fac[i] = (fac[i - 1] * i) % 3000301;
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--) {
         solve();
     }
