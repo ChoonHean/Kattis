@@ -18,7 +18,7 @@ typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-const int inf = 1e9;
+const ll inf = 1e18;
 const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
@@ -163,40 +163,51 @@ inline ll binpow(ll a, int p, int m) {
     return res;
 }
 
-inline double f(int x, int y, int k) {
-    double t = sqrt((k - y) / 5.0);
-    return x / t;
-}
-
-inline pdd g(int x1, int y1, int x2, int y2, int k) {
-    double m = (y2 - y1) / (double) (x2 - x1);
-    double c = y2 - m * x2;
-    if (k > c)return pair(inf, 0);
-    double v = sqrt(20 * (c - k)) / abs(m);
-    double x = -v * v * m / 10;
-    return pair(x, v);
-}
-
 inline void solve() {
-    int w, h, top, btm, x, y, k;
-    double l, r;
-    cin >> w >> h >> btm >> top;
-    vpii t(top), b(btm);
-    rep(0, btm)cin >> b[i].first >> b[i].second;
-    rep(0, top)cin >> t[i].first >> t[i].second;
-    cin >> k >> l >> r;
-    double mn = 0, mx = DBL_MAX;
-    rep(0, btm)mn = max(mn, f(b[i].first, b[i].second, k));
-    rep(1, top) {
-        if (t[i].second < t[i - 1].second) {
-            pdd calc = g(t[i - 1].first, t[i - 1].second, t[i].first, t[i].second, k);
-            if (calc.first == inf)mx = 0;
-            else if (calc.first > t[i].first)mx = min(mx, f(t[i].first, t[i].second, k));
-            else mx = min(mx, calc.second);
-        } else mx = min(mx, f(t[i].first, t[i].second, k));
+    int n;
+    cin>>n;
+    string s;
+    queue<string>q;
+    rep(0,n){
+        cin>>s;
+        q.push(s);
     }
-    if (mx <= mn)pnl(0);
-    else pnl(max((min(mx, r) - max(mn, l)) / (r - l), 0.0));
+    hmap<char,int>has;
+    string correct="_____";
+    vector<bitset<256>>wrong(5);
+    while(true){
+        cout<<q.front()<<endl;
+        cin>>s;
+        if(s=="OOOOO")return;
+        has.clear();
+        rep(0,5){
+            if(s[i]=='O'){
+                correct[i]=q.front()[i];
+                has[s[i]]++;
+            }
+            else if(s[i]=='/'){
+                wrong[i][s[i]]=1;
+                has[s[i]]++;
+            }else{
+                for(int j=0;j<5;j++)wrong[j][s[i]]=1;
+            }
+        }
+        q.pop();
+        int size=sz(q);
+        while(size--){
+            s=q.front();
+            bool can=true;
+            rep(0,5)if(correct[i]!='_')if(s[i]!=correct[i])can=false;
+            vc cnt(26);
+            rep(0,5){
+                cnt[s[i]-'a']++;
+                if(wrong[i][s[i]])can=false;
+            }
+            if(!can)continue;
+            for(auto[a,b]:has)if(cnt[a-'a']<b)can=false;
+            if(can)q.push(s);
+        }
+    }
 }
 
 
@@ -205,7 +216,7 @@ int32_t main() {
     cin.tie(nullptr);
     cout.tie(nullptr);
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--) {
         solve();
     }
