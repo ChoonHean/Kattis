@@ -18,7 +18,7 @@ typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-const ll inf = 1e18;
+const int inf = 1e9;
 const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
@@ -34,14 +34,6 @@ const int mod = 1e9 + 7;
 #define ctz(i) __builtin_ctz(i)
 #define popcount(i) __builtin_popcount(i)
 #define LSOne(i) (i&-i)
-mt19937_64 rnd(time(0));
-
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-
-using namespace __gnu_pbds;
-typedef tree<string, null_type, less<string>, rb_tree_tag, tree_order_statistics_node_update> ordered_set;
-
 
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
@@ -172,27 +164,48 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    ordered_set treem, treef;
-    int command, gender;
-    string start, end;
-    while (true) {
-        cin >> command;
-        if (command == 0)return;
-        else if (command == 1) {
-            cin >> start >> gender;
-            if (gender == 1)treem.insert(start);
-            else treef.insert(start);
-        } else if (command == 2) {
-            cin >> start;
-            treem.erase(start);
-            treef.erase(start);
+    int d, m, k;
+    string s, curr;
+    cin >> d >> m >> s >> k;
+    vi arr(20);
+    int total;
+    if (s[0] == 's') {
+        arr.assign(20, 1);
+        total = 20;
+    } else if (s[0] == 'a') {
+        rep(0, 20)for (int j = 0; j < 20; j++)arr[max(i, j)] += 1;
+        total = 400;
+    } else {
+        rep(0, 20)for (int j = 0; j < 20; j++)arr[min(i, j)] += 1;
+        total = 400;
+    }
+    int fail = arr[0], pass = arr[19];
+    total -= fail + pass;
+    hmap<int, int> dp, ndp;
+    rep(1, 19)dp[i + 1 + m] = arr[i];
+    rep(0, k) {
+        cin >> curr;
+        int x = stoi(curr.substr(2));
+        total *= x;
+        if (curr[0] == '+') {
+            for (auto [a, b]: dp) {
+                for (int j = 1; j <= x; j++)ndp[j + a] += b;
+            }
         } else {
-            cin >> start >> end >> gender;
-            if (gender == 0)pnl(treem.order_of_key(end) - treem.order_of_key(start) + treef.order_of_key(end) -
-                                treef.order_of_key(start));
-            else if (gender == 1)pnl(treem.order_of_key(end) - treem.order_of_key(start));
-            else pnl(treef.order_of_key(end) - treef.order_of_key(start));
+            for (auto [a, b]: dp) {
+                for (int j = 1; j <= x; j++)ndp[a - j] += b;
+            }
         }
+        dp.clear();
+        swap(dp, ndp);
+    }
+    double res = 0;
+    for (auto [a, b]: dp)if (a >= d)res += b;
+    cout << fixed << setprecision(10);
+    if (s[0] == 's') {
+        pnl(0.9 * res / total + 0.05);
+    } else {
+        pnl(0.9 * res / total + pass / 400.0);
     }
 }
 

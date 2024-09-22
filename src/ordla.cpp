@@ -34,14 +34,6 @@ const int mod = 1e9 + 7;
 #define ctz(i) __builtin_ctz(i)
 #define popcount(i) __builtin_popcount(i)
 #define LSOne(i) (i&-i)
-mt19937_64 rnd(time(0));
-
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-
-using namespace __gnu_pbds;
-typedef tree<string, null_type, less<string>, rb_tree_tag, tree_order_statistics_node_update> ordered_set;
-
 
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
@@ -172,27 +164,57 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    ordered_set treem, treef;
-    int command, gender;
-    string start, end;
+    int n;
+    cin >> n;
+    string s;
+    deque<string> q, next;
+    rep(0, n) {
+        cin >> s;
+        q.push_front(s);
+    }
+    hmap<char, int> has;
+    string correct = "_____", ans;
+    vector<bitset<256>> wrong(5);
     while (true) {
-        cin >> command;
-        if (command == 0)return;
-        else if (command == 1) {
-            cin >> start >> gender;
-            if (gender == 1)treem.insert(start);
-            else treef.insert(start);
-        } else if (command == 2) {
-            cin >> start;
-            treem.erase(start);
-            treef.erase(start);
-        } else {
-            cin >> start >> end >> gender;
-            if (gender == 0)pnl(treem.order_of_key(end) - treem.order_of_key(start) + treef.order_of_key(end) -
-                                treef.order_of_key(start));
-            else if (gender == 1)pnl(treem.order_of_key(end) - treem.order_of_key(start));
-            else pnl(treef.order_of_key(end) - treef.order_of_key(start));
+        s = q.front();
+        cout << s << endl;
+        cin >> ans;
+        if (ans == "OOOOO")return;
+        has.clear();
+        rep(0, 5) {
+            if (ans[i] == 'O') {
+                correct[i] = s[i];
+                has[s[i]]++;
+            } else if (ans[i] == '/') {
+                wrong[i][s[i]] = 1;
+                has[s[i]]++;
+            } else {
+                bool exist = false;
+                for (int j = 0; j < i; j++)if (s[i] == s[j] && ans[j] == '/')exist = true;
+                if (exist)wrong[i][s[i]] = 1;
+                else {
+                    for (int j = 0; j < 5; j++) {
+                        if (ans[j] == 'O')continue;
+                        wrong[j][s[i]] = 1;
+                    }
+                }
+            }
         }
+        q.pop_front();
+        while (!q.empty()) {
+            s = q.front();
+            q.pop_front();
+            bool can = true;
+            rep(0, 5)if (correct[i] != '_')if (s[i] != correct[i])can = false;
+            vc cnt(26);
+            rep(0, 5) {
+                cnt[s[i] - 'a']++;
+                if (wrong[i][s[i]])can = false;
+            }
+            for (auto [a, b]: has)if (cnt[a - 'a'] < b)can = false;
+            if (can)next.push_front(s);
+        }
+        swap(q, next);
     }
 }
 

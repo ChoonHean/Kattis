@@ -18,7 +18,7 @@ typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-const ll inf = 1e18;
+const int inf = 1e9;
 const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int i=0;i<n;i++)cin>>arr[i]
@@ -34,14 +34,6 @@ const int mod = 1e9 + 7;
 #define ctz(i) __builtin_ctz(i)
 #define popcount(i) __builtin_popcount(i)
 #define LSOne(i) (i&-i)
-mt19937_64 rnd(time(0));
-
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-
-using namespace __gnu_pbds;
-typedef tree<string, null_type, less<string>, rb_tree_tag, tree_order_statistics_node_update> ordered_set;
-
 
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
@@ -172,35 +164,54 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    ordered_set treem, treef;
-    int command, gender;
-    string start, end;
-    while (true) {
-        cin >> command;
-        if (command == 0)return;
-        else if (command == 1) {
-            cin >> start >> gender;
-            if (gender == 1)treem.insert(start);
-            else treef.insert(start);
-        } else if (command == 2) {
-            cin >> start;
-            treem.erase(start);
-            treef.erase(start);
-        } else {
-            cin >> start >> end >> gender;
-            if (gender == 0)pnl(treem.order_of_key(end) - treem.order_of_key(start) + treef.order_of_key(end) -
-                                treef.order_of_key(start));
-            else if (gender == 1)pnl(treem.order_of_key(end) - treem.order_of_key(start));
-            else pnl(treef.order_of_key(end) - treef.order_of_key(start));
+    int n;
+    cin >> n;
+    read(n);
+    bool dec = false, reversed = false;
+    set<int> tree;
+    int val = 0;
+    tree.insert(0);
+    tree.insert(arr[0]);
+    rep(1, n) {
+        if (arr[i] < arr[i - 1]) {
+            if (reversed) {
+                cout << "No";
+                return;
+            }
+            if (dec) {
+                continue;
+            } else {
+                val = *--tree.lower_bound(arr[i - 1]);
+                dec = true;
+            }
+        } else if (arr[i] > arr[i - 1]) {
+            if (tree.upper_bound(arr[i]) != tree.end()) {
+                cout << "No";
+                return;
+            }
+            if (dec) {
+                if (arr[i - 1] < val) {
+                    cout << "No";
+                    return;
+                }
+                reversed = true;
+                dec = false;
+            }
         }
+        tree.insert(arr[i]);
     }
+    if (dec)
+        if (arr.back() < val) {
+            cout << "No";
+            return;
+        }
+    cout << "Yes";
 }
 
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
-    cout.tie(nullptr);
     int t = 1;
     //cin >> t;
     while (t--) {
