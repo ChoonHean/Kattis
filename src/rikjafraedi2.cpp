@@ -168,20 +168,22 @@ inline ll binpow(ll a, int p, int m) {
     }
     return res;
 }
-const int N=1000;
+
+const int N = 1000;
+
 inline void solve() {
-    int n,q,command,x,y;
-    cin>>n>>q;
-    vector<bitset<N>>arr(n);
-    rep(0,n)arr[i][i]=1;
-    while(q--){
-        cin>>command>>x>>y;
-        if(command){
-            arr[x-1][y-1]?pnl("Jebb"):pnl("Neibb");
-        }else{
-            arr[--x]|=arr[y-1];
-            auto &curr=arr[x];
-            rep(0,n)if(arr[i][x])arr[i]|=curr;
+    int n, q, command, x, y;
+    cin >> n >> q;
+    vector<bitset<N>> arr(n);
+    rep(0, n)arr[i][i] = 1;
+    while (q--) {
+        cin >> command >> x >> y;
+        if (command) {
+            arr[x - 1][y - 1] ? pnl("Jebb") : pnl("Neibb");
+        } else {
+            arr[--x] |= arr[y - 1];
+            auto &curr = arr[x];
+            rep(0, n)if (arr[i][x])arr[i] |= curr;
         }
     }
 }
