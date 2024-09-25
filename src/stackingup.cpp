@@ -172,30 +172,27 @@ inline ll binpow(ll a, int p, int m) {
 inline void solve() {
     int n;
     cin >> n;
-    int mx = 0, m = 0;
     read(n);
-    rep(0, n)
-        if (arr[i] > mx) {
-            mx = arr[i];
-            m = i;
-        }
-    ll lo = 0, hi = 7.5e9, y = mx - arr[0] - 4;
-    while (lo < hi) {
-        ll mid = lo + hi >> 1;
-        bool can = true;
-        double x = mid + m;
-        double grad = y / x;
-        double c = mid * grad + 4 + arr[0];
-        rep(0, m) {
-            if (arr[i] >= grad * i + c) {
-                can = false;
-                break;
+    stack<string> s;
+    int cnt = 0;
+    for (int i = n - 1; i >= 0; i--) {
+        int cur = arr[i] + cnt;
+        while (cur) {
+            if (cur == 1)s.push("1");
+            else if (cur & 1) {
+                s.push("d+1+");
+                cnt += 2;
+            } else {
+                s.push("d+");
+                cnt++;
             }
+            cur >>= 1;
         }
-        if (can)hi = mid;
-        else lo = mid + 1;
     }
-    cout << lo;
+    while (!s.empty()) {
+        cout << s.top();
+        s.pop();
+    }
 }
 
 
