@@ -68,7 +68,7 @@ struct ST {
     }
 
     ST(int sz) : n(sz), A(n) {
-        int mx = 1 << (32 - __builtin_clz(n - 1));
+        int mx = (1 << (33 - __builtin_clz(n - 1))) + 1;
         st.resize(mx);
         lazy.assign(mx, -1);
     }
