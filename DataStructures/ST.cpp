@@ -67,7 +67,11 @@ struct ST {
         }
     }
 
-    ST(int sz) : n(sz), A(n), st(4 * n), lazy(4 * n, -1) {}
+    ST(int sz) : n(sz), A(n) {
+        int mx = 1 << (32 - __builtin_clz(n - 1));
+        st.resize(mx);
+        lazy.assign(mx, -1);
+    }
 
     ST(const vi &initialA) : ST((int) initialA.size()) {
         A = initialA;
