@@ -169,57 +169,29 @@ inline ll binpow(ll a, int p, int m) {
     return res;
 }
 
-typedef bitset<50000> bs;
-
 inline void solve() {
-    int n, u, v, c;
-    cin >> n;
-    vector<vpii> adj(n);
-    bs ones;
-    rep(0, n)ones.set(i);
-    bs res = ones;
-    rep(1, n) {
-        cin >> u >> v >> c;
-        adj[--u].pb(pair(--v, c));
-        adj[v].pb(pair(u, c));
-    }
-    vector<bs> arr(n);
-    vi p(n);
-    auto dfs = [&](auto &self, int i, int par) -> void {
-        arr[i][i] = 1;
-        p[i] = par;
-        for (auto [j, k]: adj[i]) {
-            if (j == par)continue;
-            self(self, j, i);
-            arr[i] |= arr[j];
+    int n, m;
+    cin >> n >> m;
+    vvi grid(n, vi(m));
+    for (int j = 0; j < n; j++)readarr(m, grid[j]);
+    map<int, vpii> mp;
+    vi row(n), col(m);
+    rep(0, n)for (int j = 0; j < m; j++)mp[grid[i][j]].pb({i, j});
+    for (auto [x, v]: mp) {
+        unordered_map<int, int> nrow, ncol;
+        for (auto [i, j]: v) {
+            int mx = max(row[i], col[j]) + 1;
+            nrow[i] = max(nrow[i], mx);
+            ncol[j] = max(ncol[j], mx);
         }
-    };
-    dfs(dfs, 0, 0);
-    rep(0, n) {
-        bs par = ones;
-        map<int, vi> mp;
-        int pcol;
-        for (auto [j, k]: adj[i]) {
-            if (j == p[i]) {
-                pcol = k;
-                continue;
-            }
-            par ^= arr[j];
-            mp[k].pb(j);
-        }
-        par.reset(i);
-        mp[pcol].pb(p[i]);
-        for (auto [x, vec]: mp) {
-            if (sz(vec) > 1) {
-                for (auto j: vec) {
-                    if (j == p[i])res &= ~par;
-                    else res &= ~arr[j];
-                }
-            }
+        for (auto [i, j]: v) {
+            row[i] = col[j] = max(nrow[i], ncol[j]);
         }
     }
-    pnl(res.count());
-    rep(0, n)if (res[i])pnl(i + 1);
+    int res = 0;
+    for (int i: row)res = max(res, i);
+    for (int i: col)res = max(res, i);
+    cout << res;
 }
 
 
