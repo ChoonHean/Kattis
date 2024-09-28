@@ -170,53 +170,44 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    int n;
-    cin >> n;
-    vl arr(n);
-    readarr(n, arr);
-    vi pre(n), post(n);
-    stack<int> s;
-    rep(0, n) {
-        while (!s.empty() && arr[s.top()] > arr[i]) {
-            post[s.top()] = i;
+    int r, c;
+    cin >> r >> c;
+    vs arr(r);
+    readarr(r, arr);
+    int res = 0;
+    vi dp(c);
+    rep(0, c)if (arr[0][i] == '.')dp[i] = 1;
+    stack<pii> s;
+    s.push({0, 0});
+    rep(0, c) {
+        while (dp[i] < s.top().first) {
+            res = max(res, s.top().first + i - s.top().second);
             s.pop();
         }
-        s.push(i);
+        while (dp[i] > s.top().first)s.push({s.top().first + 1, i});
     }
-    while (!s.empty()) {
-        post[s.top()] = n;
+    while (s.top().first) {
+        res = max(res, s.top().first + c - s.top().second);
         s.pop();
     }
-    s.push(n - 1);
-    for (int i = n - 1; i >= 0; i--) {
-        while (!s.empty() && arr[s.top()] > arr[i]) {
-            pre[s.top()] = i;
-            s.pop();
+    rep(1, r) {
+        for (int j = 0; j < c; j++) {
+            if (arr[i][j] == '.')dp[j]++;
+            else dp[j] = 0;
         }
-        s.push(i);
-    }
-    while (!s.empty()) {
-        pre[s.top()] = -1;
-        s.pop();
-    }
-    ll res = 0;
-    int l = n, r = n;
-    rep(0, n) {
-        ll next = (post[i] - pre[i] - 1) * arr[i];
-        if (next > res) {
-            res = next;
-            l = pre[i] + 2;
-            r = post[i];
-        } else if (next == res) {
-            if (pre[i] + 2 < l) {
-                l = pre[i] + 2;
-                r = post[i];
+        for (int j = 0; j < c; j++) {
+            while (dp[j] < s.top().first) {
+                res = max(res, s.top().first + j - s.top().second);
+                s.pop();
             }
+            while (dp[j] > s.top().first)s.push({s.top().first + 1, j});
+        }
+        while (s.top().first) {
+            res = max(res, s.top().first + c - s.top().second);
+            s.pop();
         }
     }
-    pr(l);
-    pr(r);
-    pr(res);
+    cout << (res << 1) - 1;
 }
 
 
