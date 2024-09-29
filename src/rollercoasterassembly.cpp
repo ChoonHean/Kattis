@@ -1,3 +1,5 @@
+// Will TLE bigger cases as it is O(n^2logn) but partial marks are awarded
+
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
@@ -174,8 +176,36 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    int n,m;
-    cin>>n;
+    int n,a,b,prev;
+    cin>>n>>a>>prev;
+    map<int,ll>dp,ndp;
+    dp[a]=dp[0]=0;
+    rep(2,n){
+        cin>>a>>b;
+        for(auto it=next(dp.begin());it!=dp.end();it++){
+            auto[in,x]=*it;
+            ndp[0]=max(ndp[0],x+min(prev,a)+min(b,in));
+            ll next=x+min(a,prev);
+            auto it2=ndp.lower_bound(in);
+            if(it2==ndp.end())ndp[in]=next;
+            else if(it2->second<next)ndp[in]=next;
+        }
+        auto[in,x]=*dp.begin();
+        auto it=ndp.lower_bound(a);
+        if(it==ndp.end())ndp[a]=x;
+        else if(it->second<x)ndp[a]=x;
+        prev=b;
+        swap(dp,ndp);
+        ndp.clear();
+        pr(dp);
+    }
+    cin>>a>>b;
+    ll res=0;
+    for(auto it=next(dp.begin());it!=dp.end();it++){
+        auto[in,x]=*it;
+        res=max(res,x+min(prev,a)+min(in,b));
+    }
+    cout<<res;
 }
 
 int32_t main() {
@@ -183,7 +213,7 @@ int32_t main() {
     cin.tie(nullptr);
     cout.tie(nullptr);
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--) {
         solve();
     }
