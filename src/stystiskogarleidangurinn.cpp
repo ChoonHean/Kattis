@@ -174,9 +174,39 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    int n,m;
-    cin>>n;
-    
+    int n, m, s, u, v, x;
+    cin >> n >> m >> s;
+    read(n);
+    vi sorted(arr);
+    sort(all(sorted), greater<int>());
+    vector<vpii> adj(n);
+    while (m--) {
+        cin >> u >> v >> x;
+        adj[--u].pb({--v, x});
+        adj[v].pb({u, x});
+    }
+    int done = (1 << n) - 1;
+    m = (n + 1) << n;
+    vi dist(m, inf);
+    set<pii> pq;
+    pq.emplace(0, 1);
+    rep(2, m)pq.emplace_hint(pq.end(), inf, i);
+    while (!pq.empty()) {
+        auto [cur, i] = *pq.begin();
+        if ((i & done) == done) {
+            cout << cur + accumulate(sorted.begin() + s, sorted.end(), 0);
+            return;
+        }
+        pq.erase(pq.begin());
+        for (auto [j, d]: adj[i >> n]) {
+            int nextd = cur + d, nextj = (i & done) | (j << n) | (1 << j);
+            if (nextd < dist[nextj]) {
+                pq.erase(pair(dist[nextj], nextj));
+                pq.emplace(nextd, nextj);
+                dist[nextj] = nextd;
+            }
+        }
+    }
 }
 
 int32_t main() {
