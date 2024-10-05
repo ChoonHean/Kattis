@@ -173,19 +173,42 @@ inline ll binpow(ll a, int p, int m) {
     return res;
 }
 
-struct LCA {
-    int n;
-    vpii A,st;
+struct UFDS {
+    vi p;
 
-    inline int l(int p) { return p << 1; }
-    inline int r(int p) { return (p << 1) + 1; }
+    UFDS(int n) {
+        p.reserve(n);
+        for (int i = 0; i < n; i++)p.push_back(i);
+    }
+
+    int find(int n) {
+        if (n == p[n])return n;
+        return p[n] = find(p[n]);
+    }
+
+    inline bool sameset(int x, int y) { return find(x) == find(y); }
+
+    inline void unionset(int x, int y) {
+        x = find(x);
+        y = find(y);
+        p[y] = x;
+    }
+};
+
+struct LCA {
+    int n;                                         // n = (int)A.size()
+    vpii A;
+    vpii st;
+
+    inline int l(int p) { return p << 1; }                 // go to left child
+    inline int r(int p) { return (p << 1) + 1; }              // go to right child
 
     inline pii conquer(pii a, pii b) {
         if (a.first < b.first)return a;
         else return b;
     }
 
-    void build(int p, int L, int R) {
+    void build(int p, int L, int R) {              // O(n)
         if (L == R)
             st[p] = A[L];
         else {
@@ -196,9 +219,9 @@ struct LCA {
         }
     }
 
-    pii RMQ(int p, int L, int R, int i, int j) {
-        if (i > j) return {inf, inf};
-        if ((L >= i) && (R <= j)) return st[p];
+    pii RMQ(int p, int L, int R, int i, int j) {   // O(log n)
+        if (i > j) return {inf, inf};                        // infeasible
+        if ((L >= i) && (R <= j)) return st[p];      // found the segment
         int m = (L + R) / 2;
         return conquer(RMQ(l(p), L, m, i, min(m, j)),
                        RMQ(r(p), m + 1, R, max(i, m + 1), j));
@@ -217,16 +240,107 @@ struct LCA {
     inline int RMQ(int i, int j) { return RMQ(1, 0, n - 1, i, j).second; }
 };
 
+struct ST {
+    int n;                                         // n = (int)A.size()
+    vi A, st, lazy;                                // the arrays
+
+    inline int l(int p) { return p << 1; }                 // go to left child
+    inline int r(int p) { return (p << 1) + 1; }              // go to right child
+
+    inline int conquer(int a, int b) {
+        if (a == -1) return b;                       // corner case
+        if (b == -1) return a;
+        return min(a, b);                            // RMQ
+    }
+
+    void build(int p, int L, int R) {              // O(n)
+        if (L == R)
+            st[p] = A[L];                              // base case
+        else {
+            int m = (L + R) / 2;
+            build(l(p), L, m);
+            build(r(p), m + 1, R);
+            st[p] = conquer(st[l(p)], st[r(p)]);
+        }
+    }
+
+    inline void propagate(int p, int L, int R) {
+        if (lazy[p] != -1) {                         // has a lazy flag
+            st[p] = lazy[p];                           // [L..R] has same value
+            if (L != R)                                // not a leaf
+                lazy[l(p)] = lazy[r(p)] = lazy[p];       // propagate downwards
+            else                                       // L == R, a single index
+                A[L] = lazy[p];                          // time to update this
+            lazy[p] = -1;                              // erase lazy flag
+        }
+    }
+
+    int RMQ(int p, int L, int R, int i, int j) {   // O(log n)
+        propagate(p, L, R);                          // lazy propagation
+        if (i > j) return -1;                        // infeasible
+        if ((L >= i) && (R <= j)) return st[p];      // found the segment
+        int m = (L + R) / 2;
+        return conquer(RMQ(l(p), L, m, i, min(m, j)),
+                       RMQ(r(p), m + 1, R, max(i, m + 1), j));
+    }
+
+    void update(int p, int L, int R, int i, int j, int val) { // O(log n)
+        propagate(p, L, R);                          // lazy propagation
+        if (i > j) return;
+        if ((L >= i) && (R <= j)) {                  // found the segment
+            lazy[p] = val;                             // update this
+            propagate(p, L, R);                        // lazy propagation
+        } else {
+            int m = (L + R) / 2;
+            update(l(p), L, m, i, min(m, j), val);
+            update(r(p), m + 1, R, max(i, m + 1), j, val);
+            int lsubtree = (lazy[l(p)] != -1) ? lazy[l(p)] : st[l(p)];
+            int rsubtree = (lazy[r(p)] != -1) ? lazy[r(p)] : st[r(p)];
+            st[p] = conquer(lsubtree, rsubtree);
+        }
+    }
+
+    ST(int sz) : n(sz), A(n) {
+        int mx = (1 << (33 - __builtin_clz(n - 1))) + 1;
+        st.resize(mx);
+        lazy.assign(mx, -1);
+    }
+
+    ST(const vi &initialA) : ST((int) initialA.size()) {
+        A = initialA;
+        build(1, 0, n - 1);
+    }
+
+    inline void update(int i, int j, int val) { update(1, 0, n - 1, i, j, val); }
+
+    inline int RMQ(int i, int j) { return RMQ(1, 0, n - 1, i, j); }
+};
 
 inline void solve() {
-    int n;
-    cin>>n;
-    vi heavy(n), group(n),subtree(n,-1),roots;
+    int n, m, q, u, v;
+    cin >> n >> m >> q;
+    vector<pair<int, pii>> e(m);
+    for (auto &[w, p]: e) {
+        cin >> u >> v >> w;
+        p.first = u - 1;
+        p.second = v - 1;
+    }
+    sort(all(e), greater<pair<int, pii>>());
+    vector<vpii> adj(n);
+    UFDS ufds(n);
+    for (auto &[w, p]: e) {
+        if (!ufds.sameset(p.first, p.second)) {
+            adj[p.first].pb({p.second, w});
+            adj[p.second].pb({p.first, w});
+            ufds.unionset(p.first, p.second);
+        }
+    }
+    vi heavy(n), group(n), subtree(n, -1), roots;
     vpii par(n);
     int _;
     auto dfs = [&](auto &self, int i) -> int {
         int size = 1, mx = 0;
-        subtree[i]=_;
+        subtree[i] = _;
         for (auto &[j, w]: adj[i]) {
             if (j == par[i].first)continue;
             par[j].first = i;
@@ -240,11 +354,11 @@ inline void solve() {
         }
         return size;
     };
-    rep(0,n){
-        if(subtree[i]!=-1)continue;
-        _=i;
+    rep(0, n) {
+        if (subtree[i] != -1)continue;
+        _ = i;
         roots.pb(i);
-        dfs(dfs,i);
+        dfs(dfs, i);
     }
     auto decompose = [&](auto &self, int i, int p) -> void {
         group[i] = p;
@@ -254,50 +368,48 @@ inline void solve() {
             else self(self, j, j);
         }
     };
-    for(int&i:roots)decompose(decompose,i,i);
+    for (int &i: roots)decompose(decompose, i, i);
     vi first(n);
     vpii order;
     int idx;
     auto processlca = [&](auto &self, int i, int d) -> void {
         first[i] = idx++;
-        order.pb({d,i});
+        order.pb({d, i});
         for (auto &[j, w]: adj[i]) {
             if (j == par[i].first)continue;
             self(self, j, d + 1);
-            order.pb({d,i});
+            order.pb({d, i});
             idx++;
         }
     };
     hmap<int, hmap<int, vi>> maps;
     hmap<int, LCA> lcas;
     vi posinpath(n, -1);
-    for(int&i:roots){
+    for (int &i: roots) {
         order.clear();
-        idx=0;
-        processlca(processlca,i,0);
-        lcas.emplace(i,LCA(order));
-        auto&mp=maps[i];
-        mp[group[i]].pb(inf);
-        queue<int>qq;
+        idx = 0;
+        processlca(processlca, i, 0);
+        lcas.emplace(i, LCA(order));
+        auto &mp = maps[i];
+        queue<int> qq;
         qq.push(i);
-        posinpath[i]=0;
-        while(!qq.empty()){
-            int j=qq.front();
+        posinpath[i] = 0;
+        while (!qq.empty()) {
+            int j = qq.front();
             qq.pop();
-            for(auto&[k,w]:adj[j]){
-                if(k==par[j].first)continue;
+            for (auto &[k, w]: adj[j]) {
+                if (k == par[j].first)continue;
                 qq.push(k);
-                posinpath[k]=sz(mp[group[k]]);
-                if(group[j]==group[k])mp[group[k]].pb(w);
-                else mp[group[k]].pb(inf);
+                posinpath[k] = sz(mp[group[k]]);
+                if (group[j] == group[k])mp[group[k]].pb(w);
             }
         }
     }
-    hmap<int,hmap<int,ST>>paths;
-    for(auto&i:roots){
-        auto&mp=paths[i];
-        for(auto&[g,vec]:maps[i]){
-            mp.emplace(g,ST(vec));
+    hmap<int, hmap<int, ST>> paths;
+    for (auto &i: roots) {
+        auto &mp = paths[i];
+        for (auto &[g, vec]: maps[i]) {
+            mp.emplace(g, ST(vec));
         }
     }
     int x = 0, a, b, c;
@@ -315,8 +427,8 @@ inline void solve() {
             x++;
             continue;
         }
-        int root=subtree[a];
-        auto&path=paths[root];
+        int root = subtree[a];
+        auto &path = paths[root];
         u = first[a], v = first[b];
         if (u > v)swap(u, v);
         int lca = lcas.find(root)->second.RMQ(u, v);
@@ -327,14 +439,14 @@ inline void solve() {
             res = min(res, par[a].second);
             a = par[a].first;
         }
-        if (a != lca)res = min(res, path.find(group[a])->second.RMQ(posinpath[lca]+1, posinpath[a]));
+        if (a != lca)res = min(res, path.find(group[a])->second.RMQ(posinpath[lca] + 1, posinpath[a]));
         while (group[b] != group[lca]) {
             res = min(res, path.find(group[b])->second.RMQ(0, posinpath[b]));
             b = group[b];
             res = min(res, par[b].second);
             b = par[b].first;
         }
-        if (b != lca)res = min(res, path.find(group[b])->second.RMQ(posinpath[lca]+1, posinpath[b]));
+        if (b != lca)res = min(res, path.find(group[b])->second.RMQ(posinpath[lca] + 1, posinpath[b]));
         if (res < c)pnl("Neibb");
         else {
             pnl("Jebb");
