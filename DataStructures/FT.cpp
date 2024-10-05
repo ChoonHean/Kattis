@@ -5,7 +5,7 @@
 
 using namespace std;
 
-#define LSOne(S) ((S) & -(S))                    // the key operation
+#define lsb(S) ((S) & -(S))                    // the key operation
 
 typedef long long ll;                            // for extra flexibility
 typedef vector<ll> vl;
@@ -20,8 +20,8 @@ struct FT {                              // index 0 is not used
         ft.assign(m + 1, 0);
         for (int i = 1; i <= m; ++i) {               // O(m)
             ft[i] += f[i];                             // add this value
-            if (i + LSOne(i) <= m)                       // i has parent
-                ft[i + LSOne(i)] += ft[i];                 // add to that parent
+            if (i + lsb(i) <= m)                       // i has parent
+                ft[i + lsb(i)] += ft[i];                 // add to that parent
         }
     }
 
@@ -36,7 +36,7 @@ struct FT {                              // index 0 is not used
 
     inline ll rsq(int j) {                                // returns RSQ(1, j)
         ll sum = 0;
-        for (; j; j -= LSOne(j))
+        for (; j; j -= lsb(j))
             sum += ft[j];
         return sum;
     }
@@ -45,7 +45,7 @@ struct FT {                              // index 0 is not used
 
     // updates value of the i-th element by v (v can be +ve/inc or -ve/dec)
     inline void update(int i, ll v) {
-        for (; i < (int) ft.size(); i += LSOne(i))
+        for (; i < (int) ft.size(); i += lsb(i))
             ft[i] += v;
     }
 
@@ -91,4 +91,38 @@ struct RURQ {                                    // RURQ variant
     }
 
     inline ll rsq(int i, int j) { return rsq(j) - rsq(i - 1); } // standard
+};
+
+// From mouse_wireless
+// https://codeforces.com/blog/entry/64914
+
+/* Example use cases
+ * BIT<N, M, K> b; create a N x M x K BIT 
+ * b.update(x, y, z, P); add a point with (x,y,z)
+ * b.query(x1, x2, y1, y2, z1, z2); 
+ */
+
+template <int... ArgsT> struct BIT {
+    int val = 0;
+    void update(int v) {
+        val += v;
+    }
+    int query() {
+        return val;
+    }
+};
+template <int N, int... Ns>
+struct BIT<N, Ns...> {
+    BIT<Ns...> bit[N + 1];
+    template<typename... Args>
+    void update(int pos, Args... args) {
+        for (; pos <= N; bit[pos].update(args...), pos += lsb(pos));
+    }
+    template<typename... Args>
+    int query(int l, int r, Args... args) {
+        int ans = 0;
+        for (; r >= 1; ans += bit[r].query(args...), r -= lsb(r));
+        for (--l; l >= 1; ans -= bit[l].query(args...), l -= lsb(l));
+        return ans;
+    }
 };
