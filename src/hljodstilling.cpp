@@ -174,21 +174,25 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    int n, res = 0;
-    cin >> n;
+    ll l,r;
+    int n;
+    cin>>l>>r>>n;
+    l--;
     read(n);
-    stack<pii> s;
-    s.push({arr[0], 0});
-    rep(1, n) {
-        while (s.size() > 1 && s.top().first < arr[i]) {
-            res = max(res, i - s.top().second);
-            s.pop();
+    ll res=0;
+    rep(1,1<<n){
+        ll test=1;
+        for(int j=0;j<n;j++){
+            if((i>>j)&1){
+                test*=arr[j];
+                if(test>r)break;
+            }
         }
-        if (s.top().first != arr[i])res = max(res, i - s.top().second);
-        while (s.size() && s.top().first <= arr[i])s.pop();
-        s.push({arr[i], i});
+        ll chg=r/test-l/test;
+        if(popcount(i)&1)res+=chg;
+        else res-=chg;
     }
-    cout << res;
+    cout<<res;
 }
 
 int32_t main() {
