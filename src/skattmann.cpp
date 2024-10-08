@@ -249,7 +249,7 @@ inline void solve() {
         }
     }
     vi res2;
-    rep((int)sqrt(n)+1, n + 1) {
+    rep(n / 2 + 1, n + 1) {
         if (!prime[i]) {
             hset<int> *cur = new hset<int>();
             if (i & 1) {

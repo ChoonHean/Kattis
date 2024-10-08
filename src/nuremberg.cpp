@@ -174,140 +174,56 @@ inline ll binpow(ll a, int p, int m) {
     return res;
 }
 
-struct cmp {
-    bool operator()(pair<hset<int> *, int> a, pair<hset<int> *, int> b) {
-        if (a.first->size() == b.first->size()) {
-            return a.second < b.second;
-        }
-        return a.first->size() > b.first->size();
-    }
-};
+#define int ll
 
 inline void solve() {
-    int n;
+    int n, m, u, v, t;
     cin >> n;
-    vb prime(n + 1, 1);
-    for (int i = 2; i <= sqrt(n); i++) {
-        if (prime[i]) {
-            for (int j = i * i; j <= n; j += i)prime[j] = 0;
-        }
+    vvpii adj(n);
+    rep(1, n) {
+        cin >> u >> v >> t;
+        t <<= 1;
+        adj[--u].pb({--v, t});
+        adj[v].pb({u, t});
     }
-    vector<pair<hset<int> *, int>> arr;
-    hmap<int, vi> multiples;
-    hmap<int, hset<int> *> finder;
-    vi res;
-    rep(4, n + 1) {
-        if (!prime[i]) {
-            hset<int> *cur = new hset<int>();
-            if (i & 1) {
-                for (int j = 3; j <= sqrt(i); j += 2) {
-                    if (i % j == 0) {
-                        cur->insert(j);
-                        multiples[j].pb(i);
-                        int o = i / j;
-                        cur->insert(o);
-                        multiples[o].pb(i);
-                    }
-                }
-            } else {
-                for (int j = 2; j <= sqrt(i); j++) {
-                    if (i % j == 0) {
-                        cur->insert(j);
-                        multiples[j].pb(i);
-                        int o = i / j;
-                        cur->insert(o);
-                        multiples[o].pb(i);
-                    }
-                }
+    vi times(n);
+    cin >> m;
+    rep(0, m) {
+        cin >> u >> t;
+        times[u - 1] = t;
+    }
+    t = accumulate(all(times), 0);
+    vi dp(n);
+    auto dfs = [&](auto &self, int i, int p) -> pii {
+        int visits = times[i], time = 0;
+        for (auto &[j, w]: adj[i]) {
+            if (j == p)continue;
+            pii ret = self(self, j, i);
+            visits += ret.first;
+            time += ret.first * w + ret.second;
+        }
+        dp[i] = visits;
+        return {visits, time};
+    };
+    int res = dfs(dfs, 0, 0).second;
+    vl ans{1};
+    auto search = [&](auto &self, int i, int p, int tot) -> void {
+        for (auto &[j, w]: adj[i]) {
+            if (j == p)continue;
+            int next = tot - dp[j] * w + (t - dp[j]) * w;
+            if (next < res) {
+                res = next;
+                ans = {j + 1};
+            } else if (next == res) {
+                ans.pb(j + 1);
             }
-            cur->insert(i);
-            finder[i] = cur;
-            arr.pb({cur, i});
+            self(self, j, i, next);
         }
-    }
-    for (int i = n; i; i--)
-        if (prime[i]) {
-            res.pb(i);
-            break;
-        }
-    sort(all(arr), cmp());
-    while (sz(arr)) {
-        auto &[a, b] = arr.back();
-        res.pb(b);
-        for (auto i: *a) {
-            for (int j: multiples[i]) {
-                if (j == b)continue;
-                finder[j]->erase(i);
-            }
-        }
-        arr.pop_back();
-        if (sz(arr) == 0)break;
-        sort(all(arr), cmp());
-        while (arr.back().first->size() <= 1) {
-            arr.pop_back();
-            if (sz(arr) == 0)break;
-        }
-    }
-    vi res2;
-    rep((int)sqrt(n)+1, n + 1) {
-        if (!prime[i]) {
-            hset<int> *cur = new hset<int>();
-            if (i & 1) {
-                for (int j = 3; j <= sqrt(i); j += 2) {
-                    if (i % j == 0) {
-                        cur->insert(j);
-                        multiples[j].pb(i);
-                        int o = i / j;
-                        cur->insert(o);
-                        multiples[o].pb(i);
-                    }
-                }
-            } else {
-                for (int j = 2; j <= sqrt(i); j++) {
-                    if (i % j == 0) {
-                        cur->insert(j);
-                        multiples[j].pb(i);
-                        int o = i / j;
-                        cur->insert(o);
-                        multiples[o].pb(i);
-                    }
-                }
-            }
-            finder[i] = cur;
-            arr.pb({cur, i});
-        }
-    }
-    for (int i = n; i; i--)
-        if (prime[i]) {
-            res2.pb(i);
-            break;
-        }
-    sort(all(arr), cmp());
-    while (sz(arr)) {
-        auto &[a, b] = arr.back();
-        res2.pb(b);
-        for (auto i: *a) {
-            for (int j: multiples[i]) {
-                if (j == b)continue;
-                finder[j]->erase(i);
-            }
-        }
-        arr.pop_back();
-        if (sz(arr) == 0)break;
-        sort(all(arr), cmp());
-        while (arr.back().first->size() == 0) {
-            arr.pop_back();
-            if (sz(arr) == 0)break;
-        }
-    }
-    int x = accumulate(all(res), 0), y = accumulate(all(res2), 0);
-    if (x > y) {
-        pnl(sz(res));
-        pr(res);
-    } else {
-        pnl(sz(res2));
-        pr(res2);
-    }
+    };
+    search(search, 0, 0, res);
+    pnl(res);
+    sort(all(ans));
+    pr(ans);
 }
 
 int32_t main() {
@@ -315,7 +231,7 @@ int32_t main() {
     cin.tie(nullptr);
     cout.tie(nullptr);
     int t = 1;
-    //cin >> t;
+    cin >> t;
     while (t--) {
         solve();
     }
