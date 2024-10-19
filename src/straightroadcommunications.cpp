@@ -174,55 +174,70 @@ inline ll binpow(ll a, int p, int m) {
     return res;
 }
 
-const int N = 46341;//sqrt INT_MAX
-bitset<N + 1> prime;
-vi primes;
+struct FT {                              // index 0 is not used
+    vi ft;                                        // internal FT is an array
+    FT(int m) { ft.assign(m + 1, 0); }      // create an empty FT
 
-vi primeFactors(ll n) {
-    vi factors;
-    for (int div: primes) {
-        while (n % div == 0) {
-            factors.pb(div);
-            n /= div;
+    inline void build(const vi &f) {
+        int m = (int) f.size() - 1;                     // note f[0] is always 0
+        ft.assign(m + 1, 0);
+        for (int i = 1; i <= m; ++i) {               // O(m)
+            ft[i] += f[i];                             // add this value
+            if (i + lsb(i) <= m)                       // i has parent
+                ft[i + lsb(i)] += ft[i];                 // add to that parent
         }
-        if (div * div > n)break;
     }
-    if (n != 1)factors.pb(n);
-    return factors;
-}
 
-int f(ll a, ll p) {
-    a %= p;
-    if (a == 0 | a == 1)return 1;
-    if (a == 2)return ((p * p - 1) / 8) & 1 ? -1 : 1;
-    vi factors = primeFactors(a);
-    int res = 1;
-    for (int i: factors) {
-        if (i == 2)res *= f(2, p);
-        else res *= (((p - 1) * (i - 1) / 4) & 1 ? -1 : 1) * f(p, i);
+    inline FT(const vi &f) { build(f); }        // create FT based on f
+
+    inline FT(int m, const vi &s) {              // create FT based on s
+        vi f(m + 1, 0);
+        for (int i = 0; i < (int) s.size(); ++i)      // do the conversion first
+            ++f[s[i]];                                 // in O(n)
+        build(f);                                    // in O(m)
     }
-    return res;
-}
+
+    inline int rsq(int j) {                                // returns RSQ(1, j)
+        int sum = 0;
+        for (; j; j -= lsb(j))
+            sum += ft[j];
+        return sum;
+    }
+
+    inline int rsq(int i, int j) { return rsq(j) - rsq(i - 1); } // inc/exclusion
+
+    // updates value of the i-th element by v (v can be +ve/inc or -ve/dec)
+    inline void update(int i, int v) {
+        for (; i < (int) ft.size(); i += lsb(i))
+            ft[i] += v;
+    }
+};
 
 inline void solve() {
-    ll a, p;
-    cin >> a >> p;
-    pnl(f(a, p) == 1 ? "yes" : "no");
+    int n, i, b, x, y;
+    cin >> n >> i >> b;
+    FT ft(2000);
+    while (n--) {
+        cin >> x >> y;
+        if (x > y)swap(x, y);
+        ft.update(x + 1, 1);
+        ft.update(y + b + 2, -1);
+    }
+    for (int j = 1; j <= 2000; j++) {
+        if (ft.rsq(j) > i) {
+            cout << "impossible";
+            return;
+        }
+    }
+    cout << "possible";
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    prime.set();
-    for (int i = 2; i <= N; i++) {
-        if (prime[i]) {
-            for (int j = i * i; j <= N; j += i)prime[j] = 0;
-            primes.pb(i);
-        }
-    }
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--) {
         solve();
     }

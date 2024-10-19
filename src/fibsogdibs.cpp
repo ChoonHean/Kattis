@@ -22,7 +22,7 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pair<int, ll>, null_type, greater<pair<int, ll>>, rb_tree_tag, tree_order_statistics_node_update> ordered_set;
+typedef tree<string, null_type, less<string>, rb_tree_tag, tree_order_statistics_node_update> ordered_set;
 const int inf = 1e9;
 const int mod = 1e9 + 7;
 #define all(a) a.begin(),a.end()
@@ -174,55 +174,37 @@ inline ll binpow(ll a, int p, int m) {
     return res;
 }
 
-const int N = 46341;//sqrt INT_MAX
-bitset<N + 1> prime;
-vi primes;
-
-vi primeFactors(ll n) {
-    vi factors;
-    for (int div: primes) {
-        while (n % div == 0) {
-            factors.pb(div);
-            n /= div;
-        }
-        if (div * div > n)break;
-    }
-    if (n != 1)factors.pb(n);
-    return factors;
-}
-
-int f(ll a, ll p) {
-    a %= p;
-    if (a == 0 | a == 1)return 1;
-    if (a == 2)return ((p * p - 1) / 8) & 1 ? -1 : 1;
-    vi factors = primeFactors(a);
-    int res = 1;
-    for (int i: factors) {
-        if (i == 2)res *= f(2, p);
-        else res *= (((p - 1) * (i - 1) / 4) & 1 ? -1 : 1) * f(p, i);
-    }
+inline vvl matmul(vvl &a, vvl &b) {
+    vvl res(2, vl(2));
+    res[0][0] = ((a[0][0] * b[0][0]) % mod + (a[0][1] * b[1][0]) % mod) % mod;
+    res[0][1] = ((a[0][0] * b[0][1]) % mod + (a[0][1] * b[1][1]) % mod) % mod;
+    res[1][0] = ((a[1][0] * b[0][0]) % mod + (a[1][1] * b[1][0]) % mod) % mod;
+    res[1][1] = ((a[1][0] * b[0][1]) % mod + (a[1][1] * b[1][1]) % mod) % mod;
     return res;
 }
 
 inline void solve() {
-    ll a, p;
-    cin >> a >> p;
-    pnl(f(a, p) == 1 ? "yes" : "no");
+    ll n, a, b;
+    cin >> a >> b >> n;
+    vvl mat(2, vl(2, 1));
+    mat[1][1] = 0;
+    vvl res(2, vl(2));
+    res[0][0] = res[1][1] = 1;
+    while (n) {
+        mat = matmul(mat, mat);
+        if (n & 1)res = matmul(res, mat);
+        n >>= 1;
+    }
+    pr(((res[1][0] * b) % mod + (res[1][1] * a) % mod) % mod);
+    pr(((res[0][0] * b) % mod + (res[0][1] * a) % mod) % mod);
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    prime.set();
-    for (int i = 2; i <= N; i++) {
-        if (prime[i]) {
-            for (int j = i * i; j <= N; j += i)prime[j] = 0;
-            primes.pb(i);
-        }
-    }
     int t = 1;
-    cin >> t;
+    //cin >> t;
     while (t--) {
         solve();
     }
