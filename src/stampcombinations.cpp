@@ -175,94 +175,28 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    int n;
-    cin >> n;
-    hmap<ll, int> squares;
-    squares[1] = 1;
-    ll prev = 1;
-    vl d{0, 1};
-    for (ll i = 2; i < 500001; i++) {
-        ll j = i * i;
-        squares[j] = i;
-        d.pb(j - prev);
-        prev = j;
+    int n, q, tot = 0, x;
+    cin >> n >> q;
+    vi arr(n + 1);
+    rep(0, n) {
+        cin >> arr[i];
+        tot += arr[i];
     }
-    auto ask = [](int x, int y) -> void {
-        cout << x << ' ' << y << endl;
-    };
-    while (n--) {
-        int x = 5e5, y = 5e5;
-        ll start, dist;
-        ask(x, y);
-        cin >> start;
-        if (!start)continue;
-        if (squares.contains(start)) {
-            int a = squares[start];
-            ask(x - a, y);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x + a, y);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x, y - a);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x, y + a);
-            cin >> dist;
-            if (!dist)continue;
+    while (q--) {
+        cin >> x;
+        if (x > tot) {
+            pnl("No");
+            continue;
         }
-        ask(x - 1, y);
-        cin >> dist;
-        if (dist < start) {
-            ll diff = start - dist;
-            ll dx = lower_bound(all(d), diff) - d.begin();
-            ll dy = squares[start - dx * dx];
-            ask(x - dx, y - dy);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x - dx, y + dy);
-            cin >> dist;
-            if (!dist)continue;
+        x = tot - x;
+        int l = 0, r = 0, cur = arr[0];
+        while (r < n) {
+            if (cur == x)break;
+            else if (cur < x)cur += arr[++r];
+            else cur -= arr[l++];
         }
-        ask(x + 1, y);
-        cin >> dist;
-        if (dist < start) {
-            ll diff = start - dist;
-            ll dx = lower_bound(all(d), diff) - d.begin();
-            ll dy = squares[start - dx * dx];
-            ask(x + dx, y - dy);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x + dx, y + dy);
-            cin >> dist;
-            if (!dist)continue;
-        }
-        ask(x, y + 1);
-        cin >> dist;
-        if (dist < start) {
-            ll diff = start - dist;
-            ll dy = lower_bound(all(d), diff) - d.begin();
-            ll dx = squares[start - dy * dy];
-            ask(x + dx, y + dy);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x - dx, y + dy);
-            cin >> dist;
-            if (!dist)continue;
-        }
-        ask(x, y - 1);
-        cin >> dist;
-        if (dist < start) {
-            ll diff = start - dist;
-            ll dy = lower_bound(all(d), diff) - d.begin();
-            ll dx = squares[start - dy * dy];
-            ask(x + dx, y - dy);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x - dx, y - dy);
-            cin >> dist;
-            if (!dist)continue;
-        }
+        while (cur > x)cur -= arr[l++];
+        pnl(cur == x ? "Yes" : "No");
     }
 }
 

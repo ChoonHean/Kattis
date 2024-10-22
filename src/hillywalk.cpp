@@ -176,94 +176,72 @@ inline ll binpow(ll a, int p, int m) {
 
 inline void solve() {
     int n;
+    double a, b, c;
     cin >> n;
-    hmap<ll, int> squares;
-    squares[1] = 1;
-    ll prev = 1;
-    vl d{0, 1};
-    for (ll i = 2; i < 500001; i++) {
-        ll j = i * i;
-        squares[j] = i;
-        d.pb(j - prev);
-        prev = j;
+    vector<vd> arr(n, vd(4));
+    for (auto &v: arr) {
+        cin >> a >> b;
+        v[2] = 2 * a;
+        v[3] = -a * a + b;
+        double root = sqrt(b);
+        v[0] = a - root;
+        v[1] = a + root;
     }
-    auto ask = [](int x, int y) -> void {
-        cout << x << ' ' << y << endl;
+    sort(all(arr));
+    vd cur(3);
+    PQ<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> pq;
+    double res = 0, start = -inf;
+    auto f = [&](double end) -> double {
+        double x = end;
+        double ret = c * x;
+        x *= end;
+        ret += b * x;
+        x *= end;
+        return ret + a * x;
     };
-    while (n--) {
-        int x = 5e5, y = 5e5;
-        ll start, dist;
-        ask(x, y);
-        cin >> start;
-        if (!start)continue;
-        if (squares.contains(start)) {
-            int a = squares[start];
-            ask(x - a, y);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x + a, y);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x, y - a);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x, y + a);
-            cin >> dist;
-            if (!dist)continue;
+    rep(0, n) {
+        while (!pq.empty() && pq.top().first <= arr[i][0]) {
+            auto [end, idx] = pq.top();
+            pq.pop();
+            if (sz(pq)) {
+                a = cur[0] / 3;
+                b = cur[1] / 2;
+                c = cur[2];
+                res += f(end);
+                res -= f(start);
+            }
+            start = end;
+            cur[0]++;
+            cur[1] -= arr[idx][2];
+            cur[2] -= arr[idx][3];
         }
-        ask(x - 1, y);
-        cin >> dist;
-        if (dist < start) {
-            ll diff = start - dist;
-            ll dx = lower_bound(all(d), diff) - d.begin();
-            ll dy = squares[start - dx * dx];
-            ask(x - dx, y - dy);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x - dx, y + dy);
-            cin >> dist;
-            if (!dist)continue;
+        if (sz(pq) > 1) {
+            a = cur[0] / 3;
+            b = cur[1] / 2;
+            c = cur[2];
+            res += f(arr[i][0]);
+            res -= f(start);
         }
-        ask(x + 1, y);
-        cin >> dist;
-        if (dist < start) {
-            ll diff = start - dist;
-            ll dx = lower_bound(all(d), diff) - d.begin();
-            ll dy = squares[start - dx * dx];
-            ask(x + dx, y - dy);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x + dx, y + dy);
-            cin >> dist;
-            if (!dist)continue;
-        }
-        ask(x, y + 1);
-        cin >> dist;
-        if (dist < start) {
-            ll diff = start - dist;
-            ll dy = lower_bound(all(d), diff) - d.begin();
-            ll dx = squares[start - dy * dy];
-            ask(x + dx, y + dy);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x - dx, y + dy);
-            cin >> dist;
-            if (!dist)continue;
-        }
-        ask(x, y - 1);
-        cin >> dist;
-        if (dist < start) {
-            ll diff = start - dist;
-            ll dy = lower_bound(all(d), diff) - d.begin();
-            ll dx = squares[start - dy * dy];
-            ask(x + dx, y - dy);
-            cin >> dist;
-            if (!dist)continue;
-            ask(x - dx, y - dy);
-            cin >> dist;
-            if (!dist)continue;
-        }
+        cur[0]--;
+        cur[1] += arr[i][2];
+        cur[2] += arr[i][3];
+        start = arr[i][0];
+        pq.push({arr[i][1], i});
     }
+    while (sz(pq) >= 2) {
+        auto [end, idx] = pq.top();
+        pq.pop();
+        a = cur[0] / 3;
+        b = cur[1] / 2;
+        c = cur[2];
+        res += f(end);
+        res -= f(start);
+        start = end;
+        cur[0]++;
+        cur[1] -= arr[idx][2];
+        cur[2] -= arr[idx][3];
+    }
+    cout << fixed << setprecision(10) << res;
 }
 
 int32_t main() {
