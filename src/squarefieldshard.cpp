@@ -176,47 +176,42 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    int n, x, cur;
-    cin >> n;
-    read(n);
-    int a = 0, b = 0, c = 0, spare = 0;
-    rep(0, n) {
-        cin >> cur;
-        //Give available slots, they are happy
-        x = min(spare, cur);
-        a += x;
-        cur -= x;
-        spare -= x;
-        //Swap with unhappy people that have slots, they are happy
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        a += x;
-        spare -= x;
-        //Swap with neutral people, they are happy
-        x = min(b, cur);
-        cur -= x;
-        c += x;
-        b -= x;
-        a += x;
-        spare -= x;
-        spare += arr[i];
-        //Swap with unhappy people that have slots, they are neutral
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //Give available slots, they are neutral
-        x = min(max(0, spare), cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //No slots, they are unhappy
-        c += cur;
-        spare -= cur;
+    int n, m;
+    cin >> n >> m;
+    int N = 1 << n;
+    vpii pts(n);
+    for (auto &[i, j]: pts)cin >> i >> j;
+    vvi dist(n, vi(n));
+    rep(0, n)
+        for (int j = i + 1; j < n; j++)
+            dist[i][j] = dist[j][i] = max(abs(pts[i].first - pts[j].first), abs(pts[i].second - pts[j].second));
+    int flip = (1 << n) - 1;
+    vi cost{0};
+    cost.reserve(N);
+    rep(1, N) {
+        int mx = 0;
+        for (int j = 0; j < n; j++)
+            if ((i >> j) & 1)
+                for (int k = j + 1; k < n; k++)
+                    if ((i >> k) & 1)
+                        mx = max(mx, dist[j][k]);
+        cost.pb(mx);
     }
-    pr(a - c);
+    vi dp(N, inf), ndp;
+    dp[0] = 0;
+    for (int l = 1; l <= m; l++) {
+        ndp.assign(N, inf);
+        rep(0, N) {
+            if (dp[i] == inf)continue;
+            int need = i ^ flip;
+            for (int s = need; s; s = need & (s - 1)) {
+                int j = s | i;
+                ndp[j] = min(ndp[j], max(dp[i], cost[s]));
+            }
+        }
+        swap(dp, ndp);
+    }
+    pnl(dp.back());
 }
 
 int32_t main() {
@@ -224,7 +219,10 @@ int32_t main() {
     cin.tie(nullptr);
     cout.tie(nullptr);
     int t = 1;
-    //cin >> t;
-    while (t--) solve();
+    cin >> t;
+    for (int i = 1; i <= t; i++) {
+        cout << "Case #" << i << ": ";
+        solve();
+    }
     return 0;
 }

@@ -12,7 +12,6 @@ typedef vector<bool> vb;
 typedef vector<string> vs;
 typedef vector<char> vc;
 typedef long long ll;
-typedef long double ld;
 typedef vector<ll> vl;
 typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
@@ -165,7 +164,7 @@ inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
     return a; // returns gcd(a, b)
 }
 
-inline ll binpow(ll a, int p, int m) {
+inline ll binpow(ll a, ll p, int m) {
     ll res = 1;
     while (p) {
         if (p & 1)res = (res * a) % m;
@@ -176,47 +175,60 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    int n, x, cur;
-    cin >> n;
-    read(n);
-    int a = 0, b = 0, c = 0, spare = 0;
+    int n, m;
+    cin >> n >> m;
+    vs arr(n);
+    readarr(n, arr);
+    vector<vb> visited(n, vb(m));
+    int res = 0, dist = 1;
+    queue<pii> q;
+    auto enq = [&](int x, int y) -> void {
+        if (x >= 0 && x < n && y >= 0 && y < m)
+            if (!visited[x][y]) {
+                q.push({x, y});
+                visited[x][y] = 1;
+                if (arr[x][y] == 'X')res = dist;
+            }
+    };
     rep(0, n) {
-        cin >> cur;
-        //Give available slots, they are happy
-        x = min(spare, cur);
-        a += x;
-        cur -= x;
-        spare -= x;
-        //Swap with unhappy people that have slots, they are happy
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        a += x;
-        spare -= x;
-        //Swap with neutral people, they are happy
-        x = min(b, cur);
-        cur -= x;
-        c += x;
-        b -= x;
-        a += x;
-        spare -= x;
-        spare += arr[i];
-        //Swap with unhappy people that have slots, they are neutral
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //Give available slots, they are neutral
-        x = min(max(0, spare), cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //No slots, they are unhappy
-        c += cur;
-        spare -= cur;
+        if (arr[i][0] == '-')q.push({i, 0});
+        if (arr[i].back() == '-')q.push({i, m - 1});
     }
-    pr(a - c);
+    rep(0, m) {
+        if (arr[0][i] == '-')q.push({0, i});
+        if (arr.back()[i] == '-')q.push({n - 1, i});
+    }
+    rep(1, n - 1)for (int j = 1; j < m - 1; j++)if (arr[i][j] == '-')enq(i, j);
+    int size = sz(q);
+    while (size--) {
+        auto [x, y] = q.front();
+        q.pop();
+        enq(x - 1, y);
+        enq(x + 1, y);
+        enq(x, y - 1);
+        enq(x, y + 1);
+    }
+    rep(0, n) {
+        if (!visited[i][0] && arr[i][0] == 'X')enq(i, 0);
+        if (!visited[i].back() && arr[i].back() == 'X')enq(i, m - 1);
+    }
+    rep(0, n) {
+        if (!visited[0][i] && arr[0][i] == 'X')enq(0, i);
+        if (!visited.back()[i] && arr.back()[i] == 'X')enq(n - 1, i);
+    }
+    while (!q.empty()) {
+        dist++;
+        size = sz(q);
+        while (size--) {
+            auto [x, y] = q.front();
+            q.pop();
+            enq(x - 1, y);
+            enq(x + 1, y);
+            enq(x, y - 1);
+            enq(x, y + 1);
+        }
+    }
+    cout << res;
 }
 
 int32_t main() {
@@ -225,6 +237,8 @@ int32_t main() {
     cout.tie(nullptr);
     int t = 1;
     //cin >> t;
-    while (t--) solve();
+    while (t--) {
+        solve();
+    }
     return 0;
 }

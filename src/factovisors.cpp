@@ -165,7 +165,7 @@ inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
     return a; // returns gcd(a, b)
 }
 
-inline ll binpow(ll a, int p, int m) {
+inline ll binpow(ll a, ll p, int m) {
     ll res = 1;
     while (p) {
         if (p & 1)res = (res * a) % m;
@@ -175,48 +175,50 @@ inline ll binpow(ll a, int p, int m) {
     return res;
 }
 
-inline void solve() {
-    int n, x, cur;
-    cin >> n;
-    read(n);
-    int a = 0, b = 0, c = 0, spare = 0;
-    rep(0, n) {
-        cin >> cur;
-        //Give available slots, they are happy
-        x = min(spare, cur);
-        a += x;
-        cur -= x;
-        spare -= x;
-        //Swap with unhappy people that have slots, they are happy
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        a += x;
-        spare -= x;
-        //Swap with neutral people, they are happy
-        x = min(b, cur);
-        cur -= x;
-        c += x;
-        b -= x;
-        a += x;
-        spare -= x;
-        spare += arr[i];
-        //Swap with unhappy people that have slots, they are neutral
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //Give available slots, they are neutral
-        x = min(max(0, spare), cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //No slots, they are unhappy
-        c += cur;
-        spare -= cur;
+const int N = 46341;//sqrt INT_MAX
+bitset<N + 1> prime;
+vi primes;
+
+hmap<int, int> primeFactors(int n) {
+    hmap<int, int> factors;
+    for (int div: primes) {
+        while (n % div == 0) {
+            factors[div]++;
+            n /= div;
+        }
+        if (div * div > n)break;
     }
-    pr(a - c);
+    if (n != 1)factors[n]++;
+    return factors;
+}
+
+bool _ = true;
+
+inline void solve() {
+    int n, m;
+    if (!(cin >> n)) {
+        _ = false;
+        return;
+    }
+    cin >> m;
+    if (!m) {
+        printf("%i does not divide %i!\n", m, n);
+        return;
+    }
+    hmap<int, int> factors = primeFactors(m);
+    for (auto &[factor, cnt]: factors) {
+        int cur = factor;
+        while (cur <= n) {
+            cnt -= n / cur;
+            cur *= factor;
+            if (cnt <= 0)break;
+        }
+        if (cnt > 0) {
+            printf("%i does not divide %i!\n", m, n);
+            return;
+        }
+    }
+    printf("%i divides %i!\n", m, n);
 }
 
 int32_t main() {
@@ -224,7 +226,16 @@ int32_t main() {
     cin.tie(nullptr);
     cout.tie(nullptr);
     int t = 1;
+    prime.set();
+    for (int i = 2; i <= N; i++) {
+        if (prime[i]) {
+            for (int j = i * i; j <= N; j += i)prime[j] = 0;
+            primes.pb(i);
+        }
+    }
     //cin >> t;
-    while (t--) solve();
+    while (_) {
+        solve();
+    }
     return 0;
 }

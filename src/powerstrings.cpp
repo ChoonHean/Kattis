@@ -176,47 +176,6 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    int n, x, cur;
-    cin >> n;
-    read(n);
-    int a = 0, b = 0, c = 0, spare = 0;
-    rep(0, n) {
-        cin >> cur;
-        //Give available slots, they are happy
-        x = min(spare, cur);
-        a += x;
-        cur -= x;
-        spare -= x;
-        //Swap with unhappy people that have slots, they are happy
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        a += x;
-        spare -= x;
-        //Swap with neutral people, they are happy
-        x = min(b, cur);
-        cur -= x;
-        c += x;
-        b -= x;
-        a += x;
-        spare -= x;
-        spare += arr[i];
-        //Swap with unhappy people that have slots, they are neutral
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //Give available slots, they are neutral
-        x = min(max(0, spare), cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //No slots, they are unhappy
-        c += cur;
-        spare -= cur;
-    }
-    pr(a - c);
 }
 
 int32_t main() {
@@ -225,6 +184,42 @@ int32_t main() {
     cout.tie(nullptr);
     int t = 1;
     //cin >> t;
-    while (t--) solve();
+    string s;
+    const int p = 31, N = 2e6;
+    vl pow(N), inv(N), h(N);
+    pow[0] = 1;
+    rep(1, N)pow[i] = (pow[i - 1] * p) % mod;
+    rep(0, N)inv[i] = binpow(pow[i], mod - 2, mod);
+    auto hash = [&](int l, int r) -> int {
+        if (!l)return h[r];
+        ll res = (h[r] - h[l - 1] + mod) % mod;
+        res = (res * inv[l]) % mod;
+        return res;
+    };
+    while (true) {
+        cin >> s;
+        if (s[0] == '.')break;
+        int n = sz(s);
+        h[0] = s[0];
+        rep(1, n)h[i] = (h[i - 1] + s[i] * pow[i]) % mod;
+        bool done = false;
+        for (int i = 1; i <= n >> 1; i++)
+            if (n % i == 0) {
+                bool can = true;
+                int val = hash(0, i - 1);
+                for (int j = i; j < n; j += i) {
+                    if (hash(j, j + i - 1) != val) {
+                        can = false;
+                        break;
+                    }
+                }
+                if (can) {
+                    pnl(n / i);
+                    done = true;
+                    break;
+                }
+            }
+        if (!done)pnl(1);
+    }
     return 0;
 }

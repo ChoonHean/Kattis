@@ -12,7 +12,6 @@ typedef vector<bool> vb;
 typedef vector<string> vs;
 typedef vector<char> vc;
 typedef long long ll;
-typedef long double ld;
 typedef vector<ll> vl;
 typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
@@ -165,7 +164,7 @@ inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
     return a; // returns gcd(a, b)
 }
 
-inline ll binpow(ll a, int p, int m) {
+inline ll binpow(ll a, ll p, int m) {
     ll res = 1;
     while (p) {
         if (p & 1)res = (res * a) % m;
@@ -176,47 +175,52 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    int n, x, cur;
+    int n;
     cin >> n;
-    read(n);
-    int a = 0, b = 0, c = 0, spare = 0;
-    rep(0, n) {
-        cin >> cur;
-        //Give available slots, they are happy
-        x = min(spare, cur);
-        a += x;
-        cur -= x;
-        spare -= x;
-        //Swap with unhappy people that have slots, they are happy
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        a += x;
-        spare -= x;
-        //Swap with neutral people, they are happy
-        x = min(b, cur);
-        cur -= x;
-        c += x;
-        b -= x;
-        a += x;
-        spare -= x;
-        spare += arr[i];
-        //Swap with unhappy people that have slots, they are neutral
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //Give available slots, they are neutral
-        x = min(max(0, spare), cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //No slots, they are unhappy
-        c += cur;
-        spare -= cur;
+    string s;
+    int cur = 0;
+    vector<pair<pii, int>> inc, dec;
+    vi res;
+    rep(1, n + 1) {
+        cin >> s;
+        int add = 0, cost = 0;
+        for (char &c: s) {
+            if (c == '(')add++;
+            else {
+                add--;
+                cost = min(cost, add);
+            }
+        }
+        if (cost) {
+            if (add > 0)inc.pb({{-cost, add}, i});
+            else dec.pb({{-cost, add}, i});
+        } else {
+            cur += add;
+            res.pb(i);
+        }
     }
-    pr(a - c);
+    sort(all(inc));
+    sort(all(dec), [](auto a, auto b) {
+        return a.first.first + a.first.second > b.first.first + b.first.second;
+    });
+    for (auto &[x, y]: inc) {
+        if (x.first > cur) {
+            cout << "impossible";
+            return;
+        }
+        cur += x.second;
+        res.pb(y);
+    }
+    for (auto &[x, y]: dec) {
+        if (x.first > cur) {
+            cout << "impossible";
+            return;
+        }
+        cur += x.second;
+        res.pb(y);
+    }
+    if (cur)cout << "impossible";
+    else pr(res);
 }
 
 int32_t main() {
@@ -225,6 +229,8 @@ int32_t main() {
     cout.tie(nullptr);
     int t = 1;
     //cin >> t;
-    while (t--) solve();
+    while (t--) {
+        solve();
+    }
     return 0;
 }

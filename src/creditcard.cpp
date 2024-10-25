@@ -176,47 +176,25 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    int n, x, cur;
-    cin >> n;
-    read(n);
-    int a = 0, b = 0, c = 0, spare = 0;
-    rep(0, n) {
-        cin >> cur;
-        //Give available slots, they are happy
-        x = min(spare, cur);
-        a += x;
-        cur -= x;
-        spare -= x;
-        //Swap with unhappy people that have slots, they are happy
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        a += x;
-        spare -= x;
-        //Swap with neutral people, they are happy
-        x = min(b, cur);
-        cur -= x;
-        c += x;
-        b -= x;
-        a += x;
-        spare -= x;
-        spare += arr[i];
-        //Swap with unhappy people that have slots, they are neutral
-        if (spare >= 0)x = min(c, cur);
-        else x = min(c + spare, cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //Give available slots, they are neutral
-        x = min(max(0, spare), cur);
-        cur -= x;
-        b += x;
-        spare -= x;
-        //No slots, they are unhappy
-        c += cur;
-        spare -= cur;
+    string s1, s2, s3;
+    cin >> s1 >> s2 >> s3;
+    s1.erase(sz(s1) - 3, 1);
+    s2.erase(sz(s2) - 3, 1);
+    s3.erase(sz(s3) - 3, 1);
+    ll r = stoi(s1), b = stoi(s2), m = stoi(s3);
+    for (int i = 1; i <= 1200; i++) {
+        int next = round(b * (10000 + r) / 10000.0) - m;
+        if (next >= b) {
+            pnl("impossible");
+            return;
+        }
+        if (next <= 0) {
+            pnl(i);
+            return;
+        }
+        b = next;
     }
-    pr(a - c);
+    pnl("impossible");
 }
 
 int32_t main() {
@@ -224,7 +202,9 @@ int32_t main() {
     cin.tie(nullptr);
     cout.tie(nullptr);
     int t = 1;
-    //cin >> t;
-    while (t--) solve();
+    cin >> t;
+    while (t--) {
+        solve();
+    }
     return 0;
 }
