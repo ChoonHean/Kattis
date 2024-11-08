@@ -168,6 +168,19 @@ struct Treap {
         root = newroot;
     }
 
+    Node *select(int k) { return select(root, k); }
+
+    Node *select(Node *cur, int k) {
+        if (cur->left == nullptr) {
+            if (k == 0)return cur;
+            else return select(cur->right, k - 1);
+        } else {
+            if (k == cur->left->size)return cur;
+            else if (k < cur->left->size)return select(cur->left, k);
+            else return select(cur->right, k - cur->left->size - 1);
+        }
+    }
+
     void inorder() { inorder(root); }
 
     void inorder(Node *cur) {
