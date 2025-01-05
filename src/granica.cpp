@@ -216,31 +216,21 @@ inline ll binpow(ll a, int p, int m) {
 //    return factors;
 //}
 inline void solve() {
-    int n, k;
-    cin >> n >> k;
-    vvi cnt(k, vi(k));
-    string s;
-    rep(0, n) {
-        cin >> s;
-        for (int j = 0; j < k; j++) {
-            for (int l = j + 1; l < k; l++)cnt[s[j] - 'A'][s[l] - 'A']++;
+    int n;
+    cin >> n;
+    read(n);
+    sort(all(arr));
+    int g = 0;
+    rep(1, n)g = gcd(g, arr[i] - arr[i - 1]);
+    pr(g);
+    for (int i = 2; i < sqrt(g); i++) {
+        if (g % i == 0) {
+            pr(i);
+            pr(g / i);
         }
     }
-    vvi adj(k);
-    rep(0, k)for (int j = 0; j < k; j++)if (cnt[i][j] == n)adj[i].pb(j);
-    queue<int> q;
-    rep(0, k)q.push(i);
-    int res = 0;
-    while (!q.empty()) {
-        k = sz(q);
-        while (k--) {
-            int i = q.front();
-            q.pop();
-            for (int j: adj[i])q.push(j);
-        }
-        res++;
-    }
-    cout << res;
+    int rt = sqrt(g);
+    if (rt * rt == g)pr(rt);
 }
 
 int32_t main() {

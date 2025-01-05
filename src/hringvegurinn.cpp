@@ -215,32 +215,135 @@ inline ll binpow(ll a, int p, int m) {
 //    if (n != 1)factors.pb(n);
 //    return factors;
 //}
+struct FT {                              // index 0 is not used
+    vl ft;                                        // internal FT is an array
+    FT(int m) { ft.assign(m + 1, 0); }      // create an empty FT
+
+    inline void build(const vl &f) {
+        int m = (int) f.size() - 1;                     // note f[0] is always 0
+        ft.assign(m + 1, 0);
+        for (int i = 1; i <= m; ++i) {               // O(m)
+            ft[i] += f[i];                             // add this value
+            if (i + lsb(i) <= m)                       // i has parent
+                ft[i + lsb(i)] += ft[i];                 // add to that parent
+        }
+    }
+
+    inline FT(const vl &f) { build(f); }        // create FT based on f
+
+    inline FT(int m, const vi &s) {              // create FT based on s
+        vl f(m + 1, 0);
+        for (int i = 0; i < (int) s.size(); ++i)      // do the conversion first
+            ++f[s[i]];                                 // in O(n)
+        build(f);                                    // in O(m)
+    }
+
+    inline ll rsq(int j) {                                // returns RSQ(1, j)
+        ll sum = 0;
+        for (; j; j -= lsb(j))
+            sum += ft[j];
+        return sum;
+    }
+
+    inline ll rsq(int i, int j) { return rsq(j) - rsq(i - 1); } // inc/exclusion
+
+    // updates value of the i-th element by v (v can be +ve/inc or -ve/dec)
+    inline void update(int i, ll v) {
+        for (; i < (int) ft.size(); i += lsb(i))
+            ft[i] += v;
+    }
+
+    int select(ll k) {                             // O(log m)
+        int p = 1;
+        while (p * 2 < (int) ft.size()) p *= 2;
+        int i = 0;
+        while (p) {
+            if (k > ft[i + p]) {
+                k -= ft[i + p];
+                i += p;
+            }
+            p /= 2;
+        }
+        return i + 1;
+    }
+};
+
+struct RUPQ {                                     // RUPQ variant
+    FT ft;                                // internally use PURQ FT
+    RUPQ(int m) : ft(FT(m)) {}
+
+    inline void range_update(int ui, int uj, ll v) {
+        ft.update(ui, v);                            // [ui, ui+1, .., m] +v
+        ft.update(uj + 1, -v);                         // [uj+1, uj+2, .., m] -v
+    }                                              // [ui, ui+1, .., uj] +v
+    inline ll point_query(int i) { return ft.rsq(i); }    // rsq(i) is sufficient
+};
+
+struct RURQ {                                    // RURQ variant
+    RUPQ rupq;                                     // one RUPQ and
+    FT purq;                              // one PURQ
+    RURQ(int m) : rupq(RUPQ(m)), purq(FT(m)) {} // initialization
+    inline void range_update(int ui, int uj, ll v) {
+        rupq.range_update(ui, uj, v);                // [ui, ui+1, .., uj] +v
+        purq.update(ui, v * (ui - 1));                   // -(ui-1)*v before ui
+        purq.update(uj + 1, -v * uj);                    // +(uj-ui+1)*v after uj
+    }
+
+    inline ll rsq(int j) {
+        return rupq.point_query(j) * j -               // optimistic calculation
+               purq.rsq(j);                          // cancelation factor
+    }
+
+    inline ll rsq(int i, int j) { return rsq(j) - rsq(i - 1); } // standard
+};
+
 inline void solve() {
-    int n, k;
-    cin >> n >> k;
-    vvi cnt(k, vi(k));
-    string s;
-    rep(0, n) {
-        cin >> s;
-        for (int j = 0; j < k; j++) {
-            for (int l = j + 1; l < k; l++)cnt[s[j] - 'A'][s[l] - 'A']++;
+    int n, q, x, l, r, c, add = 0;
+    cin >> n >> q;
+    RURQ ft(n);
+    auto shift = [&](int &x, int &y, int a) -> void {
+        x += a;
+        y += a;
+        if (x > n)x -= n;
+        if (y > n)y -= n;
+    };
+    while (q--) {
+        cin >> c;
+        if (c == 1) {
+            cin >> x;
+            add = (add + x) % n;
+        } else if (c == 2) {
+            cin >> l >> r >> x;
+            if (l <= r) {
+                shift(l, r, add);
+                if (l <= r)ft.range_update(l, r, x);
+                else {
+                    ft.range_update(l, n, x);
+                    ft.range_update(1, r, x);
+                }
+            } else {
+                swap(l, r);
+                shift(l, r, add);
+                if (r <= l)ft.range_update(r, l, x);
+                else {
+                    ft.range_update(r, n, x);
+                    ft.range_update(1, l, x);
+                }
+            }
+        } else {
+            cin >> l >> r;
+            if (l <= r) {
+                shift(l, r, add);
+                if (l <= r)pnl(ft.rsq(l, r));
+                else pnl(ft.rsq(l, n) + ft.rsq(1, r));
+            } else {
+                swap(l, r);
+                shift(l, r, add);
+                if (r <= l)pnl(ft.rsq(r, l));
+                else pnl(ft.rsq(r, n) + ft.rsq(1, l));
+            }
         }
     }
-    vvi adj(k);
-    rep(0, k)for (int j = 0; j < k; j++)if (cnt[i][j] == n)adj[i].pb(j);
-    queue<int> q;
-    rep(0, k)q.push(i);
-    int res = 0;
-    while (!q.empty()) {
-        k = sz(q);
-        while (k--) {
-            int i = q.front();
-            q.pop();
-            for (int j: adj[i])q.push(j);
-        }
-        res++;
-    }
-    cout << res;
 }
 
 int32_t main() {

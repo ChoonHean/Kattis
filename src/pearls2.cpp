@@ -216,31 +216,26 @@ inline ll binpow(ll a, int p, int m) {
 //    return factors;
 //}
 inline void solve() {
-    int n, k;
-    cin >> n >> k;
-    vvi cnt(k, vi(k));
-    string s;
-    rep(0, n) {
-        cin >> s;
-        for (int j = 0; j < k; j++) {
-            for (int l = j + 1; l < k; l++)cnt[s[j] - 'A'][s[l] - 'A']++;
-        }
+    int n, m, q;
+    ll k;
+    string a, b;
+    char c, d;
+    cin >> n >> m >> k >> q >> a >> b;
+    vvi bad(26, vi(26));
+    while (k--) {
+        cin >> c >> d;
+        bad[c - 'a'][d - 'a'] = 1;
     }
-    vvi adj(k);
-    rep(0, k)for (int j = 0; j < k; j++)if (cnt[i][j] == n)adj[i].pb(j);
-    queue<int> q;
-    rep(0, k)q.push(i);
-    int res = 0;
-    while (!q.empty()) {
-        k = sz(q);
-        while (k--) {
-            int i = q.front();
-            q.pop();
-            for (int j: adj[i])q.push(j);
-        }
-        res++;
+    vs arr(26);
+    rep(0, 26)for (char &j: b)if (!bad[i][j - 'a'])arr[i].pb(j);
+    vl pre{sz(arr[a[0] - 'a']) << 1};
+    rep(1, n)pre.pb(pre.back() + (sz(arr[a[i] - 'a']) << 1));
+    while (q--) {
+        cin >> k;
+        int i = ub(all(pre), k) - pre.begin();
+        k -= i == 0 ? 0 : pre[i - 1];
+        pnl(k & 1 ? arr[a[i] - 'a'][k >> 1] : a[i]);
     }
-    cout << res;
 }
 
 int32_t main() {

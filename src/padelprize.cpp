@@ -215,32 +215,38 @@ inline ll binpow(ll a, int p, int m) {
 //    if (n != 1)factors.pb(n);
 //    return factors;
 //}
+
 inline void solve() {
-    int n, k;
-    cin >> n >> k;
-    vvi cnt(k, vi(k));
-    string s;
-    rep(0, n) {
-        cin >> s;
-        for (int j = 0; j < k; j++) {
-            for (int l = j + 1; l < k; l++)cnt[s[j] - 'A'][s[l] - 'A']++;
-        }
+    int n, m, x, y;
+    cin >> n >> m;
+    vi last(n, -1), win(m);
+    vvi p(m);
+    rep(0, m) {
+        cin >> x >> y;
+        win[i] = x;
+        if (last[x] != -1)p[i].pb(last[x]);
+        if (last[y] != -1)p[i].pb(last[y]);
+        last[y] = -1;
+        last[x] = i;
     }
-    vvi adj(k);
-    rep(0, k)for (int j = 0; j < k; j++)if (cnt[i][j] == n)adj[i].pb(j);
-    queue<int> q;
-    rep(0, k)q.push(i);
-    int res = 0;
-    while (!q.empty()) {
-        k = sz(q);
-        while (k--) {
-            int i = q.front();
-            q.pop();
-            for (int j: adj[i])q.push(j);
+    vi res(n), cnt(n);
+    set < pii > tree;
+    auto f = [&](auto &self, int i, int j) -> void {
+        tree.erase({cnt[win[i]], win[i]});
+        cnt[win[i]] += j - i;
+        tree.insert({cnt[win[i]], win[i]});
+        int mx = tree.rbegin()->first;
+        res[tree.lower_bound({mx, 0})->second]++;
+        for (int k: p[i])self(self, k, i);
+        tree.erase({cnt[win[i]], win[i]});
+        cnt[win[i]] -= j - i;
+        tree.insert({cnt[win[i]], win[i]});
+    };
+    for (int i: last)
+        if (i != -1) {
+            f(f, i, m);
         }
-        res++;
-    }
-    cout << res;
+    pr(res);
 }
 
 int32_t main() {

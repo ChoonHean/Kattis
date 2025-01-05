@@ -215,32 +215,32 @@ inline ll binpow(ll a, int p, int m) {
 //    if (n != 1)factors.pb(n);
 //    return factors;
 //}
+
 inline void solve() {
-    int n, k;
-    cin >> n >> k;
-    vvi cnt(k, vi(k));
-    string s;
+    string name, t;
+    int n;
+    cin >> n;
+    hset<string> res;
+    int mx = -1;
+    double h, w;
+    auto f = [](double h, double w, string t) -> int {
+        int mins = stoi(t.substr(0, 2)) * 60 + stoi(t.substr(3, 2));
+        if (mins >= 180 && mins <= 540)return 0;
+        mins = 180 - min(720 - mins, mins);
+        return floor((5 * h + w) * mins / 180);
+    };
     rep(0, n) {
-        cin >> s;
-        for (int j = 0; j < k; j++) {
-            for (int l = j + 1; l < k; l++)cnt[s[j] - 'A'][s[l] - 'A']++;
-        }
+        cin >> name >> h >> w >> t;
+        if (t[0] == '1' && t[1] == '2')t[0] = t[1] = '0';
+        int score = f(h, w, t);
+        if (score > mx) {
+            mx = score;
+            res.clear();
+            res.insert(name);
+        } else if (score == mx)res.insert(name);
     }
-    vvi adj(k);
-    rep(0, k)for (int j = 0; j < k; j++)if (cnt[i][j] == n)adj[i].pb(j);
-    queue<int> q;
-    rep(0, k)q.push(i);
-    int res = 0;
-    while (!q.empty()) {
-        k = sz(q);
-        while (k--) {
-            int i = q.front();
-            q.pop();
-            for (int j: adj[i])q.push(j);
-        }
-        res++;
-    }
-    cout << res;
+    if (sz(res) > 1)cout << "tie " << mx;
+    else cout << *res.begin() << ' ' << mx;
 }
 
 int32_t main() {
