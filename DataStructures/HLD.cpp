@@ -52,14 +52,17 @@ struct LCA {
         build(1, 0, n - 1);
     }
 
-    inline int RMQ(int i, int j) { return RMQ(1, 0, n - 1, i, j).second; }
+    inline int query(int i, int j) {
+        if (i > j)swap(i, j);
+        return RMQ(1, 0, n - 1, i, j).second;
+    }
 };
 
-vi par, heavy, group;
-vector<vpii> adj;
 
 int main() {
     int n = 0;
+    vi par(n), heavy(n), group(n), pos(n);
+    vector<vpii> adj(n);
     auto dfs = [&](auto &self, int i) -> int {
         int size = 1, mx = 0;
         for (auto &[j, w]: adj[i]) {
@@ -79,8 +82,10 @@ int main() {
         group[i] = p;
         for (auto &[j, w]: adj[i]) {
             if (j == par[i])continue;
-            if (j == heavy[i])self(self, j, p);
-            else self(self, j, j);
+            if (j == heavy[i]) {
+                pos[j] = pos[i] + 1;
+                self(self, j, p);
+            } else self(self, j, j);
         }
     };
 
@@ -96,4 +101,8 @@ int main() {
             order[idx++] = {d, i};
         }
     };
+    dfs(dfs, 0);
+    decompose(decompose, 0, 0);
+    processlca(processlca, 0, 0);
+    LCA lca(order);
 }
