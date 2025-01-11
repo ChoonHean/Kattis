@@ -14,6 +14,7 @@ typedef vector<int> vi;
 struct FT {                              // index 0 is not used
     vl ft;                                        // internal FT is an array
     FT(int m) { ft.assign(m + 1, 0); }      // create an empty FT
+    FT() {}
 
     inline void build(const vl &f) {
         int m = (int) f.size() - 1;                     // note f[0] is always 0
@@ -67,6 +68,7 @@ struct FT {                              // index 0 is not used
 struct RUPQ {                                     // RUPQ variant
     FT ft;                                // internally use PURQ FT
     RUPQ(int m) : ft(FT(m)) {}
+    RUPQ() : ft() {}
 
     inline void range_update(int ui, int uj, ll v) {
         ft.update(ui, v);                            // [ui, ui+1, .., m] +v
