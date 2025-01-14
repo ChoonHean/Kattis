@@ -52,6 +52,11 @@ mt19937_64 rnd(time(0));
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
 
+template<typename T>
+inline void pnl(T t) {
+    pr(t);
+    cout << nl;
+}
 
 template<typename T, typename U>
 inline void pr(pair<T, U> pa) {
@@ -158,68 +163,50 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-template<typename T>
-inline void pnl(T t) {
-    pr(t);
-    cout << nl;
-}
-
-inline ll binpow(ll a, int p, int m) {
-    ll res = 1;
-    while (p) {
-        if (p & 1)res = (res * a) % m;
-        a = (a * a) % m;
-        p >>= 1;
-    }
-    return res;
-}
-
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
+    int n, q;
+    cin >> n >> q;
+    vector<pair<pii, int>> arr(n);
+    for (auto &[p, i]: arr)cin >> i >> p.second >> p.first;
+    sort(all(arr), greater<pair<pii, int>>());
+    vvi adj(n);
+    vi p(n);
+    map<int, int> mp, idtoidx;
+    rep(0, n)idtoidx[arr[i].second] = i;
+    mp[arr[0].first.second] = 0;
+    // (height,salary),index
+    for (int i = 1; i < n; i++) {
+        mp[arr[i].first.second] = i;
+        int par = mp.upper_bound(arr[i].first.second)->second;
+        adj[par].pb(i);
+        p[i] = par;
+    }
+    vi size(n);
+    auto f = [&](auto &self, int i) -> int {
+        int res = 0;
+        for (int &j: adj[i]) {
+            res += self(self, j);
+        }
+        size[i] = res;
+        return res + 1;
     };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
+    f(f, 0);
+    int id;
+    while (q--) {
+        cin >> id;
+        int i = idtoidx[id];
+        if (i)pr(arr[p[i]].second);
+        else pr(0);
+        pnl(size[i]);
     }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
-    }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
-        }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
-        } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
-        }
-    }
-    cout << res.first << ' ' << res.second << nl;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
     int t = 1;
-    cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    //cin >> t;
+    while (t--) solve();
     return 0;
 }

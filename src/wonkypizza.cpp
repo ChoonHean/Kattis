@@ -164,53 +164,23 @@ inline void pnl(T t) {
     cout << nl;
 }
 
-inline ll binpow(ll a, int p, int m) {
-    ll res = 1;
-    while (p) {
-        if (p & 1)res = (res * a) % m;
-        a = (a * a) % m;
-        p >>= 1;
-    }
-    return res;
-}
-
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
-    };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
-    }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
-    }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
+    double a, b;
+    int n;
+    cin >> a >> b >> n;
+    double x = a * a / (24 * M_PI * M_PI), y = a * b / (4 * M_PI), z = b * b / 2;
+    double lo = 0, hi = 2 * M_PI, each = (a * a / 3 + a * b + b * b) * M_PI / n, aim = 0;
+    rep(1, n) {
+        aim += each;
+        while (fabs(hi - lo) > 1e-5) {
+            double mid = (lo + hi) / 2;
+            double cur = pow(mid, 3) * x + pow(mid, 2) * y + mid * z;
+            if (cur > aim)hi = mid;
+            else lo = mid;
         }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
-        } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
-        }
+        pnl(lo);
+        hi = 2 * M_PI;
     }
-    cout << res.first << ' ' << res.second << nl;
 }
 
 int32_t main() {
@@ -219,7 +189,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int t = 1;
-    cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    //cin >> t;
+    while (t--) solve();
     return 0;
 }

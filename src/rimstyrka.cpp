@@ -52,6 +52,11 @@ mt19937_64 rnd(time(0));
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
 
+template<typename T>
+inline void pnl(T t) {
+    pr(t);
+    cout << nl;
+}
 
 template<typename T, typename U>
 inline void pr(pair<T, U> pa) {
@@ -158,68 +163,46 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-template<typename T>
-inline void pnl(T t) {
-    pr(t);
-    cout << nl;
-}
-
-inline ll binpow(ll a, int p, int m) {
-    ll res = 1;
-    while (p) {
-        if (p & 1)res = (res * a) % m;
-        a = (a * a) % m;
-        p >>= 1;
-    }
-    return res;
-}
-
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
-    };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
-    }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
-    }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
+    int n;
+    cin >> n;
+    string s;
+    set<string> tree;
+    int res = 0;
+    rep(0, n) {
+        cin >> s;
+        reverse(all(s));
+        auto it = tree.upper_bound(s);
+        int match = 0;
+        if (it != tree.end()) {
+            string p = *it;
+            for (int j = 0; j < min(sz(s), sz(p)); j++) {
+                if (s[j] == p[j])match++;
+                else break;
+            }
+            if (match != min(sz(s), sz(p)))res = max(res, match);
         }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
-        } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
+        it = tree.lower_bound(s);
+        if (it != tree.begin()) {
+            match = 0;
+            string p = *prev(it);
+            for (int j = 0; j < min(sz(s), sz(p)); j++) {
+                if (s[j] == p[j])match++;
+                else break;
+            }
+            if (match != min(sz(s), sz(p)))res = max(res, match);
         }
+        tree.emplace_hint(it, s);
     }
-    cout << res.first << ' ' << res.second << nl;
+    cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
     int t = 1;
-    cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    //cin >> t;
+    while (t--) solve();
     return 0;
 }

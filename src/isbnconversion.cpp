@@ -25,11 +25,9 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update>
-        ordered_set;
+typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update> ordered_set;
 const int inf = 1e9;
 const int mod = 1e9 + 7;
-const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int&_:arr)cin>>_
 #define readarr(n, arr) for(auto&_:arr)cin>>_
@@ -52,6 +50,11 @@ mt19937_64 rnd(time(0));
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
 
+template<typename T>
+inline void pnl(T t) {
+    pr(t);
+    cout << nl;
+}
 
 template<typename T, typename U>
 inline void pr(pair<T, U> pa) {
@@ -158,10 +161,22 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-template<typename T>
-inline void pnl(T t) {
-    pr(t);
-    cout << nl;
+inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
+    int xx = y = 0;
+    int yy = x = 1;
+    while (b) { // repeats until b == 0
+        int q = a / b;
+        int t = b;
+        b = a % b;
+        a = t;
+        t = xx;
+        xx = x - q * xx;
+        x = t;
+        t = yy;
+        yy = y - q * yy;
+        y = t;
+    }
+    return a; // returns gcd(a, b)
 }
 
 inline ll binpow(ll a, int p, int m) {
@@ -174,52 +189,86 @@ inline ll binpow(ll a, int p, int m) {
     return res;
 }
 
+//const int N=14001;
+//bitset<N+1>prime;
+//vl primes;
+//void sieve() {
+//    prime.set();
+//    for(int i=2;i<=N;i++) {
+//        if(prime[i]){
+//            for(ll j=1LL*i*i;j<=N;j+=i)prime[j]=0;
+//            primes.pb(i);
+//        }
+//    }
+//}
+//
+//vi primeFactors(int n) {
+//    vi factors;
+//    for (ll div: primes) {
+//        if(n % div == 0) {
+//            factors.pb(div);
+//            n /= div;
+//            while(n%div==0)n/=div;
+//        }
+//        if (div * div > n)break;
+//    }
+//    if (n != 1)factors.pb(n);
+//    return factors;
+//}
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
-    };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
+    string s;
+    cin >> s;
+    if (s[0] == '-' | s.back() == '-') {
+        pnl("invalid");
+        return;
     }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
-    }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
-        }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
-        } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
+    string p;
+    for (char &c: s)if (c != '-')p.pb(c);
+    int hyp = sz(s) - sz(p);
+    if (hyp > 3) {
+        pnl("invalid");
+        return;
+    } else if (hyp == 3) {
+        if (s[sz(s) - 2] != '-') {
+            pnl("invalid");
+            return;
         }
     }
-    cout << res.first << ' ' << res.second << nl;
+    rep(1, sz(s)) {
+        if (s[i - 1] == '-' && s[i] == '-') {
+            pnl("invalid");
+            return;
+        }
+        if (s[i - 1] == 'X') {
+            pnl("invalid");
+            return;
+        }
+    }
+    if (sz(p) != 10) {
+        pnl("invalid");
+        return;
+    }
+    int sum = 0;
+    rep(0, 10) {
+        if (p[i] == 'X')sum += (10 - i) * 10;
+        else sum += (10 - i) * (p[i] - '0');
+    }
+    if (sum % 11) {
+        pnl("invalid");
+        return;
+    }
+    sum = 38;
+    rep(0, 9)sum += i & 1 ? p[i] - '0' : 3 * (p[i] - '0');
+    s.back() = (10 - (sum % 10)) % 10 + '0';
+    pnl("978-" + s);
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
     int t = 1;
     cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    while (t--) solve();
     return 0;
 }

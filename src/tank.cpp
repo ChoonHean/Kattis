@@ -52,6 +52,11 @@ mt19937_64 rnd(time(0));
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
 
+template<typename T>
+inline void pnl(T t) {
+    pr(t);
+    cout << nl;
+}
 
 template<typename T, typename U>
 inline void pr(pair<T, U> pa) {
@@ -158,68 +163,93 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-template<typename T>
-inline void pnl(T t) {
-    pr(t);
-    cout << nl;
-}
+struct point {
+    double x, y;
 
-inline ll binpow(ll a, int p, int m) {
-    ll res = 1;
-    while (p) {
-        if (p & 1)res = (res * a) % m;
-        a = (a * a) % m;
-        p >>= 1;
+    point() { x = y = 0.0; }
+
+    point(double _x, double _y) : x(_x), y(_y) {}
+
+    bool operator==(point other) const {
+        return (fabs(x - other.x) < EPS && (fabs(y - other.y) < EPS));
     }
-    return res;
+
+    bool operator<(const point &p) const {
+        return x < p.x || (abs(x - p.x) < EPS && y < p.y);
+    }
+
+    friend ostream &operator<<(ostream &os, const point &p) {
+        os << "(" << p.x << ", " << p.y << ')';
+        return os;
+    }
+};
+
+double area(const vector<point> &P) {
+    double ans = 0.0;
+    for (int i = 0; i < (int) P.size() - 1; ++i)      // Shoelace formula
+        ans += (P[i].x * P[i + 1].y - P[i + 1].x * P[i].y);
+    return fabs(ans) / 2.0;                          // only do / 2.0 here
 }
 
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
-    };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
+    int n, d;
+    double l, lo = 0, hi = 0, x, y;
+    cin >> n >> d >> l;
+    l = l * 1000 / d;
+    deque<point> dq;
+    rep(0, n) {
+        cin >> x >> y;
+        hi = max(hi, y);
+        dq.pb(point(x, y));
     }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
+    vector<point> arr;
+    while (dq.front().y != 0 || dq.back().y != 0) {
+        dq.pb(dq.front());
+        dq.pop_front();
     }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
+    while (!dq.empty()) {
+        arr.pb(dq.back());
+        dq.pop_back();
+    }
+    while (fabs(hi - lo) > 1e-4) {
+        double mid = (hi + lo) / 2;
+        vector<point> v;
+        rep(0, n) {
+            if (arr[i].y > mid) {
+                if (arr[i].x == arr[i - 1].x) {
+                    v.pb(point(arr[i].x, mid));
+                } else {
+                    double grad = (arr[i].y - arr[i - 1].y) / (arr[i].x - arr[i - 1].x);
+                    v.pb(point((mid - arr[i - 1].y) / grad + arr[i - 1].x, mid));
+                }
+                break;
+            } else v.pb(arr[i]);
         }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
-        } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
+        for (int i = n - 2; i >= 0; i--) {
+            if (arr[i].y > mid) {
+                if (arr[i + 1].x == arr[i].x)v.pb(point(arr[i].x, mid));
+                else {
+                    double grad = (arr[i + 1].y - arr[i].y) / (arr[i + 1].x - arr[i].x);
+                    v.pb(point((mid - arr[i + 1].y) / grad + arr[i + 1].x, mid));
+                }
+                i++;
+                for (; i < n; i++)v.pb(arr[i]);
+                break;
+            }
         }
+        double a = area(v);
+        if (a >= l)hi = mid;
+        else lo = mid;
     }
-    cout << res.first << ' ' << res.second << nl;
+    cout << fixed << setprecision(2) << lo;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
     int t = 1;
-    cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    //cin >> t;
+    while (t--) solve();
     return 0;
 }

@@ -27,7 +27,7 @@ typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e9;
+const ll inf = 1e18;
 const int mod = 1e9 + 7;
 const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
@@ -52,6 +52,11 @@ mt19937_64 rnd(time(0));
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
 
+template<typename T>
+inline void pnl(T t) {
+    pr(t);
+    cout << nl;
+}
 
 template<typename T, typename U>
 inline void pr(pair<T, U> pa) {
@@ -158,68 +163,70 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-template<typename T>
-inline void pnl(T t) {
-    pr(t);
-    cout << nl;
-}
-
-inline ll binpow(ll a, int p, int m) {
-    ll res = 1;
-    while (p) {
-        if (p & 1)res = (res * a) % m;
-        a = (a * a) % m;
-        p >>= 1;
-    }
-    return res;
-}
-
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
-    };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
+    int n, m, x, u, v, w, lo = 1e9, hi = 0;
+    cin >> n >> m >> x;
+    vvpii adj(n);
+    rep(0, m) {
+        cin >> u >> v >> w;
+        adj[--u].pb({--v, w});
+        adj[v].pb({u, w});
+        lo = min(lo, w);
+        hi = max(hi, w);
     }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
+    rep(0, n) {
+        sort(all(adj[i]), [](const pii a, const pii b) {
+            return a.second < b.second;
+        });
     }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
-        }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
-        } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
+    vl best(n, inf);
+    best[0] = 0;
+    set<pair<ll, int>> tree;
+    tree.insert({0, 0});
+    while (!tree.empty()) {
+        auto [d, i] = *tree.begin();
+        if (i == n - 1)break;
+        tree.erase(tree.begin());
+        for (auto &[j, w]: adj[i]) {
+            ll next = d + w;
+            if (next < best[j]) {
+                tree.erase({best[j], j});
+                best[j] = next;
+                tree.insert({next, j});
+            }
         }
     }
-    cout << res.first << ' ' << res.second << nl;
+    ll limit = best.back() * (1 + x / 100.0L);
+    while (lo < hi) {
+        int mid = lo + hi >> 1;
+        tree.clear();
+        tree.insert({0, 0});
+        best.assign(n, inf);
+        best[0] = 0;
+        while (!tree.empty()) {
+            auto [d, i] = *tree.begin();
+            if (i == n - 1 || d > limit)break;
+            tree.erase(tree.begin());
+            for (auto &[j, w]: adj[i])
+                if (w <= mid) {
+                    if (d + w < best[j]) {
+                        tree.erase({best[j], j});
+                        tree.insert({best[j] = d + w, j});
+                    }
+                } else break;
+        }
+        if (best.back() <= limit)hi = mid;
+        else lo = mid + 1;
+    }
+    cout << lo;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
     int t = 1;
-    cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    //cin >> t;
+    while (t--) solve();
     return 0;
 }

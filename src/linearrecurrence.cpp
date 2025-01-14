@@ -25,11 +25,9 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update>
-        ordered_set;
+typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update> ordered_set;
 const int inf = 1e9;
 const int mod = 1e9 + 7;
-const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int&_:arr)cin>>_
 #define readarr(n, arr) for(auto&_:arr)cin>>_
@@ -52,6 +50,11 @@ mt19937_64 rnd(time(0));
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
 
+template<typename T>
+inline void pnl(T t) {
+    pr(t);
+    cout << nl;
+}
 
 template<typename T, typename U>
 inline void pr(pair<T, U> pa) {
@@ -158,10 +161,22 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-template<typename T>
-inline void pnl(T t) {
-    pr(t);
-    cout << nl;
+inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
+    int xx = y = 0;
+    int yy = x = 1;
+    while (b) { // repeats until b == 0
+        int q = a / b;
+        int t = b;
+        b = a % b;
+        a = t;
+        t = xx;
+        xx = x - q * xx;
+        x = t;
+        t = yy;
+        yy = y - q * yy;
+        y = t;
+    }
+    return a; // returns gcd(a, b)
 }
 
 inline ll binpow(ll a, int p, int m) {
@@ -174,52 +189,87 @@ inline ll binpow(ll a, int p, int m) {
     return res;
 }
 
+inline vvl matmul(int n, vvl &a, vvl &b, int m) {
+    vvl res(n, vl(n));
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int k = 0; k < n; k++) {
+                res[i][j] = (res[i][j] + a[i][k] * b[k][j]) % m;
+            }
+        }
+    }
+    return res;
+}
+
+inline vvl matpow(int n, vvl &a, ll p, int m) {
+    vvl res(n, vl(n));
+    for (int i = 0; i < n; i++)res[i][i] = 1;
+    vvl b(a);
+    while (p) {
+        if (p & 1)res = matmul(n, res, b, m);
+        b = matmul(n, b, b, m);
+        p >>= 1;
+    }
+    return res;
+}
+
+//const int N=14001;
+//bitset<N+1>prime;
+//vl primes;
+//void sieve() {
+//    prime.set();
+//    for(int i=2;i<=N;i++) {
+//        if(prime[i]){
+//            for(ll j=1LL*i*i;j<=N;j+=i)prime[j]=0;
+//            primes.pb(i);
+//        }
+//    }
+//}
+//
+//vi primeFactors(int n) {
+//    vi factors;
+//    for (ll div: primes) {
+//        if(n % div == 0) {
+//            factors.pb(div);
+//            n /= div;
+//            while(n%div==0)n/=div;
+//        }
+//        if (div * div > n)break;
+//    }
+//    if (n != 1)factors.pb(n);
+//    return factors;
+//}
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
-    };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
-    }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
-    }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
-        }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
+    ll n, q, m, t;
+    cin >> n;
+    vvl arr(n + 1, vl(n + 1));
+    cin >> arr[0].back();
+    rep(0, n)cin >> arr[0][i];
+    rep(0, n - 1)arr[i + 1][i] = 1;
+    arr.back().back() = 1;
+    vl ori(n + 1);
+    for (int i = n - 1; i >= 0; i--)cin >> ori[i];
+    ori.back() = 1;
+    cin >> q;
+    while (q--) {
+        cin >> t >> m;
+        if (t < n) {
+            pnl(((ori[n - t - 1] % m) + m) % m);
         } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
+            vvl mat = matpow(n + 1, arr, t - n + 1, m);
+            ll res = 0;
+            rep(0, n + 1)res = (res + (((mat[0][i] * ori[i]) % m) + m) % m) % m;
+            pnl(res);
         }
     }
-    cout << res.first << ' ' << res.second << nl;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
     int t = 1;
-    cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    //cin >> t;
+    while (t--) solve();
     return 0;
 }

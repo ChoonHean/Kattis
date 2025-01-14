@@ -4,6 +4,7 @@
 
 using namespace std;
 
+const double inf = 1e9;
 const double EPS = 1e-9;
 
 double DEG_to_RAD(double d) { return d * M_PI / 180.0; }
@@ -31,128 +32,169 @@ struct point {
     }
 };
 
-struct vec {
-    double x, y;
+double dist(point p1, point p2) {                // Euclidean distance
+    // hypot(dx, dy) returns sqrt(dx*dx + dy*dy)
+    return hypot(p1.x-p2.x, p1.y-p2.y);            // return double
+}
 
+// rotate p by theta degrees CCW w.r.t origin (0, 0)
+point rotate(point p, double theta) {
+    double rad = DEG_to_RAD(theta);                // convert to radian
+    return point(p.x*cos(rad) - p.y*sin(rad),
+                 p.x*sin(rad) + p.y*cos(rad));
+}
+
+struct line { double a, b, c; };                 // most versatile
+
+// the answer is stored in the third parameter (pass by reference)
+void pointsToLine(point p1, point p2, line &l) {
+    if (fabs(p1.x-p2.x) < EPS)                     // vertical line is fine
+        l = {1.0, 0.0, -p1.x};                       // default values
+    else {
+        double a = -(double)(p1.y-p2.y) / (p1.x-p2.x);
+        l = {a, 1.0, -(double)(a*p1.x) - p1.y};      // NOTE: b always 1.0
+    }
+}
+
+// not needed since we will use the more robust form: ax + by + c = 0
+struct line2 { double m, c; };                   // alternative way
+
+int pointsToLine2(point p1, point p2, line2 &l) {
+    if (p1.x == p2.x) {                            // vertical line
+        l.m = inf;                                   // this is to denote a
+        l.c = p1.x;                                  // line x = x_value
+        return 0;                                    // differentiate result
+    }
+    else {
+        l.m = (double)(p1.y-p2.y) / (p1.x-p2.x);
+        l.c = p1.y - l.m*p1.x;
+        return 1;                                    // standard y = mx + c
+    }
+}
+
+bool areParallel(line l1, line l2) {             // check a & b
+    return (fabs(l1.a-l2.a) < EPS) && (fabs(l1.b-l2.b) < EPS);
+}
+
+bool areSame(line l1, line l2) {                 // also check  c
+    return areParallel(l1 ,l2) && (fabs(l1.c-l2.c) < EPS);
+}
+
+// returns true (+ intersection point p) if two lines are intersect
+bool areIntersect(line l1, line l2, point &p) {
+    if (areParallel(l1, l2)) return false;         // no intersection
+    // solve system of 2 linear algebraic equations with 2 unknowns
+    p.x = (l2.b*l1.c - l1.b*l2.c) / (l2.a*l1.b - l1.a*l2.b);
+    // special case: test for vertical line to avoid division by zero
+    if (fabs(l1.b) > EPS) p.y = -(l1.a*p.x + l1.c);
+    else                  p.y = -(l2.a*p.x + l2.c);
+    return true;
+}
+
+struct vec { double x, y; // name: `vec' is different from STL vector
     vec(double _x, double _y) : x(_x), y(_y) {}
 };
+vec toVec(const point &a, const point &b) {      // convert 2 points
+    return vec(b.x-a.x, b.y-a.y);                  // to vector a->b
+}
+vec scale(const vec &v, double s) {              // s = [<1..1..>1]
+    return vec(v.x*s, v.y*s);                      // shorter/eq/longer
+}                                                // return a new vec
+point translate(const point &p, const vec &v) {  // translate p
+    return point(p.x+v.x, p.y+v.y);                // according to v
+}                                                // return a new point
 
-vec toVec(point a, point b) {       // convert 2 points to vector a->b
-    return vec(b.x - a.x, b.y - a.y);
+// convert point and gradient/slope to line
+void pointSlopeToLine(point p, double m, line &l) {
+    l.a = -m;                                      // always -m
+    l.b = 1;                                       // always 1
+    l.c = -((l.a * p.x) + (l.b * p.y));            // compute this
 }
 
-double dist(point p1, point p2) {                // Euclidean distance
-    return hypot(p1.x - p2.x, p1.y - p2.y);
+void closestPoint(line l, point p, point &ans) {
+    // this line is perpendicular to l and pass through p
+    line perpendicular;
+    if (fabs(l.b) < EPS) {                         // vertical line
+        ans.x = -(l.c);
+        ans.y = p.y;
+        return;
+    }
+    if (fabs(l.a) < EPS) {                         // horizontal line
+        ans.x = p.x;
+        ans.y = -(l.c);
+        return;
+    }
+    pointSlopeToLine(p, 1/l.a, perpendicular);     // normal line
+    // intersect line l with this perpendicular line
+    // the intersection point is the closest point
+    areIntersect(l, perpendicular, ans);
 }
 
-double perimeter(const vector<point> &P) {       // by ref for efficiency
-    double ans = 0.0;
-    for (int i = 0; i < (int) P.size() - 1; ++i)      // note: P[n-1] = P[0]
-        ans += dist(P[i], P[i + 1]);                   // as we duplicate P[0]
-    return ans;
+// returns the reflection of point on a line
+void reflectionPoint(line l, point p, point &ans) {
+    point b;
+    closestPoint(l, p, b);                         // similar to distToLine
+    vec v = toVec(p, b);                           // create a vector
+    ans = translate(translate(p, v), v);           // translate p twice
 }
 
-double area(const vector<point> &P) {
-    double ans = 0.0;
-    for (int i = 0; i < (int) P.size() - 1; ++i)      // Shoelace formula
-        ans += (P[i].x * P[i + 1].y - P[i + 1].x * P[i].y);
-    return fabs(ans) / 2.0;                          // only do / 2.0 here
-}
+// returns the dot product of two vectors a and b
+double dot(vec a, vec b) { return (a.x*b.x + a.y*b.y); }
 
-double dot(vec a, vec b) { return (a.x * b.x + a.y * b.y); }
+// returns the squared value of the normalized vector
+double norm_sq(vec v) { return v.x*v.x + v.y*v.y; }
 
-double norm_sq(vec v) { return v.x * v.x + v.y * v.y; }
-
-double angle(point a, point o, point b) {  // returns angle aob in rad
-    vec oa = toVec(o, a), ob = toVec(o, b);
+double angle(const point &a, const point &o, const point &b) {
+    vec oa = toVec(o, a), ob = toVec(o, b);        // a != o != b
     return acos(dot(oa, ob) / sqrt(norm_sq(oa) * norm_sq(ob)));
+}                                                // angle aob in rad
+
+// returns the distance from p to the line defined by
+// two points a and b (a and b must be different)
+// the closest point is stored in the 4th parameter (byref)
+double distToLine(point p, point a, point b, point &c) {
+    vec ap = toVec(a, p), ab = toVec(a, b);
+    double u = dot(ap, ab) / norm_sq(ab);
+    // formula: c = a + u*ab
+    c = translate(a, scale(ab, u));                // translate a to c
+    return dist(p, c);                             // Euclidean distance
 }
 
-double cross(vec a, vec b) { return a.x * b.y - a.y * b.x; }
-
-// returns the area of polygon P, which is half the cross products
-// of vectors defined by edge endpoints
-double area_alternative(const vector<point> &P) {
-    double ans = 0.0;
-    point O(0.0, 0.0);           // O = the Origin
-    for (int i = 0; i < (int) P.size() - 1; ++i)      // sum of signed areas
-        ans += cross(toVec(O, P[i]), toVec(O, P[i + 1]));
-    return fabs(ans) / 2.0;
+// returns the distance from p to the line segment ab defined by
+// two points a and b (technically, a has to be different from b)
+// the closest point is stored in the 4th parameter (byref)
+double distToLineSegment(point p, point a, point b, point &c) {
+    vec ap = toVec(a, p), ab = toVec(a, b);
+    double u = dot(ap, ab) / norm_sq(ab);
+    if (u < 0.0) {                                 // closer to a
+        c = point(a.x, a.y);
+        return dist(p, a);                           // dist p to a
+    }
+    if (u > 1.0) {                                 // closer to b
+        c = point(b.x, b.y);
+        return dist(p, b);                           // dist p to b
+    }
+    return distToLine(p, a, b, c);                 // use distToLine
 }
+
+// returns the cross product of two vectors a and b
+double cross(vec a, vec b) { return a.x*b.y - a.y*b.x; }
+
+//// another variant
+// returns 'twice' the area of this triangle A-B-c
+// int area2(point p, point q, point r) {
+//   return p.x * q.y - p.y * q.x +
+//          q.x * r.y - q.y * r.x +
+//          r.x * p.y - r.y * p.x;
+// }
 
 // note: to accept collinear points, we have to change the `> 0'
 // returns true if point r is on the left side of line pq
 bool ccw(point p, point q, point r) {
-    return cross(toVec(p, q), toVec(p, r)) > 0;
+    return cross(toVec(p, q), toVec(p, r)) > -EPS;
 }
 
 // returns true if point r is on the same line as the line pq
 bool collinear(point p, point q, point r) {
     return fabs(cross(toVec(p, q), toVec(p, r))) < EPS;
-}
-
-bool isConvex(const vector<point> &P) {
-    int n = (int) P.size();
-    // a point/sz=2 or a line/sz=3 is not convex
-    if (n <= 3) return false;
-    bool firstTurn = ccw(P[0], P[1], P[2]);        // remember one result,
-    for (int i = 1; i < n - 1; ++i)                 // compare with the others
-        if (ccw(P[i], P[i + 1], P[(i + 2) == n ? 1 : i + 2]) != firstTurn)
-            return false;                              // different -> concave
-    return true;                                   // otherwise -> convex
-}
-
-int insidePolygon(point pt, const vector<point> &P) {
-    int n = (int) P.size();
-    if (n <= 3) return -1;                         // avoid point or line
-    bool on_polygon = false;
-    for (int i = 0; i < n - 1; ++i)                  // on vertex/edge?
-        if (fabs(dist(P[i], pt) + dist(pt, P[i + 1]) - dist(P[i], P[i + 1])) < EPS)
-            on_polygon = true;
-    if (on_polygon) return 0;                      // pt is on polygon
-    double sum = 0.0;                              // first = last point
-    for (int i = 0; i < n - 1; ++i) {
-        if (ccw(pt, P[i], P[i + 1]))
-            sum += angle(P[i], pt, P[i + 1]);            // left turn/ccw
-        else
-            sum -= angle(P[i], pt, P[i + 1]);            // right turn/cw
-    }
-    return fabs(sum) > M_PI ? 1 : -1;              // 360d->in, 0d->out
-}
-
-point lineIntersectSeg(point p, point q, point A, point B) {
-    double a = B.y - A.y, b = A.x - B.x, c = B.x * A.y - A.x * B.y;
-    double u = fabs(a * p.x + b * p.y + c);
-    double v = fabs(a * q.x + b * q.y + c);
-    return point((p.x * v + q.x * u) / (u + v), (p.y * v + q.y * u) / (u + v));
-}
-
-vector<point> cutPolygon(point A, point B, const vector<point> &Q) {
-    vector<point> P;
-    for (int i = 0; i < (int) Q.size(); ++i) {
-        double left1 = cross(toVec(A, B), toVec(A, Q[i])), left2 = 0;
-        if (i != (int) Q.size() - 1) left2 = cross(toVec(A, B), toVec(A, Q[i + 1]));
-        if (left1 > -EPS) P.push_back(Q[i]);         // Q[i] is on the left
-        if (left1 * left2 < -EPS)                      // crosses line AB
-            P.push_back(lineIntersectSeg(Q[i], Q[i + 1], A, B));
-    }
-    if (!P.empty() && !(P.back() == P.front()))
-        P.push_back(P.front());                      // wrap around
-    return P;
-}
-
-vector<point> CH_Andrew(vector<point> &Pts) {    // overall O(n log n)
-    int n = Pts.size(), k = 0;
-    vector<point> H(2 * n);
-    sort(Pts.begin(), Pts.end());                  // sort the points by x/y
-    for (int i = 0; i < n; ++i) {                  // build lower hull
-        while ((k >= 2) && !ccw(H[k - 2], H[k - 1], Pts[i])) --k;
-        H[k++] = Pts[i];
-    }
-    for (int i = n - 2, t = k + 1; i >= 0; --i) {       // build upper hull
-        while ((k >= t) && !ccw(H[k - 2], H[k - 1], Pts[i])) --k;
-        H[k++] = Pts[i];
-    }
-    H.resize(k);
-    return H;
 }

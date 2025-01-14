@@ -52,6 +52,11 @@ mt19937_64 rnd(time(0));
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
 
+template<typename T>
+inline void pnl(T t) {
+    pr(t);
+    cout << nl;
+}
 
 template<typename T, typename U>
 inline void pr(pair<T, U> pa) {
@@ -158,68 +163,102 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-template<typename T>
-inline void pnl(T t) {
-    pr(t);
-    cout << nl;
-}
+struct LCA {
+    int n;
+    vpii A, st;
 
-inline ll binpow(ll a, int p, int m) {
-    ll res = 1;
-    while (p) {
-        if (p & 1)res = (res * a) % m;
-        a = (a * a) % m;
-        p >>= 1;
+    inline int l(int p) { return p << 1; }
+
+    inline int r(int p) { return (p << 1) + 1; }
+
+    inline pii conquer(pii a, pii b) {
+        if (a.first < b.first)return a;
+        else return b;
     }
-    return res;
-}
+
+    void build(int p, int L, int R) {
+        if (L == R)
+            st[p] = A[L];
+        else {
+            int m = (L + R) / 2;
+            build(l(p), L, m);
+            build(r(p), m + 1, R);
+            st[p] = conquer(st[l(p)], st[r(p)]);
+        }
+    }
+
+    pii RMQ(int p, int L, int R, int i, int j) {
+        if (i > j) return {inf, inf};
+        if ((L >= i) && (R <= j)) return st[p];
+        int m = (L + R) / 2;
+        return conquer(RMQ(l(p), L, m, i, min(m, j)),
+                       RMQ(r(p), m + 1, R, max(i, m + 1), j));
+    }
+
+    LCA(int sz) : n(sz), A(n) {
+        int mx = (1 << (33 - __builtin_clz(n - 1))) + 1;
+        st.resize(mx);
+    }
+
+    LCA(const vpii &initialA) : LCA((int) initialA.size()) {
+        A = initialA;
+        build(1, 0, n - 1);
+    }
+
+    inline int RMQ(int i, int j) {
+        if (i > j)swap(i, j);
+        return RMQ(1, 0, n - 1, i, j).second;
+    }
+};
 
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
+    int n, q, u, v;
+    cin >> n >> q;
+    vi par(n);
+    vvi adj(n);
+    auto dfs = [&](auto &self, int i) -> void {
+        for (auto &j: adj[i]) {
+            if (j == par[i])continue;
+            par[j] = i;
+            self(self, j);
+        }
     };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
-    }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
-    }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
+    vi first(n);
+    vpii order(n << 1);
+    int idx = 0;
+    auto processlca = [&](auto &self, int i, int d) -> void {
+        first[i] = idx;
+        order[idx++] = {d, i};
+        for (auto &j: adj[i]) {
+            if (j == par[i])continue;
+            self(self, j, d + 1);
+            order[idx++] = {d, i};
         }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
-        } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
-        }
+    };
+    rep(1, n) {
+        cin >> u >> v;
+        adj[--u].pb(--v);
+        adj[v].pb(u);
     }
-    cout << res.first << ' ' << res.second << nl;
+    dfs(dfs, 0);
+    processlca(processlca, 0, 0);
+    LCA lca(order);
+    while (q--) {
+        cin >> u >> v;
+        --u;
+        --v;
+        ll dist =
+                order[first[u]].first + order[first[v]].first - (order[first[lca.RMQ(first[u], first[v])]].first << 1);
+        pnl(n + (1 + dist) * dist / 2);
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
     int t = 1;
-    cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    //cin >> t;
+    while (t--) solve();
     return 0;
 }

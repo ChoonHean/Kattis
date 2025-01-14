@@ -175,51 +175,31 @@ inline ll binpow(ll a, int p, int m) {
 }
 
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
-    };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
-    }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
-    }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
+    int n, m;
+    cin >> n >> m;
+    if (m >= n) {//mCn
+        int k = m - n;
+        ll a = 1, b = 1, c = 1;
+        rep(2, m + 1) {
+            a = (a * i) % mod;
+            if (i == n)b = a;
+            if (i == k)c = a;
         }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
-        } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
-        }
+        cout << ((a * binpow(b, mod - 2, mod)) % mod * binpow(c, mod - 2, mod)) % mod;
+    } else {//partition n into m non-empty subarrays
+        vvi dp(n + 1, vi(m + 1));
+        dp[0][0] = 1;
+        for (int i = 1; i <= n; i++)for (int j = 1; j <= m; j++)dp[i][j] = (dp[i - 1][j] + dp[i - 1][j - 1]) % mod;
+        cout << dp.back().back();
     }
-    cout << res.first << ' ' << res.second << nl;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
     int t = 1;
-    cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    //cin >> t;
+    while (t--) solve();
     return 0;
 }

@@ -52,6 +52,11 @@ mt19937_64 rnd(time(0));
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
 
+template<typename T>
+inline void pnl(T t) {
+    pr(t);
+    cout << nl;
+}
 
 template<typename T, typename U>
 inline void pr(pair<T, U> pa) {
@@ -158,68 +163,47 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-template<typename T>
-inline void pnl(T t) {
-    pr(t);
-    cout << nl;
-}
-
-inline ll binpow(ll a, int p, int m) {
-    ll res = 1;
-    while (p) {
-        if (p & 1)res = (res * a) % m;
-        a = (a * a) % m;
-        p >>= 1;
-    }
-    return res;
-}
-
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
-    };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
+    int n, m, k, t;
+    cin >> n >> m >> k;
+    string s;
+    getline(cin, s);
+    typedef pair<string, int> psi;
+    PQ<psi, vector<psi>, greater<psi>> pq;
+    pq.push({"Jane Eyre", k});
+    rep(0, n) {
+        getline(cin, s);
+        int pos = s.find("\"", 1);
+        pq.push({s.substr(1, pos - 1), stoi(s.substr(pos + 2))});
     }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
+    vector<pair<int, psi>> arr;
+    rep(0, m) {
+        cin >> t;
+        getline(cin, s);
+        int pos = s.find("\"", 2);
+        arr.pb({t, {s.substr(2, pos - 2), stoi(s.substr(pos + 2))}});
     }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
-        }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
-        } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
+    sort(all(arr), greater<pair<int, psi>>());
+    ll res = 0;
+    while (!pq.empty()) {
+        auto [name, pages] = pq.top();
+        pq.pop();
+        res += pages;
+        if (name == "Jane Eyre")break;
+        while (!arr.empty() && arr.back().first <= res) {
+            pq.push(arr.back().second);
+            arr.pop_back();
         }
     }
-    cout << res.first << ' ' << res.second << nl;
+    cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
     int t = 1;
-    cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    //cin >> t;
+    while (t--) solve();
     return 0;
 }

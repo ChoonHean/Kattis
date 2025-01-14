@@ -27,7 +27,7 @@ typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e9;
+const ll inf = 1e18;
 const int mod = 1e9 + 7;
 const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
@@ -52,6 +52,11 @@ mt19937_64 rnd(time(0));
 template<typename T>
 inline void pr(T t) { cout << t << ' '; }
 
+template<typename T>
+inline void pnl(T t) {
+    pr(t);
+    cout << nl;
+}
 
 template<typename T, typename U>
 inline void pr(pair<T, U> pa) {
@@ -158,68 +163,41 @@ inline void pr(PQ<T, vector<T>, greater<T>> pq) {
     cout << nl;
 }
 
-template<typename T>
-inline void pnl(T t) {
-    pr(t);
-    cout << nl;
-}
-
-inline ll binpow(ll a, int p, int m) {
-    ll res = 1;
-    while (p) {
-        if (p & 1)res = (res * a) % m;
-        a = (a * a) % m;
-        p >>= 1;
-    }
-    return res;
-}
-
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
-    };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
+    string s, line;
+    hset<string> dict;
+    while (true) {
+        cin >> line;
+        if (line == "#")break;
+        dict.insert(line);
     }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
-    }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
+    while (true) {
+        cin >> line;
+        if (line == "#")break;
+        s.append(line);
+        if (s.back() != '|')continue;
+        s.pop_back();
+        int n = sz(s);
+        vi dp(n + 1);
+        rep(0, n) {
+            dp[i + 1] = max(dp[i + 1], dp[i]);
+            string cur = "";
+            for (int j = i; j < min(i + 10, n); j++) {
+                cur.pb(s[j]);
+                if (dict.contains(cur))dp[j + 1] = max(dp[j + 1], dp[i] + 1);
+            }
         }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
-        } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
-        }
+        pnl(dp.back());
+        s = "";
     }
-    cout << res.first << ' ' << res.second << nl;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
     int t = 1;
-    cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    //cin >> t;
+    while (t--) solve();
     return 0;
 }

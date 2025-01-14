@@ -164,53 +164,103 @@ inline void pnl(T t) {
     cout << nl;
 }
 
-inline ll binpow(ll a, int p, int m) {
-    ll res = 1;
-    while (p) {
-        if (p & 1)res = (res * a) % m;
-        a = (a * a) % m;
-        p >>= 1;
+struct FT {                              // index 0 is not used
+    vl ft;                                        // internal FT is an array
+    FT(int m) { ft.assign(m + 1, 0); }      // create an empty FT
+    FT() {}
+
+    inline void build(const vl &f) {
+        int m = (int) f.size() - 1;                     // note f[0] is always 0
+        ft.assign(m + 1, 0);
+        for (int i = 1; i <= m; ++i) {               // O(m)
+            ft[i] += f[i];                             // add this value
+            if (i + lsb(i) <= m)                       // i has parent
+                ft[i + lsb(i)] += ft[i];                 // add to that parent
+        }
     }
-    return res;
+
+    inline FT(const vl &f) { build(f); }        // create FT based on f
+
+    inline FT(int m, const vi &s) {              // create FT based on s
+        vl f(m + 1, 0);
+        for (int i = 0; i < (int) s.size(); ++i)      // do the conversion first
+            ++f[s[i]];                                 // in O(n)
+        build(f);                                    // in O(m)
+    }
+
+    inline ll rsq(int j) {                                // returns RSQ(1, j)
+        ll sum = 0;
+        for (; j; j -= lsb(j))
+            sum += ft[j];
+        return sum;
+    }
+
+    inline ll rsq(int i, int j) { return rsq(j) - rsq(i - 1); } // inc/exclusion
+
+    // updates value of the i-th element by v (v can be +ve/inc or -ve/dec)
+    inline void update(int i, ll v) {
+        for (; i < (int) ft.size(); i += lsb(i))
+            ft[i] += v;
+    }
+
+    int select(ll k) {                             // O(log m)
+        int p = 1;
+        while (p * 2 < (int) ft.size()) p *= 2;
+        int i = 0;
+        while (p) {
+            if (k > ft[i + p]) {
+                k -= ft[i + p];
+                i += p;
+            }
+            p /= 2;
+        }
+        return i + 1;
+    }
+};
+
+struct point {
+    double x, y;
+
+    point() { x = y = 0.0; }
+
+    point(double _x, double _y) : x(_x), y(_y) {}
+
+    bool operator==(point other) const {
+        return (fabs(x - other.x) < EPS && (fabs(y - other.y) < EPS));
+    }
+
+    bool operator<(const point &p) const {
+        return x < p.x || (abs(x - p.x) < EPS && y < p.y);
+    }
+
+    friend ostream &operator<<(ostream &os, const point &p) {
+        os << "(" << p.x << ", " << p.y << ')';
+        return os;
+    }
+};
+
+double area(const vector<point> &P) {
+    double ans = 0.0;
+    for (int i = 0; i < (int) P.size() - 1; ++i)      // Shoelace formula
+        ans += (P[i].x * P[i + 1].y - P[i + 1].x * P[i].y);
+    return fabs(ans) / 2.0;                          // only do / 2.0 here
 }
 
 inline void solve() {
-    int t, a, b;
-    cin >> t >> a >> b;
-    vector<pair<pii, int>> arr;
-    string s1, s2;
-    auto f = [](string s) -> int {
-        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
-    };
-    rep(0, a) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 0});
+    int n;
+    cin >> n;
+    vector<point> arr{point(0, 0)};
+    int x = 0, y = 0;
+    string s;
+    rep(0, n) {
+        cin >> s;
+        if (s[0] == 'N')y += stoi(s.substr(1));
+        else if (s[0] == 'E')x += stoi(s.substr(1));
+        else if (s[0] == 'S')y -= stoi(s.substr(1));
+        else x -= stoi(s.substr(1));
+        arr.pb(point(x, y));
     }
-    rep(0, b) {
-        cin >> s1 >> s2;
-        arr.pb({{f(s1), f(s2) + t}, 1});
-    }
-    sort(all(arr));
-    pii res;
-    PQ<pii, vpii, greater<pii>> pq;
-    int l = 0, r = 0;
-    rep(0, a + b) {
-        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
-            if (pq.top().second)r++;
-            else l++;
-            pq.pop();
-        }
-        if (arr[i].second) {
-            if (r)r--;
-            else res.second++;
-            pq.push({arr[i].first.second, 0});
-        } else {
-            if (l)l--;
-            else res.first++;
-            pq.push({arr[i].first.second, 1});
-        }
-    }
-    cout << res.first << ' ' << res.second << nl;
+    cout << "THE AREA IS " << (int) area(arr);
 }
 
 int32_t main() {
@@ -219,7 +269,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int t = 1;
-    cin >> t;
-    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
+    //cin >> t;
+    while (t--) solve();
     return 0;
 }
