@@ -8,9 +8,9 @@ struct UFDS {
     int sets;
 
     UFDS(int n) {
-        p.reserve(n);
+        p.resize(n);
         sets = n;
-        for (int i = 0; i < n; i++)p.push_back(i);
+        iota(p.begin(), p.end(), 0);
         size.assign(n, 1);
     }
 
@@ -29,5 +29,5 @@ struct UFDS {
         size[x] += size[y];
     }
 
-    inline int sz(int n) { return size[find(n)]; }
+    inline int setsize(int n) { return size[find(n)]; }
 };
