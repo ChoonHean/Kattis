@@ -29,11 +29,11 @@ typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_
         ordered_set;
 const int inf = 1e9;
 const ll llinf = 4e18;
-const int mod = 998244353;
+const int mod = 1e9 + 7;
 const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int&_:arr)cin>>_
-#define readarr(arr) for(auto&_:arr)cin>>_
+#define readarr(n, arr) for(auto&_:arr)cin>>_
 #define rep(i, a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
@@ -166,23 +166,45 @@ inline void pnl(T t) {
 }
 
 inline void solve() {
-    ll n;
-    int m;
-    cin >> n >> m;
-    vpll arr(m);
-    for (auto &[a, b]: arr)cin >> a >> b;
-    sort(all(arr));
-    vpll merged{arr[0]};
-    rep(i, 1, m) {
-        if (arr[i].first <= merged.back().second)merged.back().second = max(merged.back().second, arr[i].second);
-        else merged.pb(arr[i]);
+    string s, res;
+    cin >> s;
+    if (s == "0") {
+        cout << s;
+        return;
     }
-    ll res = 0;
-    for (auto &[a, b]: merged)res += b - a + 1;
-    pnl(res);
-    pnl(res * 2 <= n ? "The Mexicans are Lazy! Sad!" : "The Mexicans took our jobs! Sad!");
+    reverse(all(s));
+    int n = sz(s);
+    int cnt = 0;
+    vs oct{"000", "100", "010", "110", "001", "101", "011", "111"};
+    rep(i, 0, n) {
+        res.append(oct[s[i] - '0']);
+    }
+    while (sz(res) % 4)res.pb('0');
+    hmap<string, char> mp;
+    mp.emplace("0000", '0');
+    mp.emplace("1000", '1');
+    mp.emplace("0100", '2');
+    mp.emplace("1100", '3');
+    mp.emplace("0010", '4');
+    mp.emplace("1010", '5');
+    mp.emplace("0110", '6');
+    mp.emplace("1110", '7');
+    mp.emplace("0001", '8');
+    mp.emplace("1001", '9');
+    mp.emplace("0101", 'A');
+    mp.emplace("1101", 'B');
+    mp.emplace("0011", 'C');
+    mp.emplace("1011", 'D');
+    mp.emplace("0111", 'E');
+    mp.emplace("1111", 'F');
+    string ans;
+    for (int i = 0; i < sz(res); i += 4) {
+        ans.pb(mp[res.substr(i, 4)]);
+    }
+    while (ans.back() == '0')ans.pop_back();
+    reverse(all(ans));
+    cout << ans;
 }
-
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
@@ -191,6 +213,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int t = 1;
 //    cin >> t;
-    while (t--) solve();
+    while (t--)solve();
     return 0;
 }

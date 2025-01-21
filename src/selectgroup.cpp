@@ -29,7 +29,7 @@ typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_
         ordered_set;
 const int inf = 1e9;
 const ll llinf = 4e18;
-const int mod = 998244353;
+const int mod = 1e9 + 7;
 const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int&_:arr)cin>>_
@@ -165,22 +165,76 @@ inline void pnl(T t) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    int m;
-    cin >> n >> m;
-    vpll arr(m);
-    for (auto &[a, b]: arr)cin >> a >> b;
-    sort(all(arr));
-    vpll merged{arr[0]};
-    rep(i, 1, m) {
-        if (arr[i].first <= merged.back().second)merged.back().second = max(merged.back().second, arr[i].second);
-        else merged.pb(arr[i]);
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
     }
-    ll res = 0;
-    for (auto &[a, b]: merged)res += b - a + 1;
-    pnl(res);
-    pnl(res * 2 <= n ? "The Mexicans are Lazy! Sad!" : "The Mexicans took our jobs! Sad!");
+    return res;
+}
+
+inline void solve() {
+    int n, cnt = 0, ppl = 0, i, j;
+    const int m = 10000;
+    string com, name;
+    hmap<string, int> group, people;
+    vs names;
+    vector<bitset<m>> arr(100);
+    while (true) {
+        cin >> com;
+        if (com != "group")break;
+        cin >> name >> n;
+        i = group[name] = cnt++;
+        while (n--) {
+            cin >> name;
+            if (people.contains(name))j = people[name];
+            else j = people[name] = ppl++, names.pb(name);
+            arr[i].set(j);
+        }
+    }
+    string x, y;
+    vs line{com};
+    getline(cin, com);
+    com.erase(com.begin());
+    for (string &s: split(com, ' '))line.pb(s);
+    bitset<m> a, b;
+    while (true) {
+        stack<bitset<m>> st;
+        for (auto it = line.rbegin(); it != line.rend(); it++) {
+            if (*it == "union") {
+                a = st.top();
+                st.pop();
+                b = st.top();
+                st.pop();
+                st.push(a | b);
+            } else if (*it == "intersection") {
+                a = st.top();
+                st.pop();
+                b = st.top();
+                st.pop();
+                st.push(a & b);
+            } else if (*it == "difference") {
+                a = st.top();
+                st.pop();
+                b = st.top();
+                st.pop();
+                st.push((a ^ b) & a);
+            } else {
+                st.push(arr[group[*it]]);
+            }
+        }
+        vs res;
+        bitset<m> bs = st.top();
+        rep(k, 0, ppl)if (bs.test(k))res.pb(names[k]);
+        sort(all(res));
+        pr(res);
+        if (!getline(cin, com))break;
+        line = split(com, ' ');
+    }
 }
 
 

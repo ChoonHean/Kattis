@@ -29,11 +29,11 @@ typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_
         ordered_set;
 const int inf = 1e9;
 const ll llinf = 4e18;
-const int mod = 998244353;
+const int mod = 1e9 + 7;
 const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int&_:arr)cin>>_
-#define readarr(arr) for(auto&_:arr)cin>>_
+#define readarr(n, arr) for(auto&_:arr)cin>>_
 #define rep(i, a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
@@ -166,23 +166,32 @@ inline void pnl(T t) {
 }
 
 inline void solve() {
-    ll n;
-    int m;
-    cin >> n >> m;
-    vpll arr(m);
-    for (auto &[a, b]: arr)cin >> a >> b;
-    sort(all(arr));
-    vpll merged{arr[0]};
-    rep(i, 1, m) {
-        if (arr[i].first <= merged.back().second)merged.back().second = max(merged.back().second, arr[i].second);
-        else merged.pb(arr[i]);
+    int n, q;
+    cin >> n;
+    hmap<string, int> mp;
+    string s;
+    getline(cin, s);
+    rep(i, 0, n) {
+        getline(cin, s);
+        mp[s] = i;
     }
-    ll res = 0;
-    for (auto &[a, b]: merged)res += b - a + 1;
-    pnl(res);
-    pnl(res * 2 <= n ? "The Mexicans are Lazy! Sad!" : "The Mexicans took our jobs! Sad!");
+    cin >> q;
+    getline(cin, s);
+    vi dp(n);
+    while (q-- > 0) {
+        getline(cin, s);
+        vi ndp(n, inf);
+        int skip = mp[s];
+        rep(i, 0, n) {
+            if (i == skip)continue;
+            rep(j, 0, n) {
+                ndp[i] = min(ndp[i], dp[j] + (i != j ? 1 : 0));
+            }
+        }
+        swap(dp, ndp);
+    }
+    pnl(*min_element(all(dp)));
 }
-
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
@@ -190,7 +199,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int t = 1;
-//    cin >> t;
-    while (t--) solve();
+    cin >> t;
+    for (int i = 1; i <= t; i++)cout << "Case #" << i << ": ", solve();
     return 0;
 }

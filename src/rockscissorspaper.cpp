@@ -29,7 +29,7 @@ typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_
         ordered_set;
 const int inf = 1e9;
 const ll llinf = 4e18;
-const int mod = 998244353;
+const int mod = 1e9 + 7;
 const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int&_:arr)cin>>_
@@ -166,21 +166,27 @@ inline void pnl(T t) {
 }
 
 inline void solve() {
-    ll n;
-    int m;
-    cin >> n >> m;
-    vpll arr(m);
-    for (auto &[a, b]: arr)cin >> a >> b;
-    sort(all(arr));
-    vpll merged{arr[0]};
-    rep(i, 1, m) {
-        if (arr[i].first <= merged.back().second)merged.back().second = max(merged.back().second, arr[i].second);
-        else merged.pb(arr[i]);
+    int r, c, n;
+    cin >> r >> c >> n;
+    vs arr(r), next(r, string(c, ' '));
+    readarr(arr);
+    hmap<char, char> mp;
+    mp['R'] = 'P';
+    mp['P'] = 'S';
+    mp['S'] = 'R';
+    auto f = [&](int i, int j) -> char {
+        char ch = arr[i][j];
+        if (i > 0 && arr[i - 1][j] == mp[ch])return mp[ch];
+        if (i < r - 1 && arr[i + 1][j] == mp[ch])return mp[ch];
+        if (j > 0 && arr[i][j - 1] == mp[ch])return mp[ch];
+        if (j < c - 1 && arr[i][j + 1] == mp[ch])return mp[ch];
+        return ch;
+    };
+    rep(k, 0, n) {
+        rep(i, 0, r)rep(j, 0, c)next[i][j] = f(i, j);
+        swap(arr, next);
     }
-    ll res = 0;
-    for (auto &[a, b]: merged)res += b - a + 1;
-    pnl(res);
-    pnl(res * 2 <= n ? "The Mexicans are Lazy! Sad!" : "The Mexicans took our jobs! Sad!");
+    pr(arr);
 }
 
 
@@ -190,7 +196,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int t = 1;
-//    cin >> t;
+    cin >> t;
     while (t--) solve();
     return 0;
 }

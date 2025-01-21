@@ -29,7 +29,7 @@ typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_
         ordered_set;
 const int inf = 1e9;
 const ll llinf = 4e18;
-const int mod = 998244353;
+const int mod = 1e9 + 7;
 const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int&_:arr)cin>>_
@@ -166,21 +166,15 @@ inline void pnl(T t) {
 }
 
 inline void solve() {
-    ll n;
-    int m;
-    cin >> n >> m;
-    vpll arr(m);
-    for (auto &[a, b]: arr)cin >> a >> b;
-    sort(all(arr));
-    vpll merged{arr[0]};
-    rep(i, 1, m) {
-        if (arr[i].first <= merged.back().second)merged.back().second = max(merged.back().second, arr[i].second);
-        else merged.pb(arr[i]);
+    string s;
+    cin >> s;
+    int n = sz(s), res = n / 2;
+    rep(k, n, n + n / 2) {
+        int cur = k - n;
+        rep(i, k - n, k / 2)if (s[i] != s[k - i - 1])cur++;
+        res = min(res, cur);
     }
-    ll res = 0;
-    for (auto &[a, b]: merged)res += b - a + 1;
-    pnl(res);
-    pnl(res * 2 <= n ? "The Mexicans are Lazy! Sad!" : "The Mexicans took our jobs! Sad!");
+    cout << res;
 }
 
 

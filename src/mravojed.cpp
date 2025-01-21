@@ -28,12 +28,11 @@ typedef vector<pdd> vpdd;
 typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e9;
-const ll llinf = 4e18;
-const int mod = 998244353;
+const int mod = 1e9 + 7;
 const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int&_:arr)cin>>_
-#define readarr(arr) for(auto&_:arr)cin>>_
+#define readarr(n, arr) for(auto&_:arr)cin>>_
 #define rep(i, a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
@@ -166,23 +165,76 @@ inline void pnl(T t) {
 }
 
 inline void solve() {
-    ll n;
-    int m;
-    cin >> n >> m;
-    vpll arr(m);
-    for (auto &[a, b]: arr)cin >> a >> b;
-    sort(all(arr));
-    vpll merged{arr[0]};
-    rep(i, 1, m) {
-        if (arr[i].first <= merged.back().second)merged.back().second = max(merged.back().second, arr[i].second);
-        else merged.pb(arr[i]);
-    }
-    ll res = 0;
-    for (auto &[a, b]: merged)res += b - a + 1;
-    pnl(res);
-    pnl(res * 2 <= n ? "The Mexicans are Lazy! Sad!" : "The Mexicans took our jobs! Sad!");
+    int r, c;
+    cin >> r >> c;
+    vs arr(r);
+    vector<pair<pii, int>> res;
+    rep(i, 0, r)cin >> arr[i];
+    bool cont = true;
+    for (int i = 0; i < r && cont; i++)
+        rep(j, 0, c)
+            if (arr[i][j] == 'x') {
+                int k = i + 1;
+                while (k < r && arr[k][j] == 'x')k++;
+                int l = j + 1;
+                while (l < c && arr[i][l] == 'x')l++;
+                int len = min(k - i, l - j);
+                res.pb({{i + 1, j + 1}, len});
+                cont = false;
+                for (int a = i; a < i + len; a++)
+                    for (int b = j; b < j + len; b++) {
+                        arr[a][b] = '-';
+                    }
+                break;
+            }
+    cont = true;
+    for (int i = r - 1; i >= 0 && cont; i--)
+        rep(j, 0, c)
+            if (arr[i][j] == 'x') {
+                int k = i - 1;
+                while (k >= 0 && (arr[k][j] == 'x' || arr[k][j] == '-'))k--;
+                int l = j + 1;
+                while (l < c && (arr[i][l] == 'x' || arr[i][l] == '-'))l++;
+                int len = min(i - k, l - j);
+                res.pb({{i - len + 2, j + 1}, len});
+                cont = false;
+                break;
+            }
+    cont = true;
+    for (int i = 0; i < r && cont; i++)
+        for (int j = c - 1; j >= 0; j--)
+            if (arr[i][j] == 'x') {
+                int k = i + 1;
+                while (k < r && (arr[k][j] == 'x' || arr[k][j] == '-'))k++;
+                int l = j - i;
+                while (l >= 0 && (arr[i][l] == 'x' || arr[i][l] == '-'))l--;
+                int len = min(k - i, j - l);
+                if (len > res.back().second) {
+                    res.back().first = {i + 1, j - len + 2};
+                    res.back().second = len;
+                }
+                cont = false;
+                break;
+            }
+    cont = true;
+    for (int i = r - 1; r >= 0 && cont; r--)
+        for (int j = c - 1; j >= 0; j--)
+            if (arr[i][j] == 'x') {
+                int k = i - 1;
+                while (k >= 0 && (arr[k][j] == 'x' || arr[k][j] == '-'))k--;
+                int l = j - 1;
+                while (l >= 0 && (arr[i][l] == 'x' || arr[i][l] == '-'))l--;
+                int len = min(i - k, j - l);
+                if (len > res.back().second) {
+                    res.back().first = {i - len + 2, j - len + 2};
+                    res.back().second = len;
+                }
+                cont = false;
+                break;
+            }
+    for (auto &[a, b]: res)pr(a.first), pr(a.second), pnl(b);
+    if (sz(res) == 1)for (auto &[a, b]: res)pr(a.first), pr(a.second), pnl(b);
 }
-
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
@@ -191,6 +243,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int t = 1;
 //    cin >> t;
-    while (t--) solve();
+    while (t--)solve();
     return 0;
 }

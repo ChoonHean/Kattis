@@ -29,11 +29,11 @@ typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_
         ordered_set;
 const int inf = 1e9;
 const ll llinf = 4e18;
-const int mod = 998244353;
+const int mod = 1e9 + 7;
 const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int&_:arr)cin>>_
-#define readarr(arr) for(auto&_:arr)cin>>_
+#define readarr(n, arr) for(auto&_:arr)cin>>_
 #define rep(i, a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
@@ -166,23 +166,44 @@ inline void pnl(T t) {
 }
 
 inline void solve() {
-    ll n;
-    int m;
-    cin >> n >> m;
-    vpll arr(m);
-    for (auto &[a, b]: arr)cin >> a >> b;
-    sort(all(arr));
-    vpll merged{arr[0]};
-    rep(i, 1, m) {
-        if (arr[i].first <= merged.back().second)merged.back().second = max(merged.back().second, arr[i].second);
-        else merged.pb(arr[i]);
-    }
-    ll res = 0;
-    for (auto &[a, b]: merged)res += b - a + 1;
-    pnl(res);
-    pnl(res * 2 <= n ? "The Mexicans are Lazy! Sad!" : "The Mexicans took our jobs! Sad!");
-}
+    int n, m, x1 = -1, y1, x2 = -1, y2;
+    string ss;
+    char c;
+    cin >> n >> m >> ss;
+    c = ss[1];
+    vs a(n), b(n);
+    for (auto &s: a)cin >> s;
+    for (auto &s: b)cin >> s;
+    for (int i = 0; i < n && x1 == -1; i++)
+        rep(j, 0, m)
+            if (a[i][j] == c) {
+                x1 = i;
+                y1 = j;
+                break;
+            }
+    for (int i = 0; i < n && x2 == -1; i++)
+        rep(j, 0, m)
+            if (b[i][j] == c) {
+                x2 = i;
+                y2 = j;
+                break;
+            }
+    vs res(n, string(m, ' '));
+    rep(i, 0, n)
+        rep(j, 0, m) {
+            if (a[i][j] != c)res[i][j] = a[i][j];
+            else res[i][j] = b[i][j];
+        }
+    int dx = x2 - x1, dy = y2 - y1;
 
+    rep(i, 0, n)
+        rep(j, 0, m)
+            if (b[i][j] == c) {
+                int x = i + dx, y = j + dy;
+                if (x >= 0 && x < n && y >= 0 && y < m)res[x][y] = c;
+            }
+    for (string &s: res)pnl(s);
+}
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
@@ -191,6 +212,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int t = 1;
 //    cin >> t;
-    while (t--) solve();
+    while (t--)solve();
     return 0;
 }

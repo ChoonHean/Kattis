@@ -28,13 +28,12 @@ typedef vector<pdd> vpdd;
 typedef tree<pair<int, int>, null_type, less<pair<int, int>>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e9;
-const ll llinf = 4e18;
-const int mod = 998244353;
+const int mod = 1e9 + 7;
 const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi arr(n);for(int&_:arr)cin>>_
-#define readarr(arr) for(auto&_:arr)cin>>_
-#define rep(i, a, n) for(int i=a;i<n;i++)
+#define readarr(n, arr) for(auto&_:arr)cin>>_
+#define rep(a, n) for(int i=a;i<n;i++)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define PQ priority_queue
@@ -165,24 +164,54 @@ inline void pnl(T t) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    int m;
-    cin >> n >> m;
-    vpll arr(m);
-    for (auto &[a, b]: arr)cin >> a >> b;
-    sort(all(arr));
-    vpll merged{arr[0]};
-    rep(i, 1, m) {
-        if (arr[i].first <= merged.back().second)merged.back().second = max(merged.back().second, arr[i].second);
-        else merged.pb(arr[i]);
+inline ll binpow(ll a, int p, int m) {
+    ll res = 1;
+    while (p) {
+        if (p & 1)res = (res * a) % m;
+        a = (a * a) % m;
+        p >>= 1;
     }
-    ll res = 0;
-    for (auto &[a, b]: merged)res += b - a + 1;
-    pnl(res);
-    pnl(res * 2 <= n ? "The Mexicans are Lazy! Sad!" : "The Mexicans took our jobs! Sad!");
+    return res;
 }
 
+inline void solve() {
+    int t, a, b;
+    cin >> t >> a >> b;
+    vector<pair<pii, int>> arr;
+    string s1, s2;
+    auto f = [](string s) -> int {
+        return stoi(s.substr(0, 2)) * 60 + stoi(s.substr(3, 2));
+    };
+    rep(0, a) {
+        cin >> s1 >> s2;
+        arr.pb({{f(s1), f(s2) + t}, 0});
+    }
+    rep(0, b) {
+        cin >> s1 >> s2;
+        arr.pb({{f(s1), f(s2) + t}, 1});
+    }
+    sort(all(arr));
+    pii res;
+    PQ<pii, vpii, greater<pii>> pq;
+    int l = 0, r = 0;
+    rep(0, a + b) {
+        while (!pq.empty() && pq.top().first <= arr[i].first.first) {
+            if (pq.top().second)r++;
+            else l++;
+            pq.pop();
+        }
+        if (arr[i].second) {
+            if (r)r--;
+            else res.second++;
+            pq.push({arr[i].first.second, 0});
+        } else {
+            if (l)l--;
+            else res.first++;
+            pq.push({arr[i].first.second, 1});
+        }
+    }
+    cout << res.first << ' ' << res.second << nl;
+}
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
@@ -190,7 +219,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int t = 1;
-//    cin >> t;
-    while (t--) solve();
+    cin >> t;
+    rep(0, t) cout << "Case #" << i + 1 << ": ", solve();
     return 0;
 }
