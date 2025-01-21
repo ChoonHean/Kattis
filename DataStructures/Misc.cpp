@@ -8,6 +8,7 @@ typedef vector<vvi> vvvi;
 typedef vector<ll> vl;
 typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
+typedef vector<string> vs;
 #define pb push_back
 
 inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
@@ -26,6 +27,12 @@ inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
         y = t;
     }
     return a; // returns gcd(a, b)
+}
+
+inline ll crt(ll a, ll b, int m1, int m2) {
+    int x1, x2;
+    euclid(m1, m2, x1, x2);
+    return b * x1 * m1 + a * x2 * m2;
 }
 
 inline ll binpow(ll a, int p, int m) {
@@ -88,4 +95,16 @@ vi primeFactors(int n) {
     }
     if (n != 1)factors.pb(n);
     return factors;
+}
+
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
+    }
+    return res;
 }
