@@ -14,17 +14,11 @@ typedef vector<string> vs;
 inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
     int xx = y = 0;
     int yy = x = 1;
-    while (b) { // repeats until b == 0
-        int q = a / b;
-        int t = b;
-        b = a % b;
-        a = t;
-        t = xx;
-        xx = x - q * xx;
-        x = t;
-        t = yy;
-        yy = y - q * yy;
-        y = t;
+    while (b) {                                    // repeats until b == 0
+        int q = a/b;
+        tie(a, b) = tuple(b, a%b);
+        tie(x, xx) = tuple(xx, x-q*xx);
+        tie(y, yy) = tuple(yy, y-q*yy);
     }
     return a; // returns gcd(a, b)
 }
