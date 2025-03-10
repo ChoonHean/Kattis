@@ -11,14 +11,71 @@ typedef vector<vvl> vvvl;
 typedef vector<string> vs;
 #define pb push_back
 
+struct mint {
+    static constexpr int m = 998244353;
+    int x;
+
+    mint() : x(0) {}
+
+    mint(long long x_) : x(x_ % m) { if (x < 0) x += m; }
+
+    int val() { return x; }
+
+    mint &operator+=(mint b) {
+        if ((x += b.x) >= m) x -= m;
+        return *this;
+    }
+
+    mint &operator-=(mint b) {
+        if ((x -= b.x) < 0) x += m;
+        return *this;
+    }
+
+    mint &operator*=(mint b) {
+        x = (long long) (x) * b.x % m;
+        return *this;
+    }
+
+    mint pow(long long e) const {
+        mint r = 1, b = *this;
+        while (e) {
+            if (e & 1) r *= b;
+            b *= b;
+            e >>= 1;
+        }
+        return r;
+    }
+
+    mint inv() { return pow(m - 2); }
+
+    mint &operator/=(mint b) { return *this *= b.pow(m - 2); }
+
+    friend mint operator+(mint a, mint b) { return a += b; }
+
+    friend mint operator-(mint a, mint b) { return a -= b; }
+
+    friend mint operator/(mint a, mint b) { return a /= b; }
+
+    friend mint operator*(mint a, mint b) { return a *= b; }
+
+    friend bool operator==(mint a, mint b) { return a.x == b.x; }
+
+    friend bool operator!=(mint a, mint b) { return a.x != b.x; }
+
+    friend ostream &operator<<(ostream &os, const mint &a) {
+        os << a.x;
+        return os;
+    }
+};
+
 inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
     int xx = y = 0;
     int yy = x = 1;
     while (b) {                                    // repeats until b == 0
-        int q = a/b;
-        tie(a, b) = tuple(b, a%b);
-        tie(x, xx) = tuple(xx, x-q*xx);
-        tie(y, yy) = tuple(yy, y-q*yy);
+        int q = a / b;
+        tie(a, b) = tuple(b, a % b);
+        tie(x, xx) = tuple(xx, x - q * xx);
+        tie(y, yy) = tuple(yy, y - q * yy);
     }
     return a; // returns gcd(a, b)
 }

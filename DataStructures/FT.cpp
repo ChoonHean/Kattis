@@ -36,6 +36,7 @@ struct FT {                              // index 0 is not used
     }
 
     inline ll rsq(int j) {                                // returns RSQ(1, j)
+        j++;
         ll sum = 0;
         for (; j; j -= lsb(j))
             sum += ft[j];
@@ -46,6 +47,7 @@ struct FT {                              // index 0 is not used
 
     // updates value of the i-th element by v (v can be +ve/inc or -ve/dec)
     inline void update(int i, ll v) {
+        i++;
         for (; i < (int) ft.size(); i += lsb(i))
             ft[i] += v;
     }

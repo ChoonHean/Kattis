@@ -19,13 +19,14 @@ typedef vector<ll> vl;
 typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
+typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pair<int, int>, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e9;
 const ll llinf = 4e18;
@@ -36,12 +37,14 @@ const double EPS = 1e-9;
 #define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
 #define rep(i, a, n) for(int i=a;i<n;i++)
+#define repr(i, a, n) for(int i=a;i>=n;i--)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define PQ priority_queue
 #define hmap unordered_map
 #define hset unordered_set
 #define pb push_back
+#define eb emplace_back
 #define lb lower_bound
 #define ub upper_bound
 #define clz(i) __builtin_clz(i)
@@ -183,7 +186,6 @@ void pr(const Args &... args) {
 inline void solve() {
 
 }
-
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
