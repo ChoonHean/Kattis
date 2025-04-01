@@ -2,7 +2,6 @@
 CMakeLists.txt
 cmake-build-debug/
 .idea/
-fibonaccigjof.cpp
 main.cpp
 perfectskyline.cpp
 dysoncircle.cpp
