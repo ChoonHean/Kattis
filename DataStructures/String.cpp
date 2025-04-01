@@ -83,3 +83,15 @@ void findPalindromes() {
         }
     }
 }
+
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
+    }
+    return res;
+}

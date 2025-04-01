@@ -10,6 +10,7 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef vector<string> vs;
 #define pb push_back
+#define rep(i, a, n) for(int i=a;i<n;i++)
 
 struct mint {
     static constexpr int m = 998244353;
@@ -86,7 +87,7 @@ inline ll crt(ll a, ll b, int m1, int m2) {
     return b * x1 * m1 + a * x2 * m2;
 }
 
-inline ll binpow(ll a, int p, int m) {
+inline ll binpow(ll a, ll p, int m) {
     ll res = 1;
     while (p) {
         if (p & 1)res = (res * a) % m;
@@ -123,18 +124,32 @@ inline vvl matpow(int n, vvl &a, ll p, int m) {
 const int N = 14001;
 bitset<N + 1> prime;
 vl primes;
+vi minPrimeFac(N + 1);
 
 void sieve() {
     prime.set();
-    for (int i = 2; i <= N; i++) {
+    for (ll i = 2; i <= N; i++) {
         if (prime[i]) {
-            for (ll j = 1LL * i * i; j <= N; j += i)prime[j] = 0;
+            for (ll j = i * i; j <= N; j += i)prime[j] = 0;
             primes.pb(i);
         }
     }
 }
 
-vi primeFactors(int n) {
+void linSieve() {
+    for (int i = 2; i <= N; i++) {
+        if (minPrimeFac[i] == 0) {
+            minPrimeFac[i] = i;
+            primes.pb(i);
+        }
+        for (int j = 0; i * primes[j] <= N; j++) {
+            minPrimeFac[i * primes[j]] = primes[j];
+            if (primes[j] == minPrimeFac[i])break;
+        }
+    }
+}
+
+vi primeFactors(ll n) {
     vi factors;
     for (ll div: primes) {
         if (n % div == 0) {
@@ -148,14 +163,36 @@ vi primeFactors(int n) {
     return factors;
 }
 
-vs split(string s, char delim) {
-    vs res;
-    int pos = 0, prev = 0;
-    while (true) {
-        pos = s.find(delim, prev);
-        res.pb(s.substr(prev, pos - prev));
-        if (pos == string::npos)break;
-        prev = pos + 1;
+inline ll binpow2(ll n, ll p, ll m) {
+    __int128 res = 1, a = n;
+    while (p) {
+        if (p & 1)res = (res * a) % m;
+        a = (a * a) % m;
+        p >>= 1;
     }
     return res;
 }
+
+inline bool is_composite(ll n, ll a, ll d, int s) {
+    __int128 x = binpow2(a, d, n);
+    if (x == 1 || x == n - 1)return false;
+    rep(i, 0, s) {
+        x = (x * x) % n;
+        if (x == n - 1)return false;
+    }
+    return true;
+}
+
+inline bool miller_rabin(ll n) {
+    vi tests{2, 3, 5, 7};
+    if (n >= 3215031751LL) tests = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37};
+    ll d = n - 1;
+    int s = 0;
+    while (!(d & 1))d >>= 1, s++;
+    for (const int &a: tests) {
+        if (a > n - 1)break;
+        if (is_composite(n, a, d, s))return false;
+    }
+    return true;
+}
+
