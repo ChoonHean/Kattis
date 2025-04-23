@@ -1,49 +1,52 @@
 #include <bits/stdc++.h>
 
 using namespace std;
+typedef vector<int> vi;
 #define sz(v) ((int)v.size())
+#define pb push_back
 
 struct Node {
     bool present;
-    vector<Node *> child;
+    vi child;
 
-    Node() : present(false), child(26, nullptr) {};
+    Node() : present(false), child(26, -1) {}
 };
 
 struct Trie {
-    Node *root = new Node();
+    vector<Node> arr;
 
     void insert(string s) {
-        Node *curr = root;
-        for (char c: s) {
-            if (curr->child[c - 'a'] == nullptr)curr->child[c - 'a'] = new Node();
-            curr = curr->child[c - 'a'];
-            curr->present = true;
+        int i = 0;
+        for (const char &c: s) {
+            if (arr[i].child[c - 'a'] == -1)arr[i].child[c - 'a'] = newNode();
+            i = arr[i].child[c - 'a'];
         }
+        arr[i].present = true;
     }
 
     bool search(string s) {
-        Node *curr = root;
-        for (char c: s) {
-            if (curr->child[c - 'a'] == nullptr)return false;
-            curr = curr->child[c - 'a'];
-            if (!curr->present)return false;
+        int i = 0;
+        for (const char &c: s) {
+            if (arr[i].child[c - 'a'] == -1)return false;
+            i = arr[i].child[c - 'a'];
         }
-        return true;
+        return arr[i].present;
     }
 
     int prefix(string s) {
-        Node *curr = root;
-        int cnt = 0;
-        for (int i = 0; i < sz(s); i++) {
-            char c = s[i];
-            if (curr->child[c - 'a'] == nullptr)return cnt;
-            curr = curr->child[c - 'a'];
-            if (!curr->present)return cnt;
-            cnt++;
+        int i = 0, cnt = 0;
+        for (const char &c: s) {
+            if (arr[i].child[c - 'a'] == -1)return cnt;
+            i = arr[i].child[c - 'a'];
+            cnt += arr[i].present;
         }
         return cnt;
     }
 
-    Trie() {};
+    int newNode() {
+        arr.emplace_back();
+        return sz(arr) - 1;
+    }
+
+    Trie() : arr(1) {};
 };

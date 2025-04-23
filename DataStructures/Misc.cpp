@@ -69,6 +69,11 @@ struct mint {
     }
 };
 
+inline int nextp(int n) {
+    int t = n | (n - 1);
+    return (t + 1) | (((~t & -~t) - 1) >> (countr_zero((ull) n) + 1));
+}
+
 inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
     int xx = y = 0;
     int yy = x = 1;
