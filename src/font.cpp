@@ -217,14 +217,28 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n;
+    cin >> n;
+    vs a(n);
+    reada(a);
+    vector<uint> b(n);
+    rep(i, 0, n) {
+        for (char &c: a[i])b[i] |= 1 << (c - 'a');
+    }
+    int res = 0;
+    rep(i, 1, 1 << n) {
+        uint cur = 0;
+        for (uint j = i; j; j -= lsb(j))cur |= b[countr_zero(j)];
+        if (popcount(cur) == 26)res++;
+    }
+    cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

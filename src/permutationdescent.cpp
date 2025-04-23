@@ -217,14 +217,25 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    vvi dp(101, vi(101, -1));
+    const int m = 1001113;
+    int t, n, v;
+    cin >> t;
+    auto f = [&](auto &self, int i, int j) -> int {
+        if (j == 0 || j == i - 1)return 1;
+        if (dp[i][j] != -1)return dp[i][j];
+        return dp[i][j] = ((i - j) * self(self, i - 1, j - 1) % m + (j + 1) * self(self, i - 1, j)) % m;
+    };
+    while (cin >> t >> n >> v) {
+        cout << t << ' ' << f(f, n, v) << nl;
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

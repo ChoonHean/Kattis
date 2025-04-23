@@ -217,7 +217,16 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int r, s, x, y, w;
+    cin >> r >> s >> x >> y >> w;
+    vd dp(y + 1);
+    dp[0] = 1;
+    rep(i, 0, y) {
+        vd ndp(y + 1);
+        rep(j, 0, y)ndp[j] += dp[j] * (r - 1) / s, ndp[j + 1] += dp[j] * (s - r + 1) / s;
+        swap(dp, ndp);
+    }
+    pnl(accumulate(dp.begin() + x, dp.end(), 0.0) * w > 1 ? "yes" : "no");
 }
 
 int32_t main() {
@@ -226,7 +235,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;

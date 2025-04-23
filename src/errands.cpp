@@ -31,17 +31,16 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
 #define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
@@ -71,11 +70,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -216,8 +210,69 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
+    }
+    return res;
+}
 
+inline void solve() {
+    int n;
+    cin >> n;
+    vpdd a(n);
+    string s;
+    vs place;
+    int src, dst;
+    hmap<string, int> mp;
+    rep(i, 0, n) {
+        cin >> s >> a[i].first >> a[i].second;
+        mp[s] = i;
+        place.pb(s);
+        if (s == "home")src = i;
+        else if (s == "work")dst = i;
+    }
+    getline(cin, s);
+    auto dist = [&](int i, int j) {
+        return hypot(a[i].first - a[j].first, a[i].second - a[j].second);
+    };
+    while (getline(cin, s)) {
+        vi b;
+        for (const string &ss: split(s, ' '))b.pb(mp[ss]);
+        n = sz(b);
+        vector<vector<pdi>> dp(n, vector<pdi>(1 << n, {inf, 0}));
+        rep(i, 0, n)dp[i][1 << i] = {dist(src, b[i]), src};
+        rep(i, 0, 1 << n)
+            rep(j, 0, n)
+                rep(k, 0, n) {
+                    if (!((i >> k) & 1)) {
+                        int next = i | (1 << k);
+                        dp[k][next] = min(dp[k][next], {dp[j][i].first + dist(b[j], b[k]), j});
+                    }
+                }
+        double mn = inf;
+        int idx = 0;
+        rep(i, 0, n) {
+            double cur = dp[i].back().first + dist(dst, b[i]);
+            if (cur < mn) {
+                mn = cur;
+                idx = i;
+            }
+        }
+        int mask = (1 << n) - 1;
+        while (mask) {
+            pr(place[b[idx]]);
+            int tmp = idx;
+            idx = dp[idx][mask].second;
+            mask ^= 1 << tmp;
+        }
+        cout << nl;
+    }
 }
 
 int32_t main() {
@@ -228,6 +283,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

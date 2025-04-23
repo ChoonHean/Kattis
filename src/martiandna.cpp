@@ -217,14 +217,46 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, k, r, x, y;
+    cin >> n >> k >> r;
+    read(n);
+    vi b(n);
+    set<pii> s;
+    rep(i, 0, r) {
+        cin >> x >> y;
+        b[x] = y;
+        s.emplace(y, x);
+    }
+    int res = inf, l = 0;
+    r = 0;
+    while (r < n) {
+        if (l == r || s.rbegin()->first > 0) {
+            s.erase({b[a[r]], a[r]});
+            s.emplace(--b[a[r]], a[r]);
+            r++;
+        } else {
+            res = min(res, r - l);
+            s.erase({b[a[l]], a[l]});
+            s.emplace(++b[a[l]], a[l]);
+            l++;
+        }
+    }
+    while (l < n) {
+        if (s.rbegin()->first > 0)break;
+        res = min(res, r - l);
+        s.erase({b[a[l]], a[l]});
+        s.emplace(++b[a[l]], a[l]);
+        l++;
+    }
+    if (res == inf)cout << "impossible";
+    else cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

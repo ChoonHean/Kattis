@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -71,11 +66,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,6 +207,55 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
+    hmap<string, int> mp;
+    mp["BST"] = mp["CET"] = mp["WEST"] = mp["IST"] = 60;
+    mp["CEST"] = mp["EET"] = 2 * 60;
+    mp["EEST"] = mp["MSK"] = 3 * 60;
+    mp["MSD"] = 4 * 60;
+    mp["AWST"] = 8 * 60;
+    mp["ACST"] = 9.5 * 60;
+    mp["AEST"] = 10 * 60;
+    mp["ACDT"] = 10.5 * 60;
+    mp["AEDT"] = 11 * 60;
+    mp["NDT"] = -2.5 * 60;
+    mp["ADT"] = -3 * 60;
+    mp["NST"] = -3.5 * 60;
+    mp["AST"] = mp["EDT"] = -4 * 60;
+    mp["EST"] = mp["CDT"] = -5 * 60;
+    mp["CST"] = mp["MDT"] = -6 * 60;
+    mp["MST"] = mp["PDT"] = -7 * 60;
+    mp["PST"] = mp["AKDT"] = -8 * 60;
+    mp["AKST"] = -9 * 60;
+    mp["HST"] = -10 * 60;
+    int tc;
+    cin >> tc;
+    while (tc--) {
+        string time, a, s, t;
+        cin >> time;
+        const int mx = 24 * 60, mid = 12 * 60;
+        int pos = time.find(':');
+        int cur = time[0] == 'n' ? mid : time[0] == 'm' ? 0 : stoi(time.substr(0, pos)) % 12 * 60 +
+                                                              stoi(time.substr(pos + 1));
+        if (time[0] != 'n' && time[0] != 'm') {
+            cin >> a;
+            if (a[0] == 'p')cur += mid;
+        }
+        cin >> s >> t;
+        cur += mp[t] - mp[s];
+        cur = (cur + mx) % mx;
+        if (cur == 0)pnl("midnight");
+        else if (cur == 12 * 60)pnl("noon");
+        else {
+            bool p = cur > mid;
+            cur %= mid;
+            if (cur / 60 == 0)cout << 12;
+            else cout << cur / 60;
+            cout << ':';
+            if (cur % 60 < 10)cout << '0' << cur % 60;
+            else cout << cur % 60;
+            cout << ' ' << (p ? 'p' : 'a') << ".m.\n";
+        }
+    }
 
 }
 
@@ -228,6 +267,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

@@ -31,7 +31,7 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
@@ -217,14 +217,28 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, m;
+    cin >> n;
+    read(n);
+    cin >> m;
+    vi b(m);
+    reada(b);
+    int mx = max(accumulate(all(a), 0), accumulate(all(b), 0)) + 1;
+    vi dp1(mx, inf), dp2(mx, inf);
+    dp1[0] = dp2[0] = 0;
+    rep(i, 0, n)repr(j, mx, a[i])dp1[j] = min(dp1[j], dp1[j - a[i]] + 1);
+    rep(i, 0, m)repr(j, mx, b[i])dp2[j] = min(dp2[j], dp2[j - b[i]] + 1);
+    int res = inf;
+    rep(i, 1, mx)res = min(res, dp1[i] + dp2[i]);
+    if (res == inf)cout << "impossible";
+    else cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

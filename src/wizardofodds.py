@@ -1,0 +1,5 @@
+ii = lambda: int(input())
+mii = lambda: map(int, input().split())
+lmii = lambda: list(mii())
+n, k = mii()
+print("Your wish is granted!" if n <= (1 << k) else "You will become a flying monkey!")

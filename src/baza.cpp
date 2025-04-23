@@ -23,9 +23,6 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
@@ -33,18 +30,16 @@ typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-9;
+const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
-#define rep(i, a, n) for(int i=a;i<n;++i)
-#define repr(i, a, n) for(int i=a;i>=n;--i)
+#define rep(i, a, n) for(int i=a;i<n;i++)
+#define repr(i, a, n) for(int i=a;i>=n;i--)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define PQ priority_queue
@@ -57,26 +52,6 @@ const double eps = 1e-9;
 #define lsb(i) (i&-i)
 mt19937_64 rnd(time(0));
 
-template<typename T>
-inline bool chmin(T &a, T &b) {
-    if (a > b) {
-        swap(a, b);
-        return true;
-    } else return false;
-}
-
-template<typename T>
-inline bool chmax(T &a, T &b) {
-    if (a < b) {
-        swap(a, b);
-        return true;
-    } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
-}
 
 template<typename T>
 inline void pr(const T &t) { cout << t << ' '; }
@@ -216,8 +191,79 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+struct Node {
+    bool present;
+    vi child;
+    int cnt;
 
+    Node() : present(false), child(26, -1), cnt(0) {};
+};
+
+struct Trie {
+    vector<Node> arr;
+
+    void insert(string s) {
+        int i = 0;
+        for (const char &c: s) {
+            if (arr[i].child[c - 'a'] == -1)arr[i].child[c - 'a'] = newNode();
+            i = arr[i].child[c - 'a'];
+            arr[i].cnt++;
+        }
+        arr[i].present = true;
+    }
+
+    int search(string s) {
+        int i = 0, res = 0;
+        for (const char &c: s) {
+            if (arr[i].child[c - 'a'] == -1)return res;
+            i = arr[i].child[c - 'a'];
+            res += arr[i].cnt;
+        }
+        return res;
+    }
+
+    int prefix(string s) {
+        int i = 0, cnt = 0;
+        for (const char &c: s) {
+            if (arr[i].child[c - 'a'] == -1)return cnt;
+            i = arr[i].child[c - 'a'];
+            cnt += arr[i].present;
+        }
+        return cnt;
+    }
+
+    int newNode() {
+        arr.emplace_back();
+        return sz(arr) - 1;
+    }
+
+    Trie() : arr(1) {};
+};
+
+inline void solve() {
+    int n, q;
+    Trie trie;
+    string s;
+    cin >> n;
+    vector<string> arr;
+    hmap<string, int> pos;
+    rep(i, 0, n)cin >> s, arr.pb(s), pos[s] = i;
+    cin >> q;
+    vi res(q);
+    vector<pair<pii, string>> query;
+    rep(i, 0, q) {
+        cin >> s;
+        query.eb(pair(n - 1, i), s);
+        auto it = pos.find(s);
+        if (it != pos.end())query.back().first.first = it->second;
+    }
+    sort(all(query));
+    int pt = 0;
+    for (const auto &[p, s]: query) {
+        while (pt <= p.first)trie.insert(arr[pt++]);
+        res[p.second] = trie.search(s) + pt;
+    }
+    for (const int &i: res)pnl(i);
 }
 
 int32_t main() {
@@ -228,6 +274,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

@@ -217,14 +217,45 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    const int n = 6;
+    read(n);
+    vi b(6), c(6);
+    reada(b);
+    reada(c);
+    sort(all(a));
+    sort(all(b));
+    sort(all(c));
+    int abn = 0, abd = 36, acn = 0, acd = 36;
+    for (const int &i: a) {
+        auto it = lb(all(b), i);
+        abn += it - b.begin();
+        while (it != b.end() && *it == i)abd--, it++;
+        it = lb(all(c), i);
+        acn += it - c.begin();
+        while (it != c.end() && *it == i)acd--, it++;
+    }
+    if (abd != 0 && acd != 0 && abn * 2 >= abd && acn * 2 >= acd) {
+        cout << 1;
+        return;
+    }
+    int bcn = 0, bcd = 36;
+    for (const int &i: b) {
+        auto it = lb(all(c), i);
+        bcn += it - c.begin();
+        while (it != c.end() && *it == i)bcd--, it++;
+    }
+    if (abd != 0 && bcd != 0 && abn * 2 <= abd && bcn * 2 >= bcd) {
+        cout << 2;
+    } else if (acd != 0 && bcd != 0 && acn * 2 <= acd && bcn * 2 <= bcd) {
+        cout << 3;
+    } else cout << "No dice";
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

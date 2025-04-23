@@ -216,8 +216,19 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+hset<string> d;
 
+inline void solve() {
+    string s;
+    cin >> s;
+    int n = sz(s);
+    vb dp(n + 1);
+    dp[0] = 1;
+    dp[1] = d.contains(s.substr(0, 1));
+    rep(i, 2, n + 1) {
+        dp[i] = (dp[i - 1] && d.contains(s.substr(i - 1, 1))) || (dp[i - 2] && d.contains(s.substr(i - 2, 2)));
+    }
+    pnl(dp.back() ? "YES" : "NO");
 }
 
 int32_t main() {
@@ -226,7 +237,15 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    vs a{"h", "he", "li", "be", "b", "c", "n", "o", "f", "ne", "na", "mg", "al", "si", "p", "s", "cl", "ar", "k", "ca",
+         "sc", "ti", "v", "cr", "mn", "fe", "co", "ni", "cu", "zn", "ga", "ge", "as", "se", "br", "kr", "rb", "sr", "y",
+         "zr", "nb", "mo", "tc", "ru", "rh", "pd", "ag", "cd", "in", "sn", "sb", "te", "i", "xe", "cs", "ba", "hf",
+         "ta", "w", "re", "os", "ir", "pt", "au", "hg", "tl", "pb", "bi", "po", "at", "rn", "fr", "ra", "rf", "db",
+         "sg", "bh", "hs", "mt", "ds", "rg", "cn", "fl", "lv", "la", "ce", "pr", "nd", "pm", "sm", "eu", "gd", "tb",
+         "dy", "ho", "er", "tm", "yb", "lu", "ac", "th", "pa", "u", "np", "pu", "am", "cm", "bk", "cf", "es", "fm",
+         "md", "no", "lr"};
+    for (const string &s: a)d.insert(s);
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;

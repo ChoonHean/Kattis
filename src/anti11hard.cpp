@@ -216,8 +216,85 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+struct mint {
+    static constexpr int m = mod;
+    int x;
 
+    mint() : x(0) {}
+
+    mint(long long x_) : x(x_ % m) { if (x < 0) x += m; }
+
+    int val() { return x; }
+
+    mint &operator+=(mint b) {
+        if ((x += b.x) >= m) x -= m;
+        return *this;
+    }
+
+    mint &operator-=(mint b) {
+        if ((x -= b.x) < 0) x += m;
+        return *this;
+    }
+
+    mint &operator*=(mint b) {
+        x = (long long) (x) * b.x % m;
+        return *this;
+    }
+
+    mint pow(long long e) const {
+        mint r = 1, b = *this;
+        while (e) {
+            if (e & 1) r *= b;
+            b *= b;
+            e >>= 1;
+        }
+        return r;
+    }
+
+    mint inv() { return pow(m - 2); }
+
+    mint &operator/=(mint b) { return *this *= b.pow(m - 2); }
+
+    friend mint operator+(mint a, mint b) { return a += b; }
+
+    friend mint operator-(mint a, mint b) { return a -= b; }
+
+    friend mint operator/(mint a, mint b) { return a /= b; }
+
+    friend mint operator*(mint a, mint b) { return a *= b; }
+
+    friend bool operator==(mint a, mint b) { return a.x == b.x; }
+
+    friend bool operator!=(mint a, mint b) { return a.x != b.x; }
+
+    friend ostream &operator<<(ostream &os, const mint &a) {
+        os << a.x;
+        return os;
+    }
+};
+
+inline void solve() {
+    int n;
+    string s;
+    cin >> n >> s;
+    const int m = sz(s), M = 1 << m, all = M - 1;
+    if (m > n) {
+        pnl(1 << n);
+        return;
+    }
+    int b = stoi(s, 0, 2);
+    vector<mint> dp(M, 1);
+    dp[b] = 0;
+    rep(i, m, n) {
+        vector<mint> ndp(M);
+        rep(j, 0, M) {
+            ndp[j << 1 & all] += dp[j];
+            ndp[j << 1 & all ^ 1] += dp[j];
+        }
+        ndp[b] = 0;
+        swap(dp, ndp);
+    }
+    pnl(accumulate(all(dp), mint()));
 }
 
 int32_t main() {
@@ -226,7 +303,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;

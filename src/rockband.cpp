@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -71,11 +66,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,7 +207,46 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, s;
+    cin >> n >> s;
+    vvi a(n, vi(s));
+    for (auto &v: a)readarr(v);
+    vvi adj(s), t(s);
+    for (auto &v: a)rep(i, 0, s - 1)adj[v[i + 1] - 1].pb(v[i] - 1), t[v[i] - 1].pb(v[i + 1] - 1);
+    vi scc(s), size(s);
+    vi order;
+    vb visit(s);
+    auto dfs = [&](auto &self, int i) -> void {
+        visit[i] = 1;
+        for (const int &j: adj[i])if (!visit[j])self(self, j);
+        order.pb(i);
+    };
+    auto kosaraju = [&](auto &self, int i, int g) -> void {
+        scc[i] = g;
+        size[g]++;
+        visit[i] = 1;
+        for (const int &j: t[i])if (!visit[j])self(self, j, g);
+    };
+    rep(i, 0, s)if (!visit[i])dfs(dfs, i);
+    visit.assign(s, 0);
+    int cnt = 0;
+    while (!order.empty()) {
+        if (!visit[order.back()])kosaraju(kosaraju, order.back(), cnt++);
+        order.pop_back();
+    }
+    vector<hset<int>> cond(cnt);
+    rep(i, 0, s)for (const int &j: adj[i])cond[scc[i]].insert(scc[j]);
+    rep(i, 0, cnt)cond[i].erase(i);
+    int mn = inf, idx = 0;
+    rep(i, 0, cnt)
+        if (cond[i].empty()) {
+            if (size[i] < mn) {
+                mn = size[i];
+                idx = i;
+            }
+        }
+    pnl(mn);
+    rep(i, 0, s)if (scc[i] == idx)pr(i + 1);
 }
 
 int32_t main() {
@@ -228,6 +257,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

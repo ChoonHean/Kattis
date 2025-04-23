@@ -217,7 +217,18 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    vvi ncr(31, vi(31));
+    ncr[0][0] = 1;
+    rep(i, 0, 31) {
+        ncr[i][0] = ncr[i][i] = 1;
+        rep(j, 1, i)ncr[i][j] = ncr[i - 1][j - 1] + ncr[i - 1][j];
+    }
+    int t, n, m;
+    cin >> t;
+    while (t--) {
+        cin >> n >> m;
+        pnl(ncr[n][m - 1]);
+    }
 }
 
 int32_t main() {

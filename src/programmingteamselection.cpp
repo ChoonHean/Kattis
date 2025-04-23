@@ -31,10 +31,10 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
@@ -71,11 +71,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,17 +212,53 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int m;
+    while (cin >> m) {
+        if (!m)break;
+        string u, v;
+        vvb adj(15, vb(15, 1));
+        hmap<string, int> mp;
+        int x, y, n = 0;
+        rep(i, 0, m) {
+            cin >> u >> v;
+            auto it = mp.find(u);
+            if (it == mp.end())x = mp[u] = n++;
+            else x = it->second;
+            it = mp.find(v);
+            if (it == mp.end())y = mp[v] = n++;
+            else y = it->second;
+            adj[x][y] = adj[y][x] = 0;
+        }
+        if (n % 3) {
+            pnl("impossible");
+            continue;
+        }
+        bitset<1 << 15> dp;
+        dp[0] = 1;
+        rep(i, 0, 1 << n) {
+            if (!dp[i])continue;
+            rep(j, 0, n) {
+                if ((i >> j) & 1)continue;
+                rep(k, j + 1, n) {
+                    if (adj[j][k] || (i >> k) & 1)continue;
+                    rep(l, k + 1, n) {
+                        if (adj[j][l] || adj[k][l] || (i >> l) & 1)continue;
+                        dp[i | (1 << j) | (1 << k) | (1 << l)] = 1;
+                    }
+                }
+            }
+        }
+        pnl(dp[(1 << n) - 1] ? "possible" : "impossible");
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

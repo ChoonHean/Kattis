@@ -216,15 +216,80 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+struct mint {
+    static constexpr int m = 998244353;
+    int x;
 
+    mint() : x(0) {}
+
+    mint(long long x_) : x(x_ % m) { if (x < 0) x += m; }
+
+    int val() { return x; }
+
+    mint &operator+=(mint b) {
+        if ((x += b.x) >= m) x -= m;
+        return *this;
+    }
+
+    mint &operator-=(mint b) {
+        if ((x -= b.x) < 0) x += m;
+        return *this;
+    }
+
+    mint &operator*=(mint b) {
+        x = (long long) (x) * b.x % m;
+        return *this;
+    }
+
+    mint pow(long long e) const {
+        mint r = 1, b = *this;
+        while (e) {
+            if (e & 1) r *= b;
+            b *= b;
+            e >>= 1;
+        }
+        return r;
+    }
+
+    mint inv() { return pow(m - 2); }
+
+    mint &operator/=(mint b) { return *this *= b.pow(m - 2); }
+
+    friend mint operator+(mint a, mint b) { return a += b; }
+
+    friend mint operator-(mint a, mint b) { return a -= b; }
+
+    friend mint operator/(mint a, mint b) { return a /= b; }
+
+    friend mint operator*(mint a, mint b) { return a *= b; }
+
+    friend bool operator==(mint a, mint b) { return a.x == b.x; }
+
+    friend bool operator!=(mint a, mint b) { return a.x != b.x; }
+
+    friend ostream &operator<<(ostream &os, const mint &a) {
+        os << a.x;
+        return os;
+    }
+};
+
+inline void solve() {
+    int r, c;
+    cin >> r >> c;
+    vector<mint> dp(r, 1);
+    rep(i, 1, c) {
+        vector<mint> ndp(r);
+        rep(j, 0, r)rep(k, 0, r)if (j != k)ndp[k] += dp[j];
+        swap(dp, ndp);
+    }
+    cout << accumulate(all(dp), mint());
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

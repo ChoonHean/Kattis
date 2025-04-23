@@ -31,7 +31,7 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
@@ -217,7 +217,29 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, c;
+    while (cin >> c >> n) {
+        vvpii dp(n + 1, vpii(c + 1));
+        vpii a(n);
+        readpair(a);
+        rep(k, 0, n) {
+            const auto &[v, w] = a[k];
+            repr(i, c, w) {
+                dp[k + 1][i] = max(dp[k][i], {dp[k][i - w].first + v, k});
+            }
+            rep(i, 0, min(w, c + 1))dp[k + 1][i] = dp[k][i];
+        }
+        int id = 0;
+        rep(i, 1, c + 1)if (dp[n][i].first > dp[n][id].first)id = i;
+        vi res;
+        repr(i, n, 1) {
+            if (dp[i][id].first == dp[i - 1][id].first)continue;
+            res.pb(dp[i][id].second);
+            id -= a[res.back()].second;
+        }
+        pnl(sz(res));
+        pr(res);
+    }
 }
 
 int32_t main() {

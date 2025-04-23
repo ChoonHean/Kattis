@@ -23,25 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
 #define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
@@ -71,11 +67,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,7 +208,26 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    string s;
+    while (cin >> s) {
+        for (char &c: s) {
+            if (c == 'B' || c == 'F' || c == 'P' || c == 'V')c = '1';
+            else if (c == 'C' || c == 'G' || c == 'J' || c == 'K' || c == 'Q' || c == 'S' || c == 'X' || c == 'Z')
+                c = '2';
+            else if (c == 'D' || c == 'T')c = '3';
+            else if (c == 'L')c = '4';
+            else if (c == 'M' || c == 'N')c = '5';
+            else if (c == 'R')c = '6';
+            else c = '-';
+        }
+        string res;
+        rep(i, 0, sz(s)) {
+            if (s[i] == '-')continue;
+            if (res.empty())res.pb(s[i]);
+            else if (s[i] != s[i - 1])res.pb(s[i]);
+        }
+        pnl(res);
+    }
 }
 
 int32_t main() {
@@ -228,6 +238,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

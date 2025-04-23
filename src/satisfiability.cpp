@@ -216,17 +216,60 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
+    }
+    return res;
+}
 
+inline void solve() {
+    int n, m;
+    cin >> n >> m;
+    string s;
+    vvi a(m);
+    getline(cin, s);
+    rep(i, 0, m) {
+        getline(cin, s);
+        vs ret = split(s, ' ');
+        for (int j = 0; j < sz(ret); j += 2) {
+            if (ret[j][0] == 'X')a[i].pb(stoi(ret[j].substr(1)));
+            else a[i].pb(-stoi(ret[j].substr(2)));
+        }
+    }
+    rep(i, 0, 1 << n) {
+        bool ok = 1;
+        rep(j, 0, m) {
+            bool cur = 0;
+            for (const int &k: a[j]) {
+                if (k > 0)cur |= ((i >> (k - 1)) & 1);
+                else cur |= !((i >> (-k - 1)) & 1);
+            }
+            if (!cur) {
+                ok = 0;
+                break;
+            }
+        }
+        if (ok) {
+            pnl("satisfiable");
+            return;
+        }
+    }
+    pnl("unsatisfiable");
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;

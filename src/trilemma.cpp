@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -71,11 +66,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -216,8 +206,73 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+template<class T>
+struct Point {
+    typedef Point P;
+    T x, y;
 
+    explicit Point(T x = 0, T y = 0) : x(x), y(y) {}
+
+    bool operator<(P p) const { return tie(x, y) < tie(p.x, p.y); }
+
+    bool operator==(P p) const { return tie(x, y) == tie(p.x, p.y); }
+
+    P operator+(P p) const { return P(x + p.x, y + p.y); }
+
+    P operator-(P p) const { return P(x - p.x, y - p.y); }
+
+    P operator*(T d) const { return P(x * d, y * d); }
+
+    P operator/(T d) const { return P(x / d, y / d); }
+
+    T dot(P p) const { return x * p.x + y * p.y; }
+
+    T cross(P p) const { return x * p.y - y * p.x; }
+
+    T cross(P a, P b) const { return (a - *this).cross(b - *this); }
+
+    T dist2() const { return x * x + y * y; }
+
+    double dist() const { return sqrt((double) dist2()); }
+
+    // angle to x-axis in interval [-pi, pi]
+    double angle() const { return atan2(y, x); }
+
+    P unit() const { return *this / dist(); } // makes dist()=1
+    P perp() const { return P(-y, x); } // rotates +90 degrees
+    P normal() const { return perp().unit(); }
+
+    // returns point rotated 'a' radians ccw around the origin
+    P rotate(double a) const {
+        return P(x * cos(a) - y * sin(a), x * sin(a) + y * cos(a));
+    }
+
+    friend ostream &operator<<(ostream &os, const P &p) {
+        return os << "(" << p.x << "," << p.y << ")";
+    }
+};
+
+typedef Point<int> P;
+
+inline void solve() {
+    int n, x1, x2, x3, y1, y2, y3;
+    cin >> n;
+    rep(i, 0, n) {
+        cin >> x1 >> y1 >> x2 >> y2 >> x3 >> y3;
+        cout << "Case #" << i + 1 << ": ";
+        P a(x1, y1), b(x2, y2), c(x3, y3);
+        if (a.cross(b, c) == 0) {
+            cout << "not a triangle\n";
+            continue;
+        }
+        vi lengths{(b - a).dist2(), (c - a).dist2(), (b - c).dist2()};
+        sort(all(lengths));
+        if (lengths[0] == lengths[1] || lengths[1] == lengths[2])cout << "isosceles ";
+        else cout << "scalene ";
+        if (lengths[0] + lengths[1] == lengths[2])cout << "right triangle\n";
+        else if (lengths[0] + lengths[1] < lengths[2])cout << "obtuse triangle\n";
+        else cout << "acute triangle\n";
+    }
 }
 
 int32_t main() {
@@ -228,6 +283,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

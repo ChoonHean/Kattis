@@ -31,7 +31,7 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
@@ -217,7 +217,37 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, t, v;
+    cin >> n;
+    read(n);
+    vvi adj(n);
+    vi deg(n);
+    rep(i, 0, n) {
+        cin >> t;
+        deg[i] = t;
+        while (t--) {
+            cin >> v;
+            adj[v - 1].pb(i);
+        }
+    }
+    queue<int> q({0});
+    vi ord;
+    while (!q.empty()) {
+        ord.pb(q.front());
+        for (const int &j: adj[q.front()])if (!--deg[j])q.push(j);
+        q.pop();
+    }
+    int res = inf;
+    rep(i, 0, n) {
+        int tmp = a[i];
+        a[i] = 0;
+        vi dp(n);
+        dp[0] = 0;
+        for (const int &j: ord)for (const int &k: adj[j])dp[k] = max(dp[k], dp[j] + a[j]);
+        res = min(res, dp.back() + a.back());
+        a[i] = tmp;
+    }
+    cout << res;
 }
 
 int32_t main() {

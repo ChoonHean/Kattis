@@ -31,9 +31,9 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
@@ -217,7 +217,24 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, d;
+    cin >> n >> d;
+    read(n);
+    vi b(n);
+    reada(b);
+    if (n == 1) {
+        pnl(ceildiv(a[0], d));
+        return;
+    }
+    vvl dp(n, vl(3, llinf));
+    dp[0][0] = ceildiv(max(a[0] - b[1], 0), d);
+    dp[0][1] = ceildiv(a[0], d);
+    rep(i, 1, n - 1) {
+        dp[i][0] = min(dp[i - 1][1] + ceildiv(max(a[i] - b[i - 1] - b[i + 1], 0), d),
+                       dp[i - 1][0] + ceildiv(max(a[i] - b[i + 1], 0), d));
+        dp[i][1] = min(dp[i - 1][0] + ceildiv(a[i], d), dp[i - 1][1] + ceildiv(max(a[i] - b[i - 1], 0), d));
+    }
+    pnl(min(dp[n - 2][0] + ceildiv(a.back(), d), dp[n - 2][1] + ceildiv(max(a.back() - b[n - 2], 0), d)));
 }
 
 int32_t main() {
@@ -226,8 +243,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

@@ -217,14 +217,28 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, w;
+    cin >> n >> w;
+    if (w < n || w > 26 * n) {
+        cout << "impossible";
+        return;
+    }
+    w -= n;
+    string res(n, 'a');
+    rep(i, 0, n) {
+        if (w == 0)break;
+        res[i] += min(25, w);
+        w -= min(25, w);
+    }
+    cout << res;
+    int tot = 0;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

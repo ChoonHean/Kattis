@@ -31,17 +31,16 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
 #define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
@@ -71,11 +70,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,7 +211,49 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, m, u, v, w;
+    cin >> n >> m;
+    vvpii adj(n);
+    rep(i, 0, m) {
+        cin >> u >> v >> w;
+        adj[u].eb(v, w);
+        adj[v].eb(u, w);
+    }
+    cin >> m;
+    read(m);
+    int air;
+    cin >> air;
+    vvi dist(m, vi(n, inf));
+    rep(i, 0, m) {
+        const int &s = a[i];
+        vi &d = dist[i];
+        d[s] = 0;
+        set<pii> pq;
+        pq.emplace(0, s);
+        while (!pq.empty()) {
+            auto [cur, j] = *pq.begin();
+            pq.erase(pq.begin());
+            for (const auto &[k, w]: adj[j]) {
+                int next = cur + w;
+                if (next < d[k]) {
+                    pq.erase({d[k], k});
+                    pq.emplace(d[k] = next, k);
+                }
+            }
+        }
+    }
+    vvi dp(1 << m, vi(m, -inf));
+    rep(i, 0, m)dp[1 << i][i] = air - dist[i][0];
+    rep(i, 0, 1 << m)
+        rep(j, 0, m)
+            if (!((i >> j) & 1))
+                rep(k, 0, m) {
+                    int l = i | (1 << j);
+                    dp[l][j] = max(dp[l][j], dp[i][k] - dist[k][a[j]]);
+                }
+    int res = 0;
+    rep(i, 0, 1 << m)rep(j, 0, m)if (dp[i][j] >= dist[j][0])res = max(res, popcount((uint) i));
+    pnl(res);
 }
 
 int32_t main() {
@@ -226,8 +262,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

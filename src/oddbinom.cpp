@@ -217,7 +217,17 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    ll n;
+    cin >> n;
+    hmap<ll, ll> mp;
+    mp[0] = 0;
+    mp[1] = 1;
+    auto f = [&](auto &self, ll n) -> ll {
+        if (mp.contains(n))return mp[n];
+        if (n & 1)return mp[n] = 2 * self(self, n >> 1) + self(self, n / 2 + 1);
+        else return mp[n] = 3 * self(self, n >> 1);
+    };
+    cout << f(f, n);
 }
 
 int32_t main() {

@@ -31,10 +31,10 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
@@ -71,11 +71,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,17 +212,30 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n;
+    cin >> n;
+    vpii a(n);
+    readpair(a);
+    sort(all(a), [](pii a, pii b) {
+        if (a.first == b.first)return a.second < b.second;
+        return a.first > b.first;
+    });
+    vi res;
+    for (const auto &[i, j]: a) {
+        auto it = ub(all(res), j);
+        if (it == res.end())res.pb(j);
+        else *it = j;
+    }
+    pnl(sz(res));
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

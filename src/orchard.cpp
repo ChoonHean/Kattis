@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -71,11 +66,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -216,8 +206,63 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+struct UFDS {
+    vi p, size;
+    int sets;
 
+    UFDS(int n) {
+        p.resize(n);
+        sets = n;
+        iota(p.begin(), p.end(), 0);
+        size.assign(n, 1);
+    }
+
+    int find(int n) {
+        if (n == p[n])return n;
+        return p[n] = find(p[n]);
+    }
+
+    inline bool sameset(int x, int y) { return find(x) == find(y); }
+
+    inline void unionset(int x, int y) {
+        sets--;
+        x = find(x);
+        y = find(y);
+        p[y] = x;
+        size[x] += size[y];
+    }
+
+    inline int setsize(int n) { return size[find(n)]; }
+};
+
+inline void solve() {
+    int r, g, b, y, s;
+    cin >> r >> g >> b >> y >> s;
+    vector<map<vi, double>> dp(s + 1);
+    auto f = [&](auto &self, int a, vi b) -> double {
+        if (a == 0)return 0;
+        if (b.back() == 0)return 1;
+        auto it = dp[a].find(b);
+        if (it != dp[a].end())return it->second;
+        int tot = 3;
+        double res = self(self, a - 1, b);
+        rep(i, 0, 3) {
+            if (b[i] == 0)continue;
+            tot++;
+            vi c(b);
+            c[i]--;
+            sort(all(c));
+            res += self(self, a, c);
+        }
+        vi c(b);
+        c[3]--;
+        sort(all(c));
+        res += 2 * self(self, a, c);
+        return dp[a][b] = res / tot;
+    };
+    vi a{r, g, y, b};
+    sort(all(a));
+    cout << f(f, s, a);
 }
 
 int32_t main() {
@@ -228,6 +273,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

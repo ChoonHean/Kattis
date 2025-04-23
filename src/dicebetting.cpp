@@ -217,7 +217,20 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, s, k;
+    cin >> n >> s >> k;
+    vector<ld> dp(s + 1);
+    dp[0] = 1;
+    rep(i, 0, n) {
+        vector<ld> ndp(s + 1);
+        rep(j, 0, s) {
+            ndp[j + 1] += dp[j] * (s - j) / s;
+            ndp[j] += dp[j] * j / s;
+        }
+        ndp.back() += dp.back();
+        swap(dp, ndp);
+    }
+    cout << accumulate(dp.begin() + k, dp.end(), 0.0);
 }
 
 int32_t main() {

@@ -217,7 +217,28 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    string s;
+    cin >> s;
+    vi dp(1 << 23, inf);
+    int st = 0;
+    int a = 7;
+    rep(i, 0, 23)if (s[i] == 'o')st |= 1 << i;
+    auto f = [&](auto &self, uint mask) -> int {
+        if (dp[mask] != inf)return dp[mask];
+        int res = popcount(mask);
+        rep(i, 2, 23)
+            if ((mask >> i) & 1)
+                if ((mask >> (i - 1)) & 1)
+                    if (!((mask >> (i - 2)) & 1))
+                        res = min(res, self(self, mask ^ (a << (i - 2))));
+        rep(i, 0, 21)
+            if ((mask >> i) & 1)
+                if ((mask >> (i + 1)) & 1)
+                    if (!((mask >> (i + 2)) & 1))
+                        res = min(res, self(self, mask ^ (a << i)));
+        return dp[mask] = res;
+    };
+    pnl(f(f, st));
 }
 
 int32_t main() {
@@ -226,7 +247,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;

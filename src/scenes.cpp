@@ -217,7 +217,22 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, w, h;
+    cin >> n >> w >> h;
+    vi dp(n + 1);
+    dp[0] = 1;
+    rep(i, 0, w) {
+        vi ndp(n + 1);
+        rep(j, 0, n + 1)
+            rep(k, 0, h + 1) {
+                if (j + k > n)break;
+                ndp[j + k] = (ndp[j + k] + dp[j]) % mod;
+            }
+        swap(dp, ndp);
+    }
+    int res = 0;
+    rep(i, 0, n + 1)res = (res + dp[i]) % mod;
+    cout << (res - min(h, n / w) - 1 + mod) % mod;
 }
 
 int32_t main() {

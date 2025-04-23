@@ -217,7 +217,15 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    string s;
+    cin >> s;
+    vc res;
+    for (const char &c: s) {
+        auto it = lb(all(res), c);
+        if (it == res.end())res.pb(c);
+        else *it = c;
+    }
+    cout << 26 - sz(res);
 }
 
 int32_t main() {

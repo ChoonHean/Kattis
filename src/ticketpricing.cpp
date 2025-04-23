@@ -31,7 +31,7 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
@@ -217,7 +217,33 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, w, k;
+    cin >> n >> w;
+    w++;
+    vvpii dp(w + 1, vpii(n + 1, {-inf, -1}));
+    dp[0][0] = {0, 0};
+    rep(i, 0, w) {
+        cin >> k;
+        read(k);
+        vi b(k);
+        reada(b);
+        rep(j, 0, n)
+            rep(l, 0, k) {
+                int sell = min(b[l], n - j);
+                int m = dp[i][j].first + sell * a[l];
+                if (m > dp[i + 1][j + sell].first) {
+                    dp[i + 1][j + sell] = {m, i ? dp[i][j].second : a[l]};
+                } else if (m == dp[i + 1][j + sell].first)
+                    dp[i + 1][j + sell].second = min(dp[i + 1][j + sell].second, dp[i][j].second);
+            }
+        if (dp[i].back().first > dp[i + 1].back().first)dp[i + 1].back() = dp[i].back();
+        else if (dp[i].back().first == dp[i + 1].back().first)
+            dp[i + 1].back().second = min(dp[i + 1].back().second, dp[i].back().second);
+    }
+    int mx = 0, idx = 0;
+    rep(i, 0, n + 1)if (dp.back()[i].first > mx)mx = dp.back()[i].first, idx = i;
+    pnl(mx);
+    pnl(dp.back()[idx].second);
 }
 
 int32_t main() {

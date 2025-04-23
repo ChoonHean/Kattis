@@ -217,14 +217,27 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, m, c;
+    cin >> n >> m >> c;
+    multiset<int> s;
+    vi res;
+    read(n);
+    rep(i, 0, m)s.insert(a[i]);
+    if (*s.rbegin() - *s.begin() <= c)res.pb(1);
+    rep(i, m, n) {
+        s.insert(a[i]);
+        s.erase(s.find(a[i - m]));
+        if (*s.rbegin() - *s.begin() <= c)res.pb(i - m + 2);
+    }
+    if (sz(res))pr(res);
+    else cout << "NONE";
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

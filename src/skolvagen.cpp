@@ -217,14 +217,31 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    string s;
+    cin >> s;
+    int n = sz(s);
+    vvi dp(n + 1, vi(2));
+    dp[0][1] = 1;
+    rep(i, 0, n) {
+        if (s[i] == 'N') {
+            dp[i + 1][0] = min(dp[i][0] + 1, dp[i][1] + 1);
+            dp[i + 1][1] = min(dp[i][0] + 1, dp[i][1]);
+        } else if (s[i] == 'S') {
+            dp[i + 1][0] = min(dp[i][0], dp[i][1] + 1);
+            dp[i + 1][1] = min(dp[i][0] + 1, dp[i][1] + 1);
+        } else {
+            dp[i + 1][0] = min(dp[i][0] + 1, dp[i][1] + 2);
+            dp[i + 1][1] = min(dp[i][0] + 2, dp[i][1] + 1);
+        }
+    }
+    cout << dp[n][0];
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

@@ -217,7 +217,25 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, u, v, w, x, t;
+    cin >> n;
+    vector<vector<ti>> adj(n);
+    rep(i, 1, n) {
+        cin >> u >> v >> x >> t;
+        adj[u - 1].eb(v - 1, x, t);
+    }
+    read(n);
+    auto f = [&](auto &self, int i) -> double {
+        if (adj[i].empty())return a[i];
+        double res = 0;
+        for (const auto &[j, x, t]: adj[i]) {
+            double ret = self(self, j);
+            if (t)ret = sqrt(ret);
+            res = max(res, ret * 100 / x);
+        }
+        return res;
+    };
+    cout << f(f, 0);
 }
 
 int32_t main() {

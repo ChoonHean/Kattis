@@ -217,14 +217,21 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    vi fib{1, 1};
+    rep(i, 2, 45)fib.pb(fib[i - 1] + fib[i - 2]);
+    vi res;
+    int n;
+    cin >> n;
+    repr(i, 44, 0)if (n >= fib[i])res.pb(fib[i]), n -= fib[i];
+    reverse(all(res));
+    pr(res);
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -71,11 +66,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,7 +207,58 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int t;
+    cin >> t;
+    rep(_, 0, t) {
+        cout << "Case #" << _ + 1 << ":\n";
+        int h, w;
+        cin >> h >> w;
+        vvi arr(h, vi(w));
+        for (auto &v: arr)readarr(v);
+        if (h == 1 && w == 1) {
+            pnl('a');
+            continue;
+        }
+        auto f = [&](int i, int j) -> pii {
+            vpii a;
+            if (i > 0)a.eb(i - 1, j);
+            if (j > 0)a.eb(i, j - 1);
+            if (j < w - 1)a.eb(i, j + 1);
+            if (i < h - 1)a.eb(i + 1, j);
+            stable_sort(all(a), [&](pii a, pii b) {
+                auto [x1, y1] = a;
+                auto [x2, y2] = b;
+                return arr[x1][y1] < arr[x2][y2];
+            });
+            if (arr[a[0].first][a[0].second] >= arr[i][j])return {i, j};
+            else return a[0];
+        };
+        vvi res(h, vi(w)), deg(h, vi(w));
+        vector<vvpii> adj(h, vvpii(w));
+        rep(i, 0, h)rep(j, 0, w) {
+                auto [a, b] = f(i, j);
+                if (a == i && b == j)continue;
+                adj[a][b].eb(i, j);
+                deg[i][j]++;
+            }
+        queue<pii> q;
+        int cnt = 0;
+        rep(i, 0, h)rep(j, 0, w)if (!deg[i][j])q.emplace(i, j), res[i][j] = cnt++;
+        while (!q.empty()) {
+            auto [i, j] = q.front();
+            q.pop();
+            for (const auto &[x, y]: adj[i][j]) {
+                res[x][y] = res[i][j];
+                q.emplace(x, y);
+            }
+        }
+        vector<vc> ans(h, vc(w));
+        char c = 'a';
+        vc mp(26, ' ');
+        rep(i, 0, h)rep(j, 0, w)if (mp[res[i][j]] == ' ')mp[res[i][j]] = c++;
+        rep(i, 0, h)rep(j, 0, w)ans[i][j] = mp[res[i][j]];
+        for (auto &v: ans)pr(v);
+    }
 }
 
 int32_t main() {
@@ -228,6 +269,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

@@ -31,10 +31,10 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
@@ -71,11 +71,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,17 +212,47 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, t;
+    cin >> n >> t;
+    vector<ti> a(n);
+    readtup(a);
+    vvi adj(n + 2, vi(n + 2));
+    read2d(adj);
+    const int N = 1 << n;
+    vvi dp(n, vi(N, inf));
+    rep(i, 0, n)
+        if (get<2>(a[i]) == -1 || adj[n][i] + get<1>(a[i]) <= get<2>(a[i]))
+            dp[i][1 << i] = adj[n][i] + get<1>(a[i]);
+    rep(i, 1, N)
+        rep(j, 0, n) {
+            if (!((i >> j) & 1))continue;
+            rep(k, 0, n) {
+                if ((i >> k) & 1)continue;
+                const auto &[p, ti, d] = a[k];
+                int next = i | (1 << k), reach = dp[j][i] + adj[j][k] + ti;
+                if (d == -1 || reach <= d)dp[k][next] = min(dp[k][next], reach);
+            }
+        }
+    int mx = 0, res = 0;
+    rep(i, 1, N)
+        rep(j, 0, n) {
+            if (dp[j][i] + adj[j].back() <= t) {
+                int cur = 0;
+                rep(k, 0, n)if ((i >> k) & 1)cur += get<0>(a[k]);
+                if (cur > mx)mx = cur, res = i;
+            }
+        }
+    pnl(mx);
+    rep(i, 0, n)if ((res >> i) & 1)pr(i + 1);
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

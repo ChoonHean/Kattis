@@ -216,17 +216,32 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+int t = 1;
 
+inline void solve() {
+    int k, m;
+    cin >> k >> m;
+    vvvi dp(k + 1, vvi(m + 2, vi(m + 2, -1)));
+    auto f = [&](auto &self, int l, int r, int i) {
+        if (r < l)return 0;
+        if (r == l)return l;
+        if (i == 1)return (r - l + 1) * (l + r) / 2;
+        int &res = dp[i][l][r];
+        if (res != -1)return res;
+        res = inf;
+        rep(k, l, r + 1)res = min(res, k + max(self(self, l, k - 1, i - 1), self(self, k + 1, r, i)));
+        return res;
+    };
+    pnl(f(f, 1, m, k));
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;

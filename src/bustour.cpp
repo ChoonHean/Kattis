@@ -31,7 +31,7 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
@@ -216,8 +216,62 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+inline int nextp(int n) {
+    int t = n | (n - 1);
+    return (t + 1) | (((~t & -~t) - 1) >> (countr_zero((ull) n) + 1));
+}
 
+vvi adj(20, vi(20));
+vvi dp1(18, vi(1 << 18, inf));
+vvi dp2(dp1);
+
+inline void solve() {
+    int n, m, u, v, w, t = 1;
+    while (cin >> n >> m) {
+        rep(i, 0, n)rep(j, i + 1, n)adj[i][j] = adj[j][i] = inf;
+        rep(i, 0, m) {
+            cin >> u >> v >> w;
+            u = (u - 1 + n) % n;
+            v = (v - 1 + n) % n;
+            adj[u][v] = adj[v][u] = w;
+        }
+        rep(k, 0, n)rep(i, 0, n)rep(j, 0, n)adj[i][j] = min(adj[i][j], adj[i][k] + adj[k][j]);
+        if (n == 3) {
+            cout << "Case " << t++ << ": " << (adj[2][0] + adj[1][0] << 1) << nl;
+            continue;
+        }
+        const int l = n - 2, N = 1 << l;
+        rep(i, 0, l)fill(dp1[i].begin(), dp1[i].begin() + N, inf), fill(dp2[i].begin(), dp2[i].begin() + N, inf);
+        rep(i, 0, l)dp1[i][1 << i] = adj[n - 1][i];
+        rep(i, 1, N)rep(j, 0, l) {
+                if (!((i >> j) & 1))continue;
+                rep(k, 0, l) {
+                    if ((i >> k) & 1)continue;
+                    int next = i | (1 << k);
+                    dp1[k][next] = min(dp1[k][next], dp1[j][i] + adj[j][k]);
+                }
+            }
+        rep(i, 0, l)dp2[i][1 << i] = adj[n - 2][i];
+        rep(i, 1, N)rep(j, 0, l) {
+                if (!((i >> j) & 1))continue;
+                rep(k, 0, l) {
+                    if ((i >> k) & 1)continue;
+                    int next = i | (1 << k);
+                    dp2[k][next] = min(dp2[k][next], dp2[j][i] + adj[j][k]);
+                }
+            }
+        int h = l >> 1, res = INT_MAX, all = N - 1;
+        for (int i = (1 << h) - 1; i < N; i = nextp(i)) {
+            int a = inf, b = inf;
+            for (uint mask = i; mask; mask -= lsb(mask)) {
+                int k = countr_zero(mask);
+                a = min(a, dp1[k][i] + dp2[k][all ^ i | (1 << k)]);
+                b = min(b, dp2[k][i | (1 << k)] + dp1[k][all ^ i | (1 << k)]);
+            }
+            res = min(res, a + b);
+        }
+        cout << "Case " << t++ << ": " << res << nl;
+    }
 }
 
 int32_t main() {

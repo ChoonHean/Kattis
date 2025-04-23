@@ -217,14 +217,28 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, q, x;
+    cin >> n >> q;
+    bitset<360> bs;
+    bs[0] = 1;
+    rep(i, 0, n) {
+        cin >> x;
+        rep(j, 0, 360)
+            if (bs[j]) {
+                rep(k, 1, 361)bs[(j + (k * x)) % 360] = 1;
+            }
+    }
+    while (q--) {
+        cin >> x;
+        pnl(bs[x] ? "YES" : "NO");
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

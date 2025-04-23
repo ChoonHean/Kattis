@@ -217,7 +217,29 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, m, k, u, v;
+    cin >> n >> m >> k;
+    read(n);
+    rep(i, 0, n)a[i]--;
+    vvi adj(n);
+    rep(i, 0, m) {
+        cin >> u >> v;
+        if (a[--u] == a[--v])continue;
+        adj[u].pb(v);
+        adj[v].pb(u);
+    }
+    vvl dp(n, vl(1 << k, -1));
+    auto f = [&](auto &self, int i, int mask) -> ll {
+        if (dp[i][mask] != -1)return dp[i][mask];
+        ll res = 1;
+        for (const int &j: adj[i]) {
+            if (!((mask >> a[j]) & 1))res += self(self, j, mask ^ (1 << a[j]));
+        }
+        return dp[i][mask] = res;
+    };
+    ll res = 0;
+    rep(i, 0, n)res += f(f, i, 1 << a[i]);
+    cout << res - n;
 }
 
 int32_t main() {

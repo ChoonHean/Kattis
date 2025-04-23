@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -57,26 +52,6 @@ const double eps = 1e-9;
 #define lsb(i) (i&-i)
 mt19937_64 rnd(time(0));
 
-template<typename T>
-inline bool chmin(T &a, T &b) {
-    if (a > b) {
-        swap(a, b);
-        return true;
-    } else return false;
-}
-
-template<typename T>
-inline bool chmax(T &a, T &b) {
-    if (a < b) {
-        swap(a, b);
-        return true;
-    } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
-}
 
 template<typename T>
 inline void pr(const T &t) { cout << t << ' '; }
@@ -216,8 +191,45 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+struct SuffixArray {
+    vi sa, lcp;
 
+    SuffixArray(string s, int lim = 256) { // or vector<int>
+        s.push_back(0);
+        int n = sz(s), k = 0, a, b;
+        vi x(all(s)), y(n), ws(max(n, lim));
+        sa = lcp = y, iota(all(sa), 0);
+        for (int j = 0, p = 0; p < n; j = max(1, j * 2), lim = p) {
+            p = j, iota(all(y), n - j);
+            rep(i, 0, n) if (sa[i] >= j) y[p++] = sa[i] - j;
+            fill(all(ws), 0);
+            rep(i, 0, n) ws[x[i]]++;
+            rep(i, 1, lim) ws[i] += ws[i - 1];
+            for (int i = n; i--;) sa[--ws[x[y[i]]]] = y[i];
+            swap(x, y), p = 1, x[sa[0]] = 0;
+            rep(i, 1, n) a = sa[i - 1], b = sa[i], x[b] =
+                        (y[a] == y[b] && y[a + j] == y[b + j]) ? p - 1 : p++;
+        }
+        for (int i = 0, j; i < n - 1; lcp[x[i++]] = k)
+            for (k &&k--, j = sa[x[i] - 1];
+                    s[i + k] == s[j + k];
+        k++);
+    }
+};
+
+inline void solve() {
+    string s;
+    int q, x;
+    while (getline(cin, s)) {
+        cin >> q;
+        SuffixArray sa(s);
+        while (q--) {
+            cin >> x;
+            pr(sa.sa[x + 1]);
+        }
+        cout << nl;
+        getline(cin, s);
+    }
 }
 
 int32_t main() {
@@ -228,6 +240,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

@@ -217,7 +217,16 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n;
+    const int m = 1e6;
+    cin >> n;
+    int i = 1, a = 1, b = 1;
+    while (i < n) {
+        i++;
+        b = (a + b) % m;
+        swap(a, b);
+    }
+    cout << a;
 }
 
 int32_t main() {

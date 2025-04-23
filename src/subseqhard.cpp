@@ -217,16 +217,27 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, x;
+    cin >> n;
+    hmap<int, int> mp;
+    mp[0] = 1;
+    int res = 0, cur = 0;
+    rep(i, 0, n) {
+        cin >> x;
+        cur += x;
+        res += mp[cur - 47];
+        mp[cur]++;
+    }
+    pnl(res);
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;

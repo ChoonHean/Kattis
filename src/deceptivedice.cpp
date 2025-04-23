@@ -217,7 +217,19 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, k;
+    cin >> n >> k;
+    vvd dp(k, vd(n + 1));
+    auto f = [&](auto &self, int i, int j) -> double {
+        if (i == 0)return j;
+        if (dp[i][j])return dp[i][j];
+        double res = 0;
+        rep(roll, 1, n + 1)res += self(self, i - 1, roll);
+        return dp[i][j] = max((double) j, res / n);
+    };
+    double res = 0;
+    rep(i, 1, n + 1)res += f(f, k - 1, i);
+    cout << res / n;
 }
 
 int32_t main() {

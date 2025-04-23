@@ -31,10 +31,10 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
@@ -71,11 +71,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,17 +212,27 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    string s, a, b;
+    cin >> s >> a >> b;
+    int n = sz(a), m = sz(b);
+    vvb dp(n + 1, vb(m + 1));
+    dp[0][0] = 1;
+    rep(i, 0, n)dp[i + 1][0] = dp[i][0] && s[i] == a[i];
+    rep(i, 0, m)dp[0][i + 1] = dp[0][i] && s[i] == b[i];
+    rep(i, 1, n + 1)
+        rep(j, 1, m + 1) {
+            dp[i][j] = (dp[i - 1][j] && s[i + j - 1] == a[i - 1]) || (dp[i][j - 1] && s[i + j - 1] == b[j - 1]);
+        }
+    cout << (dp.back().back() ? "yes" : "no");
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

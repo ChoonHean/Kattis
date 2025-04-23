@@ -217,14 +217,52 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, m, u, v, w;
+    while (cin >> n >> m) {
+        vvpii adj(n);
+        rep(i, 0, m) {
+            cin >> u >> v >> w;
+            adj[--u].eb(--v, w);
+            adj[v].eb(u, w);
+        }
+        vi dist(n, INT_MAX);
+        dist[1] = 0;
+        set<pii> pq;
+        pq.emplace(0, 1);
+        while (!pq.empty()) {
+            auto [d, i] = *pq.begin();
+            pq.erase(pq.begin());
+            for (const auto &[j, w]: adj[i]) {
+                int next = w + d;
+                if (next < dist[j]) {
+                    pq.erase({dist[j], j});
+                    pq.emplace(dist[j] = next, j);
+                }
+            }
+        }
+        vvi a(n);
+        vi deg(n);
+        rep(i, 0, n)for (const auto &[j, w]: adj[i])if (dist[i] < dist[j])a[j].pb(i), deg[i]++;
+        vl dp(n);
+        dp[0] = 1;
+        vi ord;
+        queue<int> q;
+        rep(i, 0, n)if (!deg[i])q.push(i);
+        while (!q.empty()) {
+            ord.pb(q.front());
+            for (const int &j: a[q.front()])if (!--deg[j])q.push(j);
+            q.pop();
+        }
+        for (const int &i: ord)for (const int &j: a[i])dp[j] += dp[i];
+        pnl(dp[1]);
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

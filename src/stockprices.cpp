@@ -23,25 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
 #define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
@@ -71,11 +67,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,7 +208,38 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, x, y;
+    string s, t;
+    PQ<pii> buy;
+    PQ<pii, vpii, greater<>> sell;
+    int prev = -1;
+    cin >> n;
+    rep(i, 0, n) {
+        cin >> s >> x >> t >> t >> y;
+        if (s[0] == 'b')buy.emplace(y, x);
+        else sell.emplace(y, x);
+        while (!sell.empty() && !buy.empty() && sell.top().first <= buy.top().first) {
+            prev = sell.top().first;
+            if (sell.top().second == buy.top().second)sell.pop(), buy.pop();
+            else if (sell.top().second < buy.top().second) {
+                auto [p, m] = buy.top();
+                buy.pop();
+                buy.emplace(p, m - sell.top().second);
+                sell.pop();
+            } else {
+                auto [p, m] = sell.top();
+                sell.pop();
+                sell.emplace(p, m - buy.top().second);
+                buy.pop();
+            }
+        }
+        if (sell.empty())pr('-');
+        else pr(sell.top().first);
+        if (buy.empty())pr('-');
+        else pr(buy.top().first);
+        if (prev == -1)pnl('-');
+        else pnl(prev);
+    }
 }
 
 int32_t main() {
@@ -226,8 +248,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

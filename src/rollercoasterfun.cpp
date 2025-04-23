@@ -31,17 +31,16 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
 #define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
@@ -71,11 +70,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,17 +211,39 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n;
+    const int m = 25001;
+    cin >> n;
+    vector<ti> a(n);
+    for (auto &[x, y, z]: a)cin >> x >> y >> z;
+    vi dp(m);
+    for (auto &[ai, bi, t]: a) {
+        if (bi) {
+            int k = 0, cur = ai;
+            while (cur > 0) {
+                repr(j, m, t)dp[j] = max(dp[j], dp[j - t] + cur);
+                k++;
+                cur = ai - (k * k * bi);
+            }
+        } else {
+            rep(j, t, m)dp[j] = max(dp[j], dp[j - t] + ai);
+        }
+    }
+    int q, x;
+    cin >> q;
+    while (q--) {
+        cin >> x;
+        pnl(*max_element(dp.begin(), dp.begin() + x + 1));
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

@@ -23,9 +23,6 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
@@ -33,18 +30,16 @@ typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-9;
+const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
-#define rep(i, a, n) for(int i=a;i<n;++i)
-#define repr(i, a, n) for(int i=a;i>=n;--i)
+#define rep(i, a, n) for(int i=a;i<n;i++)
+#define repr(i, a, n) for(int i=a;i>=n;i--)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define PQ priority_queue
@@ -57,26 +52,6 @@ const double eps = 1e-9;
 #define lsb(i) (i&-i)
 mt19937_64 rnd(time(0));
 
-template<typename T>
-inline bool chmin(T &a, T &b) {
-    if (a > b) {
-        swap(a, b);
-        return true;
-    } else return false;
-}
-
-template<typename T>
-inline bool chmax(T &a, T &b) {
-    if (a < b) {
-        swap(a, b);
-        return true;
-    } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
-}
 
 template<typename T>
 inline void pr(const T &t) { cout << t << ' '; }
@@ -216,8 +191,99 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+struct H {
+    ull x;
 
+    H(ull x = 0) : x(x) {}
+
+    H operator+(H o) { return x + o.x + (x + o.x < x); }
+
+    H operator-(H o) { return *this + ~o.x; }
+
+    H operator*(H o) {
+        auto m = (__uint128_t) x * o.x;
+        return H((ull) m) + (ull) (m >> 64);
+    }
+
+    ull get() const { return x + !~x; }
+
+    bool operator==(H o) const { return get() == o.get(); }
+
+    bool operator<(H o) const { return get() < o.get(); }
+};
+
+static const H C = (ll) 1e11 + 3; // (order ~ 3e9; random also ok)
+
+struct HashInterval {
+    vector<H> ha, pw;
+
+    HashInterval(string &str) : ha(sz(str) + 1), pw(ha) {
+        pw[0] = 1;
+        rep(i, 0, sz(str))ha[i + 1] = ha[i] * C + str[i],
+                    pw[i + 1] = pw[i] * C;
+    }
+
+    H hashInterval(int a, int b) { // hash [a, b)
+        return ha[b] - ha[a] * pw[b - a];
+    }
+};
+
+vector<H> getHashes(string &str, int length) {
+    if (sz(str) < length) return {};
+    H h = 0, pw = 1;
+    rep(i, 0, length)h = h * C + str[i], pw = pw * C;
+    vector<H> ret = {h};
+    rep(i, length, sz(str)) {
+        ret.push_back(h = h * C + str[i] - pw * str[i - length]);
+    }
+    return ret;
+}
+
+H hashString(string &s) {
+    H h{};
+    for (char c: s) h = h * C + c;
+    return h;
+}
+
+inline void solve() {
+    int n;
+    cin >> n;
+    int lo = 0, hi = 100;
+    string s;
+    vector<HashInterval> arr;
+    rep(i, 0, n) {
+        cin >> s;
+        hi = min(hi, sz(s));
+        arr.eb(s);
+    }
+    while (lo < hi) {
+        int mid = lo + hi + 1 >> 1;
+        bool ok = false;
+        rep(i, 0, sz(arr[0].ha) - mid) {
+            H cur = arr[0].hashInterval(i, i + mid);
+            bool can = true;
+            rep(j, 1, n) {
+                bool found = false;
+                rep(k, 0, sz(arr[j].ha) - mid) {
+                    if (cur == arr[j].hashInterval(k, k + mid)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    can = false;
+                    break;
+                }
+            }
+            if (can) {
+                ok = true;
+                break;
+            }
+        }
+        if (ok)lo = mid;
+        else hi = mid - 1;
+    }
+    cout << lo;
 }
 
 int32_t main() {
@@ -228,6 +294,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

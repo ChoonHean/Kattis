@@ -217,7 +217,19 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, k;
+    while (cin >> k >> n) {
+        vector<ld> dp(k + 1, 1);
+        rep(_, 1, n) {
+            vector<ld> ndp(dp);
+            rep(i, 0, k)ndp[i + 1] += dp[i];
+            rep(i, 1, k + 1)ndp[i - 1] += dp[i];
+            swap(dp, ndp);
+        }
+        ld tot = accumulate(all(dp), 0.0L) * 100;
+        rep(i, 0, n)tot /= k + 1;
+        pnl(tot);
+    }
 }
 
 int32_t main() {

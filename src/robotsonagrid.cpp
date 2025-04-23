@@ -217,14 +217,43 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n;
+    cin >> n;
+    vs a(n);
+    reada(a);
+    const ll MOD = (1LL << 31) - 1;
+    vvl dp(n, vl(n));
+    dp[0][0] = 1;
+    rep(i, 1, n)if (a[0][i] == '.')dp[0][i] = dp[0][i - 1];
+    rep(i, 1, n)if (a[i][0] == '.')dp[i][0] = dp[i - 1][0];
+    rep(i, 1, n)rep(j, 1, n)if (a[i][j] == '.')dp[i][j] = (dp[i - 1][j] + dp[i][j - 1]) % MOD;
+    if (dp[n - 1][n - 1] != 0) {
+        cout << dp[n - 1][n - 1];
+        return;
+    }
+    vvb v(n, vb(n));
+    queue<pii> q({{0, 0}});
+    v[0][0] = 1;
+    auto enq = [&](int i, int j) {
+        if (a[i][j] == '.' && !v[i][j])q.emplace(i, j);
+        v[i][j] = 1;
+    };
+    while (!q.empty()) {
+        auto [i, j] = q.front();
+        q.pop();
+        if (i)enq(i - 1, j);
+        if (i < n - 1)enq(i + 1, j);
+        if (j)enq(i, j - 1);
+        if (j < n - 1)enq(i, j + 1);
+    }
+    cout << (v[n - 1][n - 1] ? "THE GAME IS A LIE" : "INCONCEIVABLE");
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

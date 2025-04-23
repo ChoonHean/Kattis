@@ -31,7 +31,7 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
@@ -217,7 +217,29 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    string s;
+    int tc = 1;
+    getline(cin, s);
+    string t = "welcome to code jam";
+    const int MOD = 10000, m = sz(t);
+    while (getline(cin, s)) {
+        int n = sz(s);
+        vi dp(n + 1);
+        dp[0] = 1;
+        rep(i, 0, m) {
+            vi ndp(n + 1);
+            repr(j, n - 1, 0)
+                if (s[j] == t[i]) {
+                    int cur = 0;
+                    rep(k, 0, j + 1)cur = (cur + dp[k]) % MOD;
+                    ndp[j] = cur;
+                }
+            swap(dp, ndp);
+        }
+        int res = 0;
+        rep(i, 0, n + 1)res = (res + dp[i]) % MOD;
+        printf("Case #%d: %04d\n", tc++, res);
+    }
 }
 
 int32_t main() {

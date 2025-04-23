@@ -217,7 +217,17 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    ll n;
+    cin >> n;
+    if (n > 10) {
+        cout << 1 - pow(M_E, -1);
+        return;
+    }
+    vector<ld> fac{1, 1};
+    rep(i, 2, 11)fac.pb(fac[i - 1] * i);
+    vector<ld> de{1, 0};
+    rep(i, 2, 11)de.pb(i * de[i - 1] + (i & 1 ? -1 : 1));
+    cout << 1 - de[n] / fac[n];
 }
 
 int32_t main() {

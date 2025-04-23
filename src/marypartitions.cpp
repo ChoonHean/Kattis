@@ -217,7 +217,16 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int tc, m, n;
+    cin >> tc >> m >> n;
+    vl dp(n + 1);
+    dp[0] = 1;
+    rep(i, 0, 1000) {
+        int cur = pow(m, i);
+        if (cur > n)break;
+        rep(j, cur, n + 1)dp[j] += dp[j - cur];
+    }
+    pr(tc, dp.back());
 }
 
 int32_t main() {
@@ -226,7 +235,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;

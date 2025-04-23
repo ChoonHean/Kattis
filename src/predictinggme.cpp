@@ -217,14 +217,28 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n;
+    cin >> n;
+    read(n);
+    vvvi dp(n, vvi(2, vi(2, -1)));
+    auto f = [&](auto &self, int i, bool own, bool sold) -> int {
+        if (i == n)return 0;
+        int &res = dp[i][own][sold];
+        if (res != -1)return res;
+        res = 0;
+        if (sold)res = self(self, i + 1, 0, 0);
+        else if (own)res = max(self(self, i + 1, 0, 1) + a[i], self(self, i + 1, 1, 0));
+        else res = max(self(self, i + 1, 1, 0) - a[i], self(self, i + 1, 0, 0));
+        return res;
+    };
+    cout << f(f, 0, 0, 0);
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

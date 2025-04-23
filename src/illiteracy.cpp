@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -71,11 +66,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,7 +207,66 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    string s, t;
+    cin >> s >> t;
+    hset<string> visit;
+    queue<string> q({s});
+    if (s == t) {
+        cout << 0;
+        return;
+    }
+    int cur = 1;
+    auto f = [](char c) -> char {
+        c++;
+        if (c == 'G')c = 'A';
+        return c;
+    };
+    while (true) {
+        int size = sz(q);
+        while (size--) {
+            string a = q.front();
+            q.pop();
+            rep(i, 0, 8) {
+                string b = a;
+                if (a[i] == 'A') {
+                    if (i > 0)b[i - 1] = f(b[i - 1]);
+                    if (i < 7)b[i + 1] = f(b[i + 1]);
+                } else if (a[i] == 'B') {
+                    if (i > 0 && i < 7) {
+                        b[i + 1] = b[i - 1];
+                    }
+                } else if (a[i] == 'C') {
+                    b[7 - i] = f(b[7 - i]);
+                } else if (a[i] == 'D') {
+                    if (i <= 3) {
+                        rep(j, 0, i)b[j] = f(b[j]);
+                    } else {
+                        rep(j, i + 1, 8)b[j] = f(b[j]);
+                    }
+                } else if (a[i] == 'E') {
+                    if (i <= 3) {
+                        b[0] = f(b[0]);
+                        b[i + i] = f(b[i + i]);
+                    } else {
+                        b[7] = f(b[7]);
+                        b[i + i - 7] = f(b[i + i - 7]);
+                    }
+                } else {
+                    if (i & 1) {
+                        b[i >> 1] = f(b[i >> 1]);
+                    } else {
+                        b[i + 8 >> 1] = f(b[i + 8 >> 1]);
+                    }
+                }
+                if (b == t) {
+                    cout << cur;
+                    return;
+                }
+                if (visit.insert(b).second)q.push(b);
+            }
+        }
+        cur++;
+    }
 }
 
 int32_t main() {
@@ -228,6 +277,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -71,11 +66,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,7 +207,49 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n;
+    string s;
+    cin >> n >> s;
+    int a = 0, b = 0, c = 0;
+    for (const char &ch: s) {
+        if (ch == 'A')a++;
+        else if (ch == 'B')b++;
+        else c++;
+    }
+    int res = inf;
+    int l = a, r = a + b, cur = 0;
+    rep(i, 0, l)if (s[i] != 'A')cur++;
+    rep(i, l, r)if (s[i] != 'B')cur++;
+    rep(i, r, n)if (s[i] != 'C')cur++;
+    res = min(cur, res);
+    rep(i, 0, n) {
+        if (s[i] == 'A')cur++;
+        if (s[i] == 'C')cur--;
+        if (s[l] == 'B')cur++;
+        if (s[l] == 'A')cur--;
+        if (s[r] == 'C')cur++;
+        if (s[r] == 'B')cur--;
+        res = min(res, cur);
+        l = (l + 1) % n;
+        r = (r + 1) % n;
+    }
+    cur = 0, l = a, r = a + c;
+    rep(i, 0, l)if (s[i] != 'A')cur++;
+    rep(i, l, r)if (s[i] != 'C')cur++;
+    rep(i, r, n)if (s[i] != 'B')cur++;
+    res = min(res, cur);
+    rep(i, 0, n) {
+        if (s[i] == 'A')cur++;
+        if (s[i] == 'B')cur--;
+        if (s[l] == 'C')cur++;
+        if (s[l] == 'A')cur--;
+        if (s[r] == 'B')cur++;
+        if (s[r] == 'C')cur--;
+        res = min(res, cur);
+        l = (l + 1) % n;
+        r = (r + 1) % n;
+    }
+    cout << res;
 }
 
 int32_t main() {
@@ -228,6 +260,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

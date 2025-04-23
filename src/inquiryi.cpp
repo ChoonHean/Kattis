@@ -217,14 +217,24 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n;
+    cin >> n;
+    ll res = 0, b = 0, f = 0;
+    read(n);
+    b = accumulate(all(a), 0LL);
+    rep(i, 0, n) {
+        b -= a[i];
+        f += a[i] * a[i];
+        res = max(res, f * b);
+    }
+    cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

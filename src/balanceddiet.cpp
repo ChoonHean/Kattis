@@ -217,14 +217,28 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n;
+    while (cin >> n) {
+        if (!n)break;
+        read(n);
+        int tot = accumulate(all(a), 0);
+        vb dp(tot / 2 + 1);
+        dp[0] = 1;
+        rep(i, 0, n)repr(j, tot / 2, a[i])dp[j] = dp[j] | dp[j - a[i]];
+        repr(i, tot / 2, 0) {
+            if (dp[i]) {
+                pr(tot - i, i);
+                break;
+            }
+        }
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

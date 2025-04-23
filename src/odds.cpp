@@ -217,14 +217,53 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    char a, b, c, d;
+    while (cin >> a >> b >> c >> d) {
+        if (a == '0')break;
+        int num = 0, den = 0;
+        rep(i, 1, 7) {
+            if (a != '*' && a != '0' + i)continue;
+            rep(j, 1, 7) {
+                if (b != '*' && b != '0' + j)continue;
+                rep(k, 1, 7) {
+                    if (c != '*' && c != '0' + k)continue;
+                    rep(l, 1, 7) {
+                        if (d != '*' && d != '0' + l)continue;
+                        string x, y;
+                        x.pb('0' + i), x.pb('0' + j);
+                        y.pb('0' + k), y.pb('0' + l);
+                        sort(all(x));
+                        sort(all(y));
+                        den++;
+                        if (x == "12") {
+                            if (y != "12")num++;
+                        } else if (y == "12") {
+                        } else if (x[0] == x[1]) {
+                            if (y[0] == y[1])num += x[0] > y[0];
+                            else num++;
+                        } else if (y[0] == y[1]) {
+                        } else {
+                            if (x[1] > y[1])num++;
+                            else if (x[1] == y[1])num += x[0] > y[0];
+                        }
+                    }
+                }
+            }
+        }
+        if (num == 0)pnl(0);
+        else if (num == den)pnl(1);
+        else {
+            int g = gcd(num, den);
+            cout << num / g << '/' << den / g << nl;
+        }
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

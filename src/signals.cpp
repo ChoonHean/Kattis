@@ -217,7 +217,16 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, x;
+    vi res;
+    cin >> n;
+    rep(i, 0, n) {
+        cin >> x;
+        auto it = lb(all(res), x);
+        if (it == res.end())res.pb(x);
+        else *it = x;
+    }
+    cout << sz(res);
 }
 
 int32_t main() {

@@ -217,7 +217,36 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, k;
+    cin >> n >> k;
+    vl a(256);
+    int r, p;
+    rep(i, 0, n)cin >> r >> p, a[r] = p;
+    vvl cost(257, vl(257));
+    rep(i, 0, 256)
+        rep(j, i + 2, 256)
+            rep(l, i + 1, j) {
+                ll mn = min(l - i, j - l);
+                cost[i][j] += a[l] * mn * mn;
+            }
+    rep(i, 1, 256) {
+        rep(j, 0, i)cost[256][i] += a[j] * pow(i - j, 2);
+    }
+    rep(i, 0, 255) {
+        rep(j, i + 1, 256)cost[i][256] += a[j] * pow(j - i, 2);
+    }
+    vvl dp(256, vl(k, -1));
+    auto f = [&](auto &self, int i, int j) -> ll {
+        if (j == 0)return cost[i][256];
+        if (i == 255)return 0;
+        if (dp[i][j] != -1)return dp[i][j];
+        ll res = llinf;
+        rep(k, i + 1, 256)res = min(res, cost[i][k] + self(self, k, j - 1));
+        return dp[i][j] = res;
+    };
+    ll res = llinf;
+    rep(i, 0, 256)res = min(res, cost[256][i] + f(f, i, k - 1));
+    cout << res;
 }
 
 int32_t main() {

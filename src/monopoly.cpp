@@ -217,7 +217,30 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, m, k, a, b, u, v;
+    cin >> n >> m >> k >> a >> b;
+    vvi adj(n);
+    rep(i, 0, m) {
+        cin >> u >> v;
+        adj[u - 1].pb(v - 1);
+    }
+    vi arr(n);
+    string s;
+    getline(cin, s);
+    rep(i, 0, n) {
+        getline(cin, s);
+        if (s[0] == 'S')arr[i] = stoi(s.substr(7));
+        else if (s[0] == 'T')arr[i] = -stoi(s.substr(4));
+    }
+    vl dp(n, -llinf);
+    auto f = [&](auto &self, int i) -> ll {
+        if (adj[i].empty())return 0;
+        if (dp[i] != -llinf)return dp[i];
+        ll res = -llinf;
+        for (const int &j: adj[i])res = max(res, arr[j] + self(self, j));
+        return dp[i] = res;
+    };
+    pr(f(f, a - 1), f(f, b - 1));
 }
 
 int32_t main() {

@@ -31,7 +31,7 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
@@ -217,7 +217,28 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, a, b;
+    cin >> a >> a >> a >> b >> n;
+    vpii arr(n);
+    readpair(arr);
+    auto f = [](int a, int b, int c, int d) {
+        return abs(a - c) + abs(b - d);
+    };
+    const int N = 1 << n;
+    vvi dp(N, vi(n, inf));
+    rep(i, 0, n)dp[1 << i][i] = f(a, b, arr[i].first, arr[i].second);
+    rep(i, 1, N)
+        rep(j, 0, n)
+            if ((i >> j) & 1)
+                rep(k, 0, n)
+                    if (!((i >> k) & 1)) {
+                        int l = i | (1 << k);
+                        dp[l][k] = min(dp[l][k],
+                                       dp[i][j] + f(arr[j].first, arr[j].second, arr[k].first, arr[k].second));
+                    }
+    int res = inf;
+    rep(i, 0, n)res = min(res, dp.back()[i] + f(a, b, arr[i].first, arr[i].second));
+    pnl(res);
 }
 
 int32_t main() {
@@ -226,7 +247,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;

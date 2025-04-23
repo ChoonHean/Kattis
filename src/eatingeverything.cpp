@@ -217,7 +217,22 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, m, u, v;
+    cin >> n >> m;
+    read(n);
+    vvi adj(n);
+    rep(i, 0, m) {
+        cin >> u >> v;
+        adj[u].pb(v);
+    }
+    vd dp(n, -1);
+    auto f = [&](auto &self, int i) -> double {
+        if (dp[i] != -1)return dp[i];
+        double mx = 0;
+        for (const int &j: adj[i])mx = max(mx, self(self, j));
+        return max(a[i] + mx / 2, mx);
+    };
+    cout << f(f, 0);
 }
 
 int32_t main() {

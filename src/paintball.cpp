@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -71,11 +66,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -216,8 +206,71 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+bool dfs(int a, int L, vector<vi> &g, vi &btoa, vi &A, vi &B) {
+    if (A[a] != L) return 0;
+    A[a] = -1;
+    for (int b: g[a])
+        if (B[b] == L + 1) {
+            B[b] = 0;
+            if (btoa[b] == -1 || dfs(btoa[b], L + 1, g, btoa, A, B))
+                return btoa[b] = a, 1;
+        }
+    return 0;
+}
 
+int hopcroftKarp(vector<vi> &g, vi &btoa) {
+    int res = 0;
+    vi A(g.size()), B(btoa.size()), cur, next;
+    for (;;) {
+        fill(all(A), 0);
+        fill(all(B), 0);
+        /// Find the starting nodes for BFS (i.e. layer 0).
+        cur.clear();
+        for (int a: btoa) if (a != -1) A[a] = -1;
+        rep(a, 0, sz(g)) if (A[a] == 0) cur.push_back(a);
+        /// Find all layers using bfs.
+        for (int lay = 1;; lay++) {
+            bool islast = 0;
+            next.clear();
+            for (int a: cur)
+                for (int b: g[a]) {
+                    if (btoa[b] == -1) {
+                        B[b] = lay;
+                        islast = 1;
+                    } else if (btoa[b] != a && !B[b]) {
+                        B[b] = lay;
+                        next.push_back(btoa[b]);
+                    }
+                }
+            if (islast) break;
+            if (next.empty()) return res;
+            for (int a: next) A[a] = lay;
+            cur.swap(next);
+        }
+        /// Use DFS to scan for augmenting paths.
+        rep(a, 0, sz(g))res += dfs(a, 0, g, btoa, A, B);
+    }
+}
+
+inline void solve() {
+    int n, m;
+    cin >> n >> m;
+    vi btoa(n, -1);
+    vvi g(n);
+    int x, y;
+    rep(i, 0, m) {
+        cin >> x >> y;
+        g[--x].pb(--y);
+        g[y].pb(x);
+    }
+    int res = hopcroftKarp(g, btoa);
+    if (res != n)cout << "Impossible";
+    else {
+        vpii a;
+        rep(i, 0, n)a.eb(btoa[i], i);
+        sort(all(a));
+        for (const auto &[x, y]: a)pnl(y + 1);
+    }
 }
 
 int32_t main() {
@@ -228,6 +281,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

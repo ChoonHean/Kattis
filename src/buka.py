@@ -1,0 +1,7 @@
+ii = lambda: int(input())
+mii = lambda: map(int, input().split())
+lmii = lambda: list(mii())
+a = ii()
+c = input()
+b = ii()
+print(a * b if c == '*' else a + b)

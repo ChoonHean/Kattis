@@ -216,17 +216,43 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+int t = 1;
 
+inline void solve() {
+    int m;
+    const int n = 20;
+    cin >> m;
+    read(n);
+    hmap<int, vi> mp;
+    for (uint i = 0; i < 1 << n; i++) {
+        int cur = 0;
+        for (uint j = i; j; j -= lsb(j)) {
+            cur += a[countr_zero(j)];
+        }
+        mp[cur].pb(i);
+    }
+    cout << "Case #" << t++ << ": \n";
+    for (auto &[w, v]: mp) {
+        rep(i, 0, sz(v))
+            rep(j, i + 1, sz(v))
+                if ((v[i] & v[j]) == 0) {
+                    for (uint k = v[i]; k; k -= lsb(k))pr(a[countr_zero(k)]);
+                    cout << nl;
+                    for (uint k = v[j]; k; k -= lsb(k))pr(a[countr_zero(k)]);
+                    cout << nl;
+                    return;
+                }
+    }
+    cout << "impossible";
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;

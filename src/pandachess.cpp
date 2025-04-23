@@ -31,7 +31,7 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
@@ -217,7 +217,44 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, m, d;
+    ll u, v;
+    cin >> n >> m >> d;
+    hmap<ll, vl> adj;
+    hmap<ll, int> deg;
+    rep(i, 0, m) {
+        cin >> u >> v;
+        adj[u].pb(v);
+        deg[v]++;
+        if (!deg.contains(u))deg[u] = 0;
+    }
+    queue<ll> q;
+    vl topo;
+    for (const auto &[a, b]: deg)if (!b)q.push(a);
+    while (!q.empty()) {
+        topo.pb(q.front());
+        for (const ll &j: adj[q.front()]) {
+            if (!--deg[j])q.push(j);
+        }
+        q.pop();
+    }
+    hmap<ll, int> inv;
+    rep(i, 0, n)inv[topo[i]] = i;
+    vl a(n);
+    reada(a);
+    rep(i, 0, n) {
+        auto it = inv.find(a[i]);
+        if (it == inv.end())a[i] = -1;
+        else a[i] = it->second;
+    }
+    vl res;
+    for (const ll &i: a) {
+        if (i == -1)continue;
+        auto it = lb(all(res), i);
+        if (it == res.end())res.pb(i);
+        else *it = i;
+    }
+    cout << (n - sz(res) << 1);
 }
 
 int32_t main() {

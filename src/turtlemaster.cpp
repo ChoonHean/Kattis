@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -71,11 +66,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,7 +207,92 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    vs a(8);
+    readarr(a);
+    string s;
+    cin >> s;
+    int x = 7, y = 0, d = 1;
+    auto er = []() {
+        cout << "Bug!";
+    };
+    for (const char &c: s) {
+        if (c == 'F') {
+            if (d == 0) {
+                if (x == 0) {
+                    er();
+                    return;
+                } else {
+                    x--;
+                    if (a[x][y] != 'D' && a[x][y] != '.') {
+                        er();
+                        return;
+                    }
+                }
+            } else if (d == 1) {
+                if (y == 7) {
+                    er();
+                    return;
+                } else {
+                    y++;
+                    if (a[x][y] != 'D' && a[x][y] != '.') {
+                        er();
+                        return;
+                    }
+                }
+            } else if (d == 2) {
+                if (x == 7) {
+                    er();
+                    return;
+                } else {
+                    x++;
+                    if (a[x][y] != 'D' && a[x][y] != '.') {
+                        er();
+                        return;
+                    }
+                }
+            } else {
+                if (y == 0) {
+                    er();
+                    return;
+                } else {
+                    y--;
+                    if (a[x][y] != 'D' && a[x][y] != '.') {
+                        er();
+                        return;
+                    }
+                }
+            }
+        } else if (c == 'R')d = (d + 1) % 4;
+        else if (c == 'L')d = (d - 1 + 4) % 4;
+        else {
+            if (d == 0) {
+                if (x == 0 || a[x - 1][y] != 'I') {
+                    er();
+                    return;
+                }
+                a[x - 1][y] = '.';
+            } else if (d == 1) {
+                if (y == 7 || a[x][y + 1] != 'I') {
+                    er();
+                    return;
+                }
+                a[x][y + 1] = '.';
+            } else if (d == 2) {
+                if (x == 7 || a[x + 1][y] != 'I') {
+                    er();
+                    return;
+                }
+                a[x + 1][y] = '.';
+            } else {
+                if (y == 0 || a[x][y - 1] != 'I') {
+                    er();
+                    return;
+                }
+                a[x][y - 1] = '.';
+            }
+        }
+    }
+    cout << (a[x][y] == 'D' ? "Diamond!" : "Bug!");
 }
 
 int32_t main() {
@@ -228,6 +303,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

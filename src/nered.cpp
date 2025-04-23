@@ -217,7 +217,26 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, m, x, y;
+    cin >> n >> m;
+    vvi a(n + 1, vi(n + 1));
+    rep(i, 0, m)cin >> x >> y, a[x - 1][y - 1] = 1;
+    vvi pre(n + 1, vi(n + 1));
+    rep(i, 0, n) {
+        int cur = 0;
+        rep(j, 0, n)cur += a[i][j], pre[i + 1][j + 1] = pre[i][j + 1] + cur;
+    }
+    int res = m;
+    rep(i, 1, n + 1) {
+        if (m % i)continue;
+        int j = m / i;
+        rep(k, 0, n - i + 1)
+            rep(l, 0, n - j + 1) {
+                int cur = pre[k + i][l + j] - pre[k + i][l] - pre[k][l + j] + pre[k][l];
+                res = min(res, m - cur);
+            }
+    }
+    cout << res;
 }
 
 int32_t main() {

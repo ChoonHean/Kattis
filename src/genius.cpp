@@ -217,7 +217,24 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int k, t, p, q, x;
+    double a, b, c, d;
+    cin >> k >> t >> p >> q >> x;
+    vd dp(t + 1);
+    dp[0] = 1;
+    rep(i, 0, t) {
+        cin >> a >> b >> c >> d;
+        int e = x % 4;
+        if (e == 1)swap(a, b);
+        else if (e == 2)swap(a, c), swap(b, d);
+        else if (e == 3)swap(a, d), swap(b, c);
+        double prob = a / (a + b) * (c / (c + d) * a / (a + c) + d / (c + d) * a / (a + d));
+        vd ndp(t + 1);
+        rep(j, 0, t)ndp[j + 1] += dp[j] * prob, ndp[j] += dp[j] * (1 - prob);
+        swap(dp, ndp);
+        x = x * p % q;
+    }
+    cout << accumulate(dp.begin() + k, dp.end(), 0.0);
 }
 
 int32_t main() {

@@ -217,14 +217,40 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, m;
+    ll k, r;
+    cin >> n >> m >> k >> r;
+    read(n);
+    ll s, c;
+    vl dp(m, llinf);
+    dp[0] = a[0];
+    ll cur = 0;
+    rep(i, 1, m) {
+        if (i * k > a[0])break;
+        dp[i] = a[0] + i * r;
+    }
+    rep(i, 1, n) {
+        vl ndp(m, llinf);
+        cin >> s >> c;
+        rep(j, 0, m)ndp[j] = min(ndp[j], dp[j] + s + c * (j + 1));
+        swap(dp, ndp);
+        ndp.assign(m, llinf);
+        rep(j, 0, m)
+            rep(l, 0, m) {
+                if (abs(l - j) * k <= a[i]) {
+                    ndp[l] = min(ndp[l], dp[j] + a[i] + abs(l - j) * r);
+                }
+            }
+        swap(dp, ndp);
+    }
+    cout << dp[0];
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

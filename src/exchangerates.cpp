@@ -31,7 +31,7 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
@@ -217,14 +217,25 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n;
+    while (cin >> n) {
+        if (!n)break;
+        double a = 100000, b = 0, x;
+        rep(i, 0, n) {
+            cin >> x;
+            int na = max(a, 0.97 * b * x);
+            int nb = max(b, 0.97 * a / x);
+            a = na, b = nb;
+        }
+        pnl(a / 100.0);
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

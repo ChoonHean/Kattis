@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -71,11 +66,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -217,7 +207,27 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    vs arr(1001, string(1001, ' '));
+    string mv;
+    int x = 500, y = 500;
+    int mnx = 500, mxx = 500, mny = 500, mxy = 500;
+    arr[x][y] = 'S';
+    while (cin >> mv) {
+        if (mv[0] == 'd')mxy = max(mxy, ++y);
+        else if (mv[0] == 'u')mny = min(mny, --y);
+        else if (mv[0] == 'r')mxx = max(mxx, ++x);
+        else mnx = min(mnx, --x);
+        if (arr[y][x] != 'S')arr[y][x] = '*';
+    }
+    arr[y][x] = 'E';
+    vs res(mxy - mny + 3, string(mxx - mnx + 3, ' '));
+    res[0] = res.back() = string(mxx - mnx + 3, '#');
+    for (string &s: res)s[0] = s.back() = '#';
+    for (int i = 1; mny <= mxy; i++, mny++)
+        for (int j = 1, cur = mnx; cur <= mxx; cur++, j++) {
+            res[i][j] = arr[mny][cur];
+        }
+    for (string &s: res)cout << s << nl;
 }
 
 int32_t main() {
@@ -228,6 +238,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

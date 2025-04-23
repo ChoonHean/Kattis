@@ -23,9 +23,6 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
@@ -33,18 +30,16 @@ typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-9;
+const double EPS = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
-#define rep(i, a, n) for(int i=a;i<n;++i)
-#define repr(i, a, n) for(int i=a;i>=n;--i)
+#define rep(i, a, n) for(int i=a;i<n;i++)
+#define repr(i, a, n) for(int i=a;i>=n;i--)
 #define nl "\n"
 #define sz(v) ((int)v.size())
 #define PQ priority_queue
@@ -57,26 +52,6 @@ const double eps = 1e-9;
 #define lsb(i) (i&-i)
 mt19937_64 rnd(time(0));
 
-template<typename T>
-inline bool chmin(T &a, T &b) {
-    if (a > b) {
-        swap(a, b);
-        return true;
-    } else return false;
-}
-
-template<typename T>
-inline bool chmax(T &a, T &b) {
-    if (a < b) {
-        swap(a, b);
-        return true;
-    } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
-}
 
 template<typename T>
 inline void pr(const T &t) { cout << t << ' '; }
@@ -217,7 +192,30 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    string s, t;
+    cin >> s >> t;
+    int n = sz(s), m = sz(t);
+    vector<vector<pair<int, pii>>> dp(n + 1, vector<pair<int, pii>>(m + 1, {inf, {inf, inf}}));
+    dp[0][0] = {0, {-1, -1}};
+    rep(i, 1, n + 1)dp[i][0] = {i, {i - 1, 0}};
+    rep(j, 1, m + 1)dp[0][j] = {j, {0, j - 1}};
+    rep(i, 1, n + 1)
+        rep(j, 1, m + 1) {
+            if (s[i - 1] == t[j - 1])dp[i][j] = {dp[i - 1][j - 1].first + 1, {i - 1, j - 1}};
+            else
+                dp[i][j] = min(pair(dp[i - 1][j].first + 1, pair(i - 1, j)),
+                               pair(dp[i][j - 1].first + 1, pair(i, j - 1)));
+        }
+    string res;
+    auto [i, j] = pair(n, m);
+    while (i != 0 || j != 0) {
+        auto [k, l] = dp[i][j].second;
+        if (i != k)res.pb(s[k]);
+        else res.pb(t[l]);
+        i = k, j = l;
+    }
+    reverse(all(res));
+    cout << res;
 }
 
 int32_t main() {
@@ -228,6 +226,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

@@ -31,7 +31,7 @@ typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
@@ -216,8 +216,41 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
+    }
+    return res;
+}
 
+inline void solve() {
+    int n;
+    cin >> n;
+    string s;
+    getline(cin, s);
+    vvi adj(n, vi(n));
+    rep(i, 0, n) {
+        getline(cin, s);
+        for (string &t: split(s, ' ')) {
+            int c = stoi(t);
+            adj[i][c] = 1;
+        }
+    }
+    vi is;
+    rep(i, 1, 1 << n) {
+        bool ok = 1;
+        rep(j, 0, n)if ((i >> j) & 1)rep(k, 0, n)if ((i >> k) & 1)if (adj[j][k])ok = 0;
+        if (ok)is.pb(i);
+    }
+    vi dp(1 << n, inf);
+    dp[0] = 0;
+    rep(i, 1, 1 << n)for (int &j: is)if ((j & i) == j)dp[i] = min(dp[i], dp[i ^ j] + 1);
+    cout << dp.back();
 }
 
 int32_t main() {

@@ -217,14 +217,21 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    string s;
+    cin >> s;
+    ll res = 0, cur = 0;
+    for (const char &c: s) {
+        if (c == '>')cur++;
+        else if (c == '<')res += cur;
+    }
+    cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

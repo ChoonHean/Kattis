@@ -216,8 +216,24 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+vs ans{"NNN", "NNY", "NYN", "NYY", "YNN", "YNY", "YYN", "YYY"};
 
+inline void solve() {
+    int n;
+    cin >> n;
+    int cur = 0;
+    vvi a(n, vi(8));
+    read2d(a);
+    vvi dp(n, vi(8, -1));
+    auto f = [&](auto &self, int i, int j) -> int {
+        if (i == n)return j;
+        if (dp[i][j] != -1)return dp[i][j];
+        int x = self(self, i + 1, j ^ 1), y = self(self, i + 1, j ^ 2), z = self(self, i + 1, j ^ 4);
+        if (a[i][x] <= a[i][y] && a[i][x] <= a[i][z])return dp[i][j] = x;
+        if (a[i][y] <= a[i][x] && a[i][y] <= a[i][z])return dp[i][j] = y;
+        else return dp[i][j] = z;
+    };
+    pnl(ans[f(f, 0, 0)]);
 }
 
 int32_t main() {
@@ -226,7 +242,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;

@@ -23,25 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
-const ll llinf = 4e18;
+const int inf = 1e9;
+const ll llinf = 1e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
 #define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
@@ -71,11 +67,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -216,8 +207,48 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
+    }
+    return res;
+}
 
+inline void solve() {
+    string s, name, order;
+    getline(cin, s);
+    while (getline(cin, name)) {
+        getline(cin, order);
+        int m = stoi(order.substr(0, order.find(' ')));
+        int cur = 0, start, stop, step;
+        vi a(10);
+        while (cur < m) {
+            getline(cin, s);
+            if (s[0] == '+') {
+                vs v = split(s, ' ');
+                for (int i = stoi(v[1]); i <= stoi(v[2]); i += stoi(v[3])) {
+                    s = to_string(i);
+                    cur++;
+                    for (const char &c: s)a[c - '0']++;
+                }
+            } else {
+                for (const char &c: s)a[c - '0']++;
+                cur++;
+            }
+        }
+        pnl(name);
+        pnl(order);
+        rep(i, 0, 10) {
+            pr("Make", a[i], "digit", i);
+        }
+        int t = accumulate(all(a), 0);
+        pr("In total", t, t > 1 ? "digits" : "digit");
+    }
 }
 
 int32_t main() {
@@ -228,6 +259,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

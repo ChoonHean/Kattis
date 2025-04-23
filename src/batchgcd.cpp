@@ -23,26 +23,21 @@ typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
 typedef pair<double, double> pdd;
-typedef pair<double, int> pdi;
-typedef pair<int, double> pid;
-typedef pair<string, int> psi;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
 const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
-#define read(n) vi a(n);for(int&_:a)cin>>_
-#define reada(arr) for(auto&_:arr)cin>>_
+#define read(n) vi arr(n);for(int&_:arr)cin>>_
+#define readarr(arr) for(auto&_:arr)cin>>_
 #define readpair(arr) for(auto&[_,__]:arr)cin>>_>>__
-#define readtup(arr) for(auto&[_,__,___]:arr)cin>>_>>__>>___
-#define read2d(arr) for(auto&_:arr)reada(_)
 #define rep(i, a, n) for(int i=a;i<n;++i)
 #define repr(i, a, n) for(int i=a;i>=n;--i)
 #define nl "\n"
@@ -71,11 +66,6 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
-}
-
-template<typename T>
-inline T ceildiv(T a, T b) {
-    return (a + b - 1) / b;
 }
 
 template<typename T>
@@ -216,8 +206,87 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
+const int N = 1e5;
+vi primes;
+vi minPrimeFac(N + 1);
 
+void linSieve() {
+    for (int i = 2; i <= N; i++) {
+        if (minPrimeFac[i] == 0) {
+            minPrimeFac[i] = i;
+            primes.pb(i);
+        }
+        for (int j = 0; i * primes[j] <= N; j++) {
+            minPrimeFac[i * primes[j]] = primes[j];
+            if (primes[j] == minPrimeFac[i])break;
+        }
+    }
+}
+
+inline ll binpow2(ll n, ll p, ll m) {
+    __int128 res = 1, a = n;
+    while (p) {
+        if (p & 1)res = (res * a) % m;
+        a = (a * a) % m;
+        p >>= 1;
+    }
+    return res;
+}
+
+inline bool is_composite(ll n, ll a, ll d, int s) {
+    __int128 x = binpow2(a, d, n);
+    if (x == 1 || x == n - 1)return false;
+    rep(i, 0, s) {
+        x = (x * x) % n;
+        if (x == n - 1)return false;
+    }
+    return true;
+}
+
+inline bool miller_rabin(ll n) {
+    vi tests{2, 13, 23, 1662803};
+//    if (n >= 3215031751LL) tests = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37};
+    ll d = n - 1;
+    int s = 0;
+    while (!(d & 1))d >>= 1, s++;
+    for (const int &a: tests) {
+        if (a > n - 1)break;
+        if (is_composite(n, a, d, s))return false;
+    }
+    return true;
+}
+
+
+inline void solve() {
+    int n;
+    ll x;
+    cin >> n;
+    linSieve();
+    vl seen;
+    while (n--) {
+        cin >> x;
+        if (x == 1)continue;
+        else if (miller_rabin(x)) {
+            seen.pb(x);
+        } else {
+            for (const int &p: primes) {
+                if (x == 1)break;
+                if (x % p == 0) {
+                    seen.pb(p);
+                    x /= p;
+                    while (x % p == 0)x /= p;
+                }
+            }
+            if (x != 1)seen.pb(x);
+        }
+    }
+    sort(all(seen));
+    rep(i, 1, sz(seen))
+        if (seen[i] == seen[i - 1]) {
+            cout << "YES";
+            return;
+        }
+    cout << "NO";
 }
 
 int32_t main() {
@@ -228,6 +297,5 @@ int32_t main() {
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();
-    int cnt = 0;
     return 0;
 }

@@ -217,14 +217,23 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n, m;
+    cin >> n >> m;
+    int res = 0;
+    while (m && n)res += 10, n--, m--;
+    while (n) {
+        if (n >= 3)n -= 3, res += 10;
+        else if (n == 2)n -= 2, res += 3;
+        else res++, n--;
+    }
+    cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(3);
     int cases = 1;
 //    cin >> cases;
     while (cases--) solve();

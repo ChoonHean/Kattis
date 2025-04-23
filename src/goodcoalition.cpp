@@ -217,7 +217,16 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-
+    int n;
+    vector<ld> dp(151);
+    dp[0] = 1;
+    int s, p;
+    cin >> n;
+    rep(i, 0, n) {
+        cin >> s >> p;
+        repr(j, 150, s)dp[j] = max(dp[j], dp[j - s] * p / 100);
+    }
+    pnl(*max_element(dp.begin() + 76, dp.end()) * 100);
 }
 
 int32_t main() {
@@ -226,7 +235,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--) solve();
     int cnt = 0;
     return 0;
