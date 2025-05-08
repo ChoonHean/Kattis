@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,24 +216,28 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int t = 0, j = n;
+    while (j)t += j % 10, j /= 10;
+    repr(i, n - 1, 0) {
+        j = i;
+        int s = 1;
+        while (j)s += j % 10, j /= 10;
+        if (s == t) {
+            pnl(i);
+            return;
+        }
     }
-    cout << lo;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
-//    cin >> cases;
-    while (cases--)solve();
+    cin >> cases;
+    while (cases--) solve();
     return 0;
 }

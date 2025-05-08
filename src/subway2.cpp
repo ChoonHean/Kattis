@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,20 +22,13 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
-typedef vector<pid> vpid;
-typedef vector<vpid> vvpid;
 typedef pair<string, int> psi;
-typedef pair<int, ll> pil;
-typedef vector<pil> vpil;
-typedef vector<vpil> vvpil;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
-typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
@@ -44,7 +36,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -108,6 +100,9 @@ inline void pr(const tuple<Args...> &tup) {
 }
 
 template<typename T>
+void pr(const PQ<T, vector<T>, greater<>> &v);
+
+template<typename T>
 inline void pr(const vector<T> &v) {
     for (const auto &i: v) pr(i);
     cout << nl;
@@ -126,13 +121,7 @@ inline void pr(const multiset<T> &s) {
 }
 
 template<typename T>
-inline void pr(const ordered_set &s) {
-    for (const auto &t: s)pr(t);
-    cout << nl;
-}
-
-template<typename T, typename H>
-inline void pr(const unordered_set<T, H> &s) {
+inline void pr(const unordered_set<T> &s) {
     for (const auto &t: s)pr(t);
     cout << nl;
 }
@@ -215,16 +204,71 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+template<typename T, typename U>
+inline vector<U> dijkstra(const vector<vector<pair<T, U>>> &adj, int s) {
+    int n = sz(adj);
+    vector<U> dist(adj.size(), is_same<U, ll>() ? llinf : inf);
+    dist[s] = 0;
+    set<pair<U, int>> pq;
+    pq.emplace(0, s);
+    while (!pq.empty()) {
+        auto [d, u] = *pq.begin();
+        pq.erase(pq.begin());
+        for (const auto &[v, w]: adj[u]) {
+            U next = d + w;
+            if (next < dist[v]) {
+                pq.erase({dist[v], v});
+                pq.emplace(dist[v] = next, v);
+            }
+        }
     }
-    cout << lo;
+    return dist;
+}
+
+struct Hash {
+    size_t operator()(const pii &p) const {
+        return p.first | (ll) p.second << 32;
+    }
+};
+
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
+    }
+    return res;
+}
+
+inline void solve() {
+    int x1, y1, x2, y2, x, y, u, v;
+    cin >> x1 >> y1 >> x2 >> y2;
+    vvd adj(205, vd(205, inf));
+    hmap<pii, int, Hash> mp;
+    string s;
+    getline(cin, s);
+    hmap<int, int> h;
+    while (getline(cin, s)) {
+        vs cur = split(s, ' ');
+        for (int i = 0; i < sz(cur) - 4; i += 2) {
+            pii p1{stoi(cur[i]), stoi(cur[i + 1])}, p2{stoi(cur[i + 2]), stoi(cur[i + 3])};
+            u = mp.contains(p1) ? mp[p1] : mp[p1] = mp.size();
+            v = mp.contains(p2) ? mp[p2] : mp[p2] = mp.size();
+            adj[u][v] = min(adj[u][v], hypot(p1.first - p2.first, p1.second - p2.second));
+            adj[v][u] = adj[u][v];
+        }
+    }
+    pii p1{x1, y1}, p2{x2, y2};
+    u = mp.contains(p1) ? mp[p1] : mp[p1] = mp.size();
+    v = mp.contains(p2) ? mp[p2] : mp[p2] = mp.size();
+    int n = sz(mp);
+    for (const auto &[a, b]: mp)for (const auto &[c, d]: mp)adj[b][d] = min(adj[b][d], hypot(a.first - c.first,
+                                                                                             a.second - c.second) * 4);
+    rep(k, 0, n)rep(i, 0, n)rep(j, 0, n)adj[i][j] = min(adj[i][j], adj[i][k] + adj[k][j]);
+    cout << (int) round(adj[u][v] * 60 / 40000);
 }
 
 int32_t main() {
@@ -234,6 +278,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

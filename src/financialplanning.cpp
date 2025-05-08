@@ -216,13 +216,20 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, m;
+    cin >> n >> m;
+    vpii a(n);
+    readpair(a);
+    int lo = 1, hi = 2e9;
+    while (lo < hi) {
+        ll mid = (hi - lo >> 1) + lo;
+        ll t = 0;
+        for (const auto &[x, y]: a) {
+            t += max(0LL, mid * x - y);
+            if (t >= m)break;
+        }
+        if (t >= m)hi = mid;
+        else lo = mid + 1;
     }
     cout << lo;
 }

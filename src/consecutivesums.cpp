@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-
+#include <cmath>
 
 using namespace std;
 using namespace __gnu_pbds;
@@ -39,12 +39,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +216,22 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    n <<= 1;
+    rep(i, 2, ceil(sqrt(n))) {
+        if (n % i == 0) {
+            int q = n / i - i + 1;
+            if (q % 2 == 0) {
+                q >>= 1;
+                cout << n / 2 << " = " << q;
+                rep(j, q + 1, q + i)cout << " + " << j;
+                cout << nl;
+                return;
+            }
+        }
     }
-    cout << lo;
+    pnl("IMPOSSIBLE");
 }
 
 int32_t main() {
@@ -233,7 +240,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--)solve();
     return 0;
 }

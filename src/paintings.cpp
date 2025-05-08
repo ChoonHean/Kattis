@@ -216,15 +216,38 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n, m;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    vs a(n);
+    hmap<string, int> mp;
+    reada(a);
+    rep(i, 0, n)mp[a[i]] = i;
+    cin >> m;
+    vvb adj(n, vb(n, 1));
+    string s, t;
+    rep(i, 0, m) {
+        cin >> s >> t;
+        int u = mp[s], v = mp[t];
+        adj[u][v] = adj[v][u] = 0;
     }
-    cout << lo;
+    int res = 0;
+    vi cur, mx;
+    auto f = [&](auto &self, uint mask, int prev) -> void {
+        if (popcount(mask) == n) {
+            if (mx.empty())mx = cur;
+            res++;
+        }
+        rep(i, 0, n)
+            if (!((mask >> i) & 1) && adj[prev][i]) {
+                cur.pb(i);
+                self(self, mask | (1 << i), i);
+                cur.pop_back();
+            }
+    };
+    rep(i, 0, n)cur = {i}, f(f, 1 << i, i);
+    pnl(res);
+    for (const int &i: mx)pr(a[i]);
+    cout << nl;
 }
 
 int32_t main() {
@@ -233,7 +256,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--)solve();
     return 0;
 }

@@ -216,15 +216,28 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, s, r, x;
+    cin >> n >> s >> r;
+    vb a(n), b(n);
+    rep(i, 0, s)cin >> x, a[x - 1] = 1;
+    rep(i, 0, r)cin >> x, b[x - 1] = 1;
+    vvi dp(1 << n, vi(1 << n, -1));
+    int c = 0, d = 0;
+    rep(i, 0, n) {
+        if (!a[i])c |= 1 << i;
+        else if (b[i])b[i] = 0, c |= 1 << i;
+        if (b[i])d |= 1 << i;
     }
-    cout << lo;
+    auto f = [&](auto &self, int c, int d) -> int {
+        if (dp[c][d] != -1)return dp[c][d];
+        if (!d)return 0;
+        int k = countr_zero((uint) d);
+        int res = self(self, c, d ^ (1 << k));
+        if (k > 0)if (!((c >> k - 1) & 1))res = 1 + self(self, c | (1 << k - 1), d ^ (1 << k));
+        if (k < n - 1)if (!((c >> k + 1) & 1))res = max(res, 1 + self(self, c | (1 << k + 1), d ^ (1 << k)));
+        return dp[c][d] = res;
+    };
+    cout << n - f(f, c, d) - popcount((uint) c);
 }
 
 int32_t main() {

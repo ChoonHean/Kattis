@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -41,10 +40,10 @@ typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -79,6 +78,10 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -216,15 +219,20 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int t, n;
+    cin >> t >> n;
+    read(n);
+    vi b(a);
+    sort(all(b));
+    vpii c;
+    rep(i, 0, n) {
+        auto it = lb(all(b), a[i]);
+        auto it2 = ub(it, b.end(), a[i]);
+        c.eb(it - b.begin(), it2 - b.begin() - 1);
     }
-    cout << lo;
+    int res = n, cur = 0;
+    rep(i, 0, n)if (c[i].first <= cur && cur <= c[i].second)res--, cur++;
+    pr(t, res);
 }
 
 int32_t main() {
@@ -233,7 +241,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--)solve();
     return 0;
 }

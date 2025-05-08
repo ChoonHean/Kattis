@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,25 +215,44 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
+using namespace std::chrono;
+typedef year_month_day T;
+
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
-    }
-    cout << lo;
+    int x, y, z;
+    vi a;
+    cin >> x >> y >> z;
+    a.pb(x / 10);
+    a.pb(x % 10);
+    a.pb(y / 10);
+    a.pb(y % 10);
+    a.pb(z / 1000);
+    a.pb(z / 100 % 10);
+    a.pb(z / 10 % 10);
+    a.pb(z % 10);
+    sort(all(a));
+    int res = 0;
+    T mn(year(9999), month(12), day(31)), start(year(2000), month(1), day(1));
+    do {
+        T cur(year(a[0] + a[1] * 10 + a[2] * 100 + a[3] * 1000), month(a[4] + a[5] * 10), day(a[6] + a[7] * 10));
+        if (cur.ok() && cur >= start) {
+            res++;
+            mn = min(mn, cur);
+        }
+    } while (next_permutation(all(a)));
+    if (!res)printf("0\n");
+    else
+        printf("%d %02d %02d %04d\n", res, mn.day().operator unsigned int(), mn.month().operator unsigned int(),
+               mn.year().operator int());
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
-//    cin >> cases;
-    while (cases--)solve();
+    cin >> cases;
+    while (cases--) solve();
     return 0;
 }

@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -215,23 +218,82 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+template<class T>
+int sgn(T x) { return (x > 0) - (x < 0); }
+
+template<class T>
+struct Point {
+    typedef Point P;
+    T x, y;
+
+    explicit Point(T x = 0, T y = 0) : x(x), y(y) {}
+
+    bool operator<(P p) const { return tie(x, y) < tie(p.x, p.y); }
+
+    bool operator==(P p) const { return tie(x, y) == tie(p.x, p.y); }
+
+    P operator+(P p) const { return P(x + p.x, y + p.y); }
+
+    P operator-(P p) const { return P(x - p.x, y - p.y); }
+
+    P operator*(T d) const { return P(x * d, y * d); }
+
+    P operator/(T d) const { return P(x / d, y / d); }
+
+    T dot(P p) const { return x * p.x + y * p.y; }
+
+    T cross(P p) const { return x * p.y - y * p.x; }
+
+    T cross(P a, P b) const { return (a - *this).cross(b - *this); }
+
+    T dist2() const { return x * x + y * y; }
+
+    double dist() const { return sqrt((double) dist2()); }
+
+    // angle to x-axis in interval [-pi, pi]
+    double angle() const { return atan2(y, x); }
+
+    P unit() const { return *this / dist(); } // makes dist()=1
+    P perp() const { return P(-y, x); } // rotates +90 degrees
+    P normal() const { return perp().unit(); }
+
+    // returns point rotated 'a' radians ccw around the origin
+    P rotate(double a) const {
+        return P(x * cos(a) - y * sin(a), x * sin(a) + y * cos(a));
     }
-    cout << lo;
+
+    friend ostream &operator<<(ostream &os, const P &p) {
+        return os << "(" << p.x << "," << p.y << ")";
+    }
+};
+
+typedef ll T;
+typedef Point<T> P;
+
+template<class T>
+T polygonArea2(vector<Point<T>> &v) {
+    T a = v.back().cross(v[0]);
+    rep(i, 0, sz(v) - 1) a += v[i].cross(v[i + 1]);
+    return a;
+}
+
+inline void solve() {
+    int n;
+    while (cin >> n) {
+        if (!n)break;
+        vector<P> a(n);
+        readpair(a);
+        ll res = polygonArea2(a);
+        pr(res < 0 ? "CW" : "CCW");
+        pnl(abs(res) / 2.0);
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(1);
     int cases = 1;
 //    cin >> cases;
     while (cases--)solve();

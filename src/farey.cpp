@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-
+#include <cmath>
 
 using namespace std;
 using namespace __gnu_pbds;
@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +215,28 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+const int N = 1e4 + 1;
+vi phi(N + 1);
+
+void eulerTotN() {
+    iota(all(phi), 0);
+    for (int i = 2; i <= N; i++) {
+        if (phi[i] == i) {
+            for (int j = i; j <= N; j += i)phi[j] -= phi[j] / i;
+        }
     }
-    cout << lo;
+}
+
+inline void solve() {
+    eulerTotN();
+    int t, n, x;
+    cin >> n;
+    phi[0] = 1;
+    rep(i, 1, N)phi[i] += phi[i - 1];
+    rep(i, 0, n) {
+        cin >> t >> x;
+        pr(t, phi[x]);
+    }
 }
 
 int32_t main() {

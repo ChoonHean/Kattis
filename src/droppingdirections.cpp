@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +213,42 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+struct Hash {
+    size_t operator()(const pii &p) const {
+        return p.first | (ll) p.second << 32;
     }
-    cout << lo;
+};
+
+inline void solve() {
+    int n, g, a, b, c, d;
+    cin >> n >> g;
+    hmap<pii, vpii, Hash> adj;
+    hset<pii, Hash> vis;
+    rep(i, 1, n + 1) {
+        cin >> a >> b >> c >> d;
+        adj[{a, i}].pb({i, c});
+        adj[{c, i}].pb({i, a});
+        adj[{b, i}].pb({i, d});
+        adj[{d, i}].pb({i, b});
+    }
+    int res = 0;
+    for (const auto &[p, _]: adj)
+        if (vis.insert(p).second) {
+            queue<pii> q({p});
+            bool goal = 0;
+            while (!q.empty()) {
+                pair cur = q.front();
+                goal |= cur.first == g | cur.second == g;
+                q.pop();
+                for (const auto &v: adj[cur]) {
+                    if (vis.insert(v).second) {
+                        q.push(v);
+                    }
+                }
+            }
+            if (!goal)res++;
+        }
+    pnl(res / 2);
 }
 
 int32_t main() {
@@ -233,7 +257,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
-    while (cases--)solve();
+    cin >> cases;
+    while (cases--) solve();
     return 0;
 }

@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,25 +214,65 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+const int N = 5000;
+vl primes;
+vi minPrimeFac(N + 1);
+
+void linSieve() {
+    for (int i = 2; i <= N; i++) {
+        if (minPrimeFac[i] == 0) {
+            minPrimeFac[i] = i;
+            primes.pb(i);
+        }
+        for (int j = 0; i * primes[j] <= N; j++) {
+            minPrimeFac[i * primes[j]] = primes[j];
+            if (primes[j] == minPrimeFac[i])break;
+        }
     }
-    cout << lo;
+}
+
+inline void solve() {
+    linSieve();
+    int n, b;
+    cin >> n >> b;
+    if (b < n) {
+        cout << "impossible";
+        return;
+    }
+    int s = n * (n + 1) >> 1;
+    int target = *lb(all(primes), s);
+    vi a(n);
+    iota(all(a), 1);
+    rep(i, n + 1, b + 1) {
+        repr(j, n - 1, 0) {
+            if (target - s == i - a[j]) {
+                a[j] = i;
+                s = target;
+                break;
+            }
+        }
+        if (target == s)break;
+        s += i - a[0];
+        a[0] = i;
+        sort(all(a));
+    }
+    if (s < target)cout << "impossible";
+    else {
+        rep(i, 0, n) {
+            pr(a);
+            a.insert(a.begin(), a.back());
+            a.pop_back();
+        }
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

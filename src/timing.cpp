@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -215,16 +218,58 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+inline vvd matmul(int n, vvd &a, vvd &b, int m) {
+    vvd res(n, vd(n));
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int k = 0; k < n; k++) {
+                res[i][j] = (res[i][j] + a[i][k] * b[k][j]);
+            }
+        }
     }
-    cout << lo;
+    return res;
+}
+
+inline vvd matpow(int n, vvd &a, ll p, int m) {
+    vvd res(n, vd(n));
+    for (int i = 0; i < n; i++)res[i][i] = 1;
+    vvd b(a);
+    while (p) {
+        if (p & 1)res = matmul(n, res, b, m);
+        b = matmul(n, b, b, m);
+        p >>= 1;
+    }
+    return res;
+}
+
+inline void solve() {
+    int n, l, t, u, v;
+    double w;
+    cin >> n >> l >> t;
+    vvd a(n, vd(n));
+    vd b(n);
+    reada(b);
+    rep(i, 0, l) {
+        cin >> u >> v >> w;
+        a[v][u] = w;
+    }
+    rep(i, 0, n) {
+        a[i][i] = 1;
+        rep(j, 0, n) {
+            if (i == j)continue;
+            a[i][i] -= a[j][i];
+        }
+    }
+    vvd m = matpow(n, a, t, mod);
+    vd s(n);
+    rep(i, 0, n)rep(j, 0, n)s[i] += m[i][j] * b[j];
+    double res = inf;
+    rep(i, 0, n) {
+        double cur = 0;
+        rep(j, 0, n)if (a[i][j] != 0 || a[j][i] != 0 || i == j)cur += s[j];
+        res = min(res, cur);
+    }
+    pnl(res);
 }
 
 int32_t main() {
@@ -233,7 +278,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--)solve();
     return 0;
 }

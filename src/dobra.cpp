@@ -215,16 +215,48 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
+bool isvowel(const char &c) { return c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U'; }
+
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
-    }
-    cout << lo;
+    string s;
+    cin >> s;
+    int n = sz(s);
+    vector<vvvl> dp(2, vvvl(2, vvl(2, vl(n, -1))));
+    auto f = [&](auto &self, int i, bool a, bool b, bool l) -> ll {
+        if (i == n)return l;
+        ll &res = dp[a][b][l][i];
+        if (res != -1)return res;
+        res = 0;
+        if (i == 0 || i == 1) {
+            if (s[i] == '_') {
+                s[i] = 'A';
+                res = 5 * self(self, i + 1, b, 1, l);
+                s[i] = 'B';
+                res += 20 * self(self, i + 1, b, 0, l);
+                s[i] = 'L';
+                res += self(self, i + 1, b, 0, 1);
+                s[i] = '_';
+            } else res = self(self, i + 1, b, isvowel(s[i]), l || s[i] == 'L');
+        } else {
+            if (s[i] == '_') {
+                s[i] = 'A';
+                if (!(a && b))res = 5 * self(self, i + 1, b, 1, l);
+                s[i] = 'B';
+                if (a || b)res += 20 * self(self, i + 1, b, 0, l);
+                s[i] = 'L';
+                if (a || b)res += self(self, i + 1, b, 0, 1);
+                s[i] = '_';
+            } else {
+                if (!(a && b && isvowel(s[i]))) {
+                    if (a || b || isvowel(s[i])) {
+                        res = self(self, i + 1, b, isvowel(s[i]), l || s[i] == 'L');
+                    }
+                }
+            }
+        }
+        return res;
+    };
+    cout << f(f, 0, 0, 0, 0);
 }
 
 int32_t main() {

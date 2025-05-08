@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +215,22 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
+    int n;
+    double p, s, v;
+    cin >> n >> p >> s >> v;
+    const double log2n = log(n) / log(2), sqrt2 = sqrt(2);
+    auto f = [&](double c) {
+        return n * pow(log2n, c * sqrt2) / (p * 1e9) + s * (1 + 1 / c) / v;
+    };
+    double lo = 0, hi = 500;
+    while (fabs(hi - lo) > eps) {
         double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+        double dif = (hi - lo) / 4;
+        double a = mid - dif, b = mid + dif;
+        if (f(a) > f(b))lo = a;
+        else hi = b;
     }
-    cout << lo;
+    pr(f(lo), lo);
 }
 
 int32_t main() {

@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +214,49 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+template<typename T>
+inline T kruskal(vector<tuple<T, int, int>> edges, int n) {
+    struct UFDS {
+        vi p;
+
+        UFDS(int n) {
+            p.resize(n);
+            iota(p.begin(), p.end(), 0);
+        }
+
+        int find(int n) {
+            if (n == p[n])return n;
+            return p[n] = find(p[n]);
+        }
+
+        inline bool sameset(int x, int y) { return find(x) == find(y); }
+
+        inline void unionset(int x, int y) {
+            x = find(x);
+            y = find(y);
+            p[y] = x;
+        }
+    };
+    UFDS uf(n);
+    sort(all(edges));
+    T res = 0;
+    for (const auto &[w, i, j]: edges) {
+        if (uf.sameset(i, j))continue;
+        uf.unionset(i, j);
+        res = w;
+        n--;
     }
-    cout << lo;
+    return n == 1 ? res : -1;
+}
+
+inline void solve() {
+    int n, m, u, v, w;
+    cin >> n >> m;
+    vti e;
+    rep(i, 0, m)cin >> u >> v >> w, e.eb(w, u, v);
+    int res = kruskal(e, n);
+    if (res == -1)cout << "IMPOSSIBLE";
+    else cout << res;
 }
 
 int32_t main() {
@@ -234,6 +266,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

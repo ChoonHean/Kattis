@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -36,7 +34,6 @@ typedef vector<vpil> vvpil;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
-typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
@@ -44,7 +41,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -108,6 +105,9 @@ inline void pr(const tuple<Args...> &tup) {
 }
 
 template<typename T>
+void pr(const PQ<T, vector<T>, greater<>> &v);
+
+template<typename T>
 inline void pr(const vector<T> &v) {
     for (const auto &i: v) pr(i);
     cout << nl;
@@ -131,8 +131,8 @@ inline void pr(const ordered_set &s) {
     cout << nl;
 }
 
-template<typename T, typename H>
-inline void pr(const unordered_set<T, H> &s) {
+template<typename T>
+inline void pr(const unordered_set<T> &s) {
     for (const auto &t: s)pr(t);
     cout << nl;
 }
@@ -216,15 +216,45 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, m, q, s, u, v, w;
+    while (cin >> n >> m >> q >> s) {
+        if (!n)break;
+        vvpii adj(n);
+        vector<ti> e;
+        rep(i, 0, m) {
+            cin >> u >> v >> w;
+            adj[u].eb(v, w);
+            e.eb(u, v, w);
+        }
+        vi d(n, inf);
+        d[s] = 0;
+        rep(i, 1, n) {
+            for (const auto &[u, v, w]: e) {
+                if (d[u] == inf)continue;
+                d[v] = min(d[v], d[u] + w);
+            }
+        }
+        vi neg(n);
+        queue<int> qu;
+        for (const auto &[u, v, w]: e) {
+            if (d[u] == inf)continue;
+            if (d[u] + w < d[v]) {
+                if (!neg[v])neg[v] = 1, qu.push(v);
+            }
+        }
+        while (!qu.empty()) {
+            int u = qu.front();
+            qu.pop();
+            for (const auto &[v, w]: adj[u])if (!neg[v])neg[v] = 1, qu.push(v);
+        }
+        int t;
+        while (q--) {
+            cin >> t;
+            if (neg[t])pnl("-Infinity");
+            else if (d[t] == inf)pnl("Impossible");
+            else pnl(d[t]);
+        }
     }
-    cout << lo;
 }
 
 int32_t main() {
@@ -234,6 +264,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

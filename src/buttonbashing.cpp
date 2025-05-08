@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +214,36 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, t;
+    cin >> n >> t;
+    read(n);
+    vi vis(3601, -1);
+    queue<int> q({0});
+    int cur = 0;
+    while (!q.empty()) {
+        int size = sz(q);
+        while (size--) {
+            int i = q.front();
+            q.pop();
+            if (i == t) {
+                pr(cur, 0);
+                return;
+            }
+            for (const int &j: a) {
+                int next = j > 0 ? min(i + j, 3600) : max(i + j, 0);
+                if (vis[next] == -1) {
+                    vis[next] = cur + 1;
+                    q.push(next);
+                }
+            }
+        }
+        cur++;
     }
-    cout << lo;
+    rep(i, t + 1, 3601)
+        if (vis[i] != -1) {
+            pr(vis[i], i - t);
+            return;
+        }
 }
 
 int32_t main() {
@@ -233,7 +252,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
-    while (cases--)solve();
+    cin >> cases;
+    while (cases--) solve();
     return 0;
 }

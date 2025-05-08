@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +213,59 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+template<typename T>
+inline vector<T> dijkstra(const vector<vector<pair<int, T>>> &adj, int s) {
+    int n = sz(adj);
+    vector<T> dist(n, numeric_limits<T>::max());
+    dist[s] = T();
+    set<pair<T, int>> pq;
+    pq.emplace(T(), s);
+//    vi p(n, -1);
+    while (!pq.empty()) {
+        auto [d, u] = *pq.begin();
+        pq.erase(pq.begin());
+        for (const auto &[v, w]: adj[u]) {
+            T next = d + w;
+            if (next < dist[v]) {
+                pq.erase({dist[v], v});
+                pq.emplace(dist[v] = next, v);
+//                p[v] = u;
+            }
+        }
     }
-    cout << lo;
+//    return p;
+    return dist;
+}
+
+inline void solve() {
+    int l, n, m;
+    while (cin >> l >> n >> m) {
+        if (!l)break;
+        vector<vs> a(l, vs(n));
+        read2d(a);
+        const int N = n * m;
+        vvpii adj(l * N);
+        int x1, y1, z1, x2, y2, z2;
+        rep(i, 0, l)
+            rep(j, 0, n)
+                rep(k, 0, m) {
+                    if (a[i][j][k] == 'S')x1 = i, y1 = j, z1 = k;
+                    if (a[i][j][k] == 'E')x2 = i, y2 = j, z2 = k;
+                    if (a[i][j][k] == '#')continue;
+                    if (i && a[i - 1][j][k] != '#')
+                        adj[i * N + j * m + k].eb((i - 1) * N + j * m + k, 1), adj[(i - 1) * N + j * m + k].eb(
+                                i * N + j * m + k, 1);;
+                    if (j && a[i][j - 1][k] != '#')
+                        adj[i * N + j * m + k].eb(i * N + (j - 1) * m + k, 1), adj[i * N + (j - 1) * m + k].eb(
+                                i * N + j * m + k, 1);
+                    if (k && a[i][j][k - 1] != '#')
+                        adj[i * N + j * m + k].eb(i * N + j * m + (k - 1), 1), adj[i * N + j * m + (k - 1)].eb(
+                                i * N + j * m + k, 1);
+                }
+        int res = dijkstra(adj, x1 * N + y1 * m + z1)[x2 * N + y2 * m + z2];
+        if (res == INT_MAX)printf("Trapped!\n");
+        else printf("Escaped in %d minute(s).\n", res);
+    }
 }
 
 int32_t main() {
@@ -234,6 +275,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

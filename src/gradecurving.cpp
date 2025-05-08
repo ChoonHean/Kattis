@@ -216,15 +216,20 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int mn = 100, mx = 0;
+    ld x;
+    int lo, hi, cnt = 0;
+    cin >> x >> lo >> hi;
+    if (x == lo)mn = 0;
+    while (x < 100) {
+        int y = ceil(x);
+        if (lo <= y && y <= hi)mn = min(mn, cnt), mx = cnt;
+        x = 10 * sqrtl(x);
+        cnt++;
     }
-    cout << lo;
+    if (mn > mx)cout << "impossible";
+    else if (hi == 100)pr(mn, "inf");
+    else pr(mn, mx);
 }
 
 int32_t main() {

@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,24 +215,30 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
-    }
-    cout << lo;
+    string s;
+    vs a;
+    while (getline(cin, s))a.pb(s);
+    int n = sz(a), m = sz(a[0]);
+    int res = 0;
+    auto f = [&](int i, int j) {
+        if (i > 1)
+            res += a[i][j] == 'o' && a[i - 1][j] == 'o' && a[i - 2][j] == '.',
+                    res += a[i][j] == '.' && a[i - 1][j] == 'o' && a[i - 2][j] == 'o';
+        if (j > 1)
+            res += a[i][j] == 'o' && a[i][j - 1] == 'o' && a[i][j - 2] == '.',
+                    res += a[i][j] == '.' && a[i][j - 1] == 'o' && a[i][j - 2] == 'o';
+    };
+    rep(i, 0, n)rep(j, 0, m)f(i, j);
+    cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

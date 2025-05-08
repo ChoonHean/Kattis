@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-
+#include <cmath>
 
 using namespace std;
 using namespace __gnu_pbds;
@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +215,80 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+inline ll binpow2(ll n, ll p, ll m) {
+    __int128 res = 1, a = n;
+    while (p) {
+        if (p & 1)res = (res * a) % m;
+        a = (a * a) % m;
+        p >>= 1;
     }
-    cout << lo;
+    return res;
+}
+
+inline bool is_composite(ll n, ll a, ll d, int s) {
+    __int128 x = binpow2(a, d, n);
+    if (x == 1 || x == n - 1)return false;
+    rep(i, 0, s) {
+        x = (x * x) % n;
+        if (x == n - 1)return false;
+    }
+    return true;
+}
+
+inline bool miller_rabin(ll n) {
+    if (n < 2)return false;
+    vi tests{2, 3, 5, 7};
+    if (n >= 3215031751LL) tests = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37};
+    ll d = n - 1;
+    int s = 0;
+    while (!(d & 1))d >>= 1, s++;
+    for (const int &a: tests) {
+        if (a > n - 1)break;
+        if (is_composite(n, a, d, s))return false;
+    }
+    return true;
+}
+
+
+const int N = 1e5;
+vl primes;
+vi minPrimeFac(N + 1);
+
+void linSieve() {
+    for (int i = 2; i <= N; i++) {
+        if (minPrimeFac[i] == 0) {
+            minPrimeFac[i] = i;
+            primes.pb(i);
+        }
+        for (int j = 0; i * primes[j] <= N; j++) {
+            minPrimeFac[i * primes[j]] = primes[j];
+            if (primes[j] == minPrimeFac[i])break;
+        }
+    }
+}
+
+vi primeFactors(ll n) {
+    vi factors;
+    for (ll div: primes) {
+        while (n % div == 0)n /= div, factors.pb(div);
+        if (div * div > n)break;
+    }
+    if (n != 1)factors.pb(n);
+    return factors;
+}
+
+inline void solve() {
+    int n;
+    while (cin >> n) {
+        if (n == 4)break;
+        int res = 1;
+        while (!miller_rabin(n)) {
+            res++;
+            vi a = primeFactors(n);
+            n = accumulate(all(a), 0);
+        }
+        pr(n, res);
+    }
 }
 
 int32_t main() {
@@ -233,6 +297,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
+    linSieve();
 //    cin >> cases;
     while (cases--)solve();
     return 0;

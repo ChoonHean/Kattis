@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -191,6 +194,18 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
+template<typename T>
+inline void pr(const PQ<T> &pq1) {
+    auto copy(pq1);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
 template<typename T, typename C>
 inline void pr(const PQ<T, vector<T>, C> &pq1) {
     auto copy(pq1);
@@ -215,16 +230,43 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
+int n, m;
+int adj[15], dp[1 << 15];
+bool clique[1 << 15];
+
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    string s, t;
+    hmap<string, int> mp;
+    const int N = 1 << n;
+    fill(adj, adj + n, N - 1);
+    rep(i, 0, m) {
+        cin >> s >> t;
+        int u, v;
+        if (mp.contains(s))u = mp[s];
+        else u = mp[s] = sz(mp);
+        if (mp.contains(t))v = mp[t];
+        else v = mp[t] = sz(mp);
+        adj[u] ^= 1 << v;
+        adj[v] ^= 1 << u;
     }
-    cout << lo;
+    fill(clique, clique + N, 1);
+    rep(i, 1, N) {
+        int j = i;
+        for (uint k = i; k; k -= lsb(k))j &= adj[countr_zero(k)];
+        if (j != i)clique[i] = 0;
+    }
+    fill(dp + 1, dp + N, inf);
+    dp[0] = 0;
+    rep(i, 1, N) {
+        if (clique[i]) {
+            dp[i] = 1;
+            continue;
+        }
+        int r = inf;
+        for (int mask = i; mask; mask = (mask - 1) & i)if (clique[mask])r = min(r, dp[i ^ mask] + 1);
+        dp[i] = r;
+    }
+    pnl(dp[N - 1]);
 }
 
 int32_t main() {
@@ -234,6 +276,9 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cin >> n >> m) {
+        if (!n)break;
+        solve();
+    }
     return 0;
 }

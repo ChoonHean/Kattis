@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,24 +216,59 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int m, u, v;
+    cin >> m;
+    vi deg(10);
+    vvi adj(10);
+    rep(i, 0, m) {
+        cin >> u >> v;
+        adj[u].pb(v);
+        adj[v].pb(u);
+        deg[u]++;
+        deg[v]++;
     }
-    cout << lo;
+    vvi d(10, vi(10));
+    string s1, s2, s3;
+    vector<tuple<string, string, string>> a;
+    rep(i, 0, 10) {
+        cin >> s1 >> s1 >> s2 >> s3;
+        a.eb(s1, s2, s3);
+        rep(j, 0, i) {
+            auto [t1, t2, t3] = a[j];
+            if (s1 == t1 && s3 == t3)d[i][j] = d[j][i] = 3;
+            else if (s1 == t1 && s2 == t2)d[i][j] = d[j][i] = 2;
+            else if (s3 == t3)d[i][j] = d[j][i] = 2;
+            else if (s2 == t2)d[i][j] = d[j][i] = 1;
+            else if (s1 == t1)d[i][j] = d[j][i] = 1;
+        }
+    }
+    vi p(10);
+    iota(all(p), 0);
+    do {
+        bool ok = 1;
+        rep(i, 0, 10) {
+            int cur = 0;
+            for (const int &j: adj[i])cur += d[p[i]][p[j]];
+            if (cur < deg[i]) {
+                ok = 0;
+                break;
+            }
+        }
+        if (ok) {
+            cout << "yes";
+            return;
+        }
+    } while (next_permutation(all(p)));
+    cout << "no";
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

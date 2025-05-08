@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,20 +22,13 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
-typedef vector<pid> vpid;
-typedef vector<vpid> vvpid;
 typedef pair<string, int> psi;
-typedef pair<int, ll> pil;
-typedef vector<pil> vpil;
-typedef vector<vpil> vvpil;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
-typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
@@ -44,7 +36,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -108,6 +100,9 @@ inline void pr(const tuple<Args...> &tup) {
 }
 
 template<typename T>
+void pr(const PQ<T, vector<T>, greater<>> &v);
+
+template<typename T>
 inline void pr(const vector<T> &v) {
     for (const auto &i: v) pr(i);
     cout << nl;
@@ -126,19 +121,13 @@ inline void pr(const multiset<T> &s) {
 }
 
 template<typename T>
-inline void pr(const ordered_set &s) {
+inline void pr(const unordered_set<T> &s) {
     for (const auto &t: s)pr(t);
     cout << nl;
 }
 
-template<typename T, typename H>
-inline void pr(const unordered_set<T, H> &s) {
-    for (const auto &t: s)pr(t);
-    cout << nl;
-}
-
-template<typename T, typename U, typename H>
-inline void pr(const map<T, U, H> &m) {
+template<typename T, typename U>
+inline void pr(const map<T, U> &m) {
     for (const auto &[t, u]: m) {
         cout << '(';
         pr(t);
@@ -149,8 +138,8 @@ inline void pr(const map<T, U, H> &m) {
     cout << nl;
 }
 
-template<typename T, typename U, typename H>
-inline void pr(const unordered_map<T, U, H> &m) {
+template<typename T, typename U>
+inline void pr(const unordered_map<T, U> &m) {
     for (const auto &[t, u]: m) {
         cout << '(';
         pr(t);
@@ -191,8 +180,20 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
-template<typename T, typename C>
-inline void pr(const PQ<T, vector<T>, C> &pq1) {
+template<typename T>
+inline void pr(const PQ<T> &pq1) {
+    PQ<T> copy(pq1);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
+template<typename T>
+inline void pr(const PQ<T, vector<T>, greater<>> &pq1) {
     auto copy(pq1);
     vector<T> arr;
     while (!copy.empty()) {
@@ -216,15 +217,30 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, m, u, v;
+    while (cin >> n) {
+        if (!n)break;
+        vvd adj(n, vd(n, inf));
+        string s, t;
+        hmap<string, int> mp;
+        rep(i, 0, n)cin >> s, mp[s] = i;
+        double a, b;
+        cin >> m;
+        rep(i, 0, m) {
+            cin >> s >> t;
+            u = mp[s];
+            v = mp[t];
+            cin >> s;
+            int pos = s.find(':');
+            a = stod(s.substr(0, pos));
+            b = stod(s.substr(pos + 1));
+            adj[u][v] = log(a / b);
+        }
+        rep(k, 0, n)rep(i, 0, n)rep(j, 0, n)adj[i][j] = min(adj[i][j], adj[i][k] + adj[k][j]);
+        bool ok = 1;
+        rep(i, 0, n)if (adj[i][i] < -eps)ok = 0;
+        pnl(ok ? "Ok" : "Arbitrage");
     }
-    cout << lo;
 }
 
 int32_t main() {
@@ -234,6 +250,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

@@ -216,15 +216,13 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
-    }
-    cout << lo;
+    read(n);
+    sort(all(a), greater<>());
+    int res = 0;
+    rep(i, 0, n) if (a[i] > i)res = i + 1;
+    cout << res;
 }
 
 int32_t main() {

@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +214,32 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, m, u, v;
+    cin >> n >> m;
+    vvi adj(n << 1);
+    rep(i, 0, m) {
+        cin >> u >> v;
+        if (u > 0)adj[u - 1].pb(v - 1 + n);
+        else {
+            adj[-u - 1].pb(v - 1);
+            adj[-u - 1 + n].pb(v - 1 + n);
+        }
     }
-    cout << lo;
+    for (auto &v: adj)sort(all(v));
+    vb res(n), vis(n << 1);
+    queue<int> q({0});
+    while (!q.empty()) {
+        u = q.front();
+        q.pop();
+        if (adj[u].empty())res[u % n] = 1;
+        else {
+            if (adj[u][0] >= n && u < n)res[u] = 1;
+            for (const auto &v: adj[u]) {
+                if (!vis[v])vis[v] = 1, q.push(v);
+            }
+        }
+    }
+    cout << accumulate(all(res), 0);
 }
 
 int32_t main() {
@@ -234,6 +249,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

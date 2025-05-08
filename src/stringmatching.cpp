@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -215,23 +218,72 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+struct SuffixArray {
+    vi sa, lcp;
+
+    SuffixArray(string s, int lim = 256) { // or vector<int>
+        s.push_back(0);
+        int n = sz(s), k = 0, a, b;
+        vi x(all(s)), y(n), ws(max(n, lim));
+        sa = lcp = y, iota(all(sa), 0);
+        for (int j = 0, p = 0; p < n; j = max(1, j * 2), lim = p) {
+            p = j, iota(all(y), n - j);
+            rep(i, 0, n) if (sa[i] >= j) y[p++] = sa[i] - j;
+            fill(all(ws), 0);
+            rep(i, 0, n) ws[x[i]]++;
+            rep(i, 1, lim) ws[i] += ws[i - 1];
+            for (int i = n; i--;) sa[--ws[x[y[i]]]] = y[i];
+            swap(x, y), p = 1, x[sa[0]] = 0;
+            rep(i, 1, n) a = sa[i - 1], b = sa[i], x[b] =
+                        (y[a] == y[b] && y[a + j] == y[b + j]) ? p - 1 : p++;
+        }
+        for (int i = 0, j; i < n - 1; lcp[x[i++]] = k)
+            for (k &&k--, j = sa[x[i] - 1];
+                    s[i + k] == s[j + k];
+        k++);
     }
-    cout << lo;
+};
+
+
+inline void solve() {
+    string t, s;
+    while (getline(cin, t)) {
+        getline(cin, s);
+        SuffixArray sa(s);
+        auto cmp = [&](int a, int n, int m, string &s, string &str) -> int {
+            rep(i, 0, m) {
+                if (i + a >= n)return -1;
+                if (s[i + a] < str[i])return -1;
+                if (s[i + a] > str[i])return 1;
+            }
+            return 0;
+        };
+        int lo = 0, hi = sz(s);
+        while (lo < hi) {
+            int mid = lo + hi >> 1;
+            if (cmp(sa.sa[mid], sz(s), sz(t), s, t) >= 0)hi = mid;
+            else lo = mid + 1;
+        }
+        int end = lo;
+        hi = sz(s);
+        while (end < hi) {
+            int mid = end + hi >> 1;
+            if (cmp(sa.sa[mid], sz(s), sz(t), s, t) > 0)hi = mid;
+            else end = mid + 1;
+        }
+        vi res;
+        rep(i, lo, end)res.pb(sa.sa[i]);
+        if (cmp(sa.sa[end], sz(s), sz(t), s, t) == 0)res.pb(sa.sa[end]);
+        sort(all(res));
+        pr(res);
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(1);
     int cases = 1;
 //    cin >> cases;
     while (cases--)solve();

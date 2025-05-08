@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -191,6 +194,18 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
+template<typename T>
+inline void pr(const PQ<T> &pq1) {
+    auto copy(pq1);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
 template<typename T, typename C>
 inline void pr(const PQ<T, vector<T>, C> &pq1) {
     auto copy(pq1);
@@ -215,23 +230,54 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
     }
-    cout << lo;
+    return res;
+}
+
+inline void solve() {
+    int n;
+    cin >> n;
+    vb v(86400);
+    int res = 0;
+    string s;
+    getline(cin, s);
+    rep(i, 0, n) {
+        getline(cin, s);
+        vs cur = split(s, ' ');
+        vi hour, min, sec;
+        for (const string &a: split(cur[0], ',')) {
+            if (a == "*")hour.resize(24), iota(all(hour), 0);
+            else if (a.find('-') == string::npos)hour.pb(stoi(a));
+            else for (int j = stoi(a.substr(0, a.find('-'))); j <= stoi(a.substr(a.find('-') + 1)); j++)hour.pb(j);
+        }
+        for (const string &a: split(cur[1], ',')) {
+            if (a == "*")min.resize(60), iota(all(min), 0);
+            else if (a.find('-') == string::npos)min.pb(stoi(a));
+            else for (int j = stoi(a.substr(0, a.find('-'))); j <= stoi(a.substr(a.find('-') + 1)); j++)min.pb(j);
+        }
+        for (const string &a: split(cur[2], ',')) {
+            if (a == "*")sec.resize(60), iota(all(sec), 0);
+            else if (a.find('-') == string::npos)sec.pb(stoi(a));
+            else for (int j = stoi(a.substr(0, a.find('-'))); j <= stoi(a.substr(a.find('-') + 1)); j++)sec.pb(j);
+        }
+        for (const int &k: hour)for (const int &l: min)for (const int &m: sec)v[k * 3600 + l * 60 + m] = 1, res++;
+    }
+    pr(accumulate(all(v), 0), res);
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(1);
     int cases = 1;
 //    cin >> cases;
     while (cases--)solve();

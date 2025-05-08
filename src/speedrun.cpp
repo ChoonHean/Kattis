@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -79,6 +78,10 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -216,15 +219,19 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, g;
+    cin >> g >> n;
+    vpii a(n);
+    readpair(a);
+    sort(all(a));
+    multiset<int> s;
+    int res = 0;
+    for (const auto &[x, y]: a) {
+        while (!s.empty() && *s.begin() <= x)res++, s.erase(s.begin());
+        s.insert(y);
+        if (sz(s) > 1)s.erase(prev(s.end()));
     }
-    cout << lo;
+    YN(res + sz(s) >= g);
 }
 
 int32_t main() {

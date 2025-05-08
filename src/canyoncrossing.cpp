@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -191,6 +194,18 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
+template<typename T>
+inline void pr(const PQ<T> &pq1) {
+    auto copy(pq1);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
 template<typename T, typename C>
 inline void pr(const PQ<T, vector<T>, C> &pq1) {
     auto copy(pq1);
@@ -216,12 +231,43 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
+    int n, m, k;
+    cin >> n >> m >> k;
+    const int N = n * m;
+    vvi a(n, vi(m));
+    read2d(a);
+    int lo = 0, hi = inf;
+    while (lo < hi) {
+        int mid = lo + hi + 1 >> 1;
+        deque<pair<pii, int>> q;
+        vvb vis(n, vb(m));
+        rep(i, 0, m) {
+            vis[0][i] = 1;
+            if (a[0][i] < mid)q.emplace_back(pii(0, i), 1);
+            else q.emplace_front(pii(0, i), 0);
+        }
+        auto enq = [&](int x, int y, int d) {
+            if (x >= 0 && x < n && y >= 0 && y < m && !vis[x][y]) {
+                vis[x][y] = 1;
+                if (a[x][y] < mid)q.emplace_back(pii(x, y), d + 1);
+                else q.emplace_front(pii(x, y), d);
+            }
+        };
+        int need = 0;
+        while (true) {
+            auto [p, d] = q.front();
+            q.pop_front();
+            const auto &[x, y] = p;
+            if (x == n - 1) {
+                need = d;
+                break;
+            }
+            enq(x - 1, y, d);
+            enq(x + 1, y, d);
+            enq(x, y - 1, d);
+            enq(x, y + 1, d);
+        }
+        if (need > k)hi = mid - 1;
         else lo = mid;
     }
     cout << lo;

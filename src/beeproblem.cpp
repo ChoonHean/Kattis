@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -191,6 +194,18 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
+template<typename T>
+inline void pr(const PQ<T> &pq1) {
+    auto copy(pq1);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
 template<typename T, typename C>
 inline void pr(const PQ<T, vector<T>, C> &pq1) {
     auto copy(pq1);
@@ -215,16 +230,73 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+struct UFDS {
+    vi p, size;
+
+    UFDS(int n) {
+        p.resize(n);
+        iota(p.begin(), p.end(), 0);
+        size.assign(n, 1);
     }
-    cout << lo;
+
+    int find(int n) {
+        if (n == p[n])return n;
+        return p[n] = find(p[n]);
+    }
+
+    inline bool sameset(int x, int y) { return find(x) == find(y); }
+
+    inline void unionset(int x, int y) {
+        x = find(x);
+        y = find(y);
+        p[y] = x;
+        size[x] += size[y];
+    }
+};
+
+inline void solve() {
+    int h, n, m, u, v;
+    cin >> h >> n >> m;
+    vs a(n, string(m, ' '));
+    rep(i, 0, n)rep(j, 0, m)cin >> a[i][j];
+    UFDS uf(n * m);
+    for (int i = 0; i < n; i += 2) {
+        rep(j, 0, m)
+            if (a[i][j] == '.') {
+                u = i * m + j;
+                if (i) {
+                    v = u - m;
+                    if (a[i - 1][j] == '.' && !uf.sameset(u, v))uf.unionset(u, v);
+                    if (j && a[i - 1][j - 1] == '.' && !uf.sameset(u, v - 1))uf.unionset(u, v - 1);
+                }
+                v = u - 1;
+                if (j && a[i][j - 1] == '.' && !uf.sameset(u, v))uf.unionset(u, v);
+                if (i < n - 1) {
+                    v = u + m;
+                    if (a[i + 1][j] == '.' && !uf.sameset(u, v))uf.unionset(u, v);
+                    if (j && a[i + 1][j - 1] == '.' && !uf.sameset(u, v - 1))uf.unionset(u, v - 1);
+                }
+            }
+    }
+    for (int i = 1; i < n; i += 2)
+        rep(j, 1, m) {
+            if (a[i][j] == '.' && a[i][j - 1] == '.' && !uf.sameset(i * m + j, i * m + j - 1))uf.unionset(i * m + j,
+                                                                                                          i * m + j -
+                                                                                                          1);
+        }
+    vi sizes;
+    vb vis(n * m);
+    rep(i, 0, n)
+        rep(j, 0, m) {
+            int x = uf.find(i * m + j);
+            if (vis[x])continue;
+            vis[x] = 1;
+            sizes.pb(uf.size[x]);
+        }
+    sort(all(sizes), greater<>());
+    int res = 0;
+    while (h > 0)h -= sizes[res++];
+    cout << res;
 }
 
 int32_t main() {

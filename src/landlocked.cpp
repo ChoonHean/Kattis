@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +213,59 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+template<typename T>
+inline vector<T> bfs(const vector<vector<pair<int, T>>> &adj, int s) {
+    int n = sz(adj);
+    deque<pair<T, int>> pq;
+    pq.emplace_back(T(), s);
+    vi dist(n, -1);
+//    vi p(n, -1);
+    while (!pq.empty()) {
+        auto [d, u] = *pq.begin();
+        pq.erase(pq.begin());
+        if (dist[u] != -1) continue;
+        dist[u] = d;
+        for (const auto &[v, w]: adj[u]) {
+            if (dist[v] != -1) continue;
+            T next = d + w;
+            if (next == d) pq.emplace_front(next, v);
+            else pq.emplace_back(next, v);
+        }
     }
-    cout << lo;
+//    return p;
+    return dist;
+}
+
+inline void solve() {
+    int n, m;
+    cin >> n >> m;
+    vs a(n);
+    reada(a);
+    const int N = n * m;
+    vvpii adj(N + 26);
+    map<char, int> mp;
+    mp['W'] = 0;
+    rep(i, 0, n)
+        rep(j, 0, m) {
+            if (a[i][j] == 'W')adj[N].eb(i * m + j, 0);
+            else {
+                int u;
+                if (mp.contains(a[i][j]))u = mp[a[i][j]];
+                else u = mp[a[i][j]] = sz(mp);
+                adj[i * m + j].eb(N + u, 0);
+                for (auto &[x, y]: {pair(i - 1, j - 1), pair(i - 1, j), pair(i - 1, j + 1), pair(i, j - 1),
+                                    pair(i, j + 1),
+                                    pair(i + 1, j - 1), pair(i + 1, j), pair(i + 1, j + 1)}) {
+                    if (x >= 0 && x < n && y >= 0 && y < m)
+                        adj[x * m + y].eb(i * m + j, a[x][y] == 'W' ? 0 : a[x][y] != a[i][j]);
+                }
+            }
+        }
+    vi dist = bfs(adj, N);
+    for (const auto &[c, i]: mp) {
+        if (c == 'W')continue;
+        pr(c, dist[i + N]);
+    }
 }
 
 int32_t main() {
@@ -234,6 +275,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

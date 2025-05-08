@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -36,7 +34,6 @@ typedef vector<vpil> vvpil;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
-typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
@@ -44,7 +41,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -108,6 +105,9 @@ inline void pr(const tuple<Args...> &tup) {
 }
 
 template<typename T>
+void pr(const PQ<T, vector<T>, greater<>> &v);
+
+template<typename T>
 inline void pr(const vector<T> &v) {
     for (const auto &i: v) pr(i);
     cout << nl;
@@ -131,8 +131,8 @@ inline void pr(const ordered_set &s) {
     cout << nl;
 }
 
-template<typename T, typename H>
-inline void pr(const unordered_set<T, H> &s) {
+template<typename T>
+inline void pr(const unordered_set<T> &s) {
     for (const auto &t: s)pr(t);
     cout << nl;
 }
@@ -215,16 +215,57 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+struct SuffixArray {
+    vi sa, lcp;
+
+    SuffixArray(string s, int lim = 256) { // or vector<int>
+        s.push_back(0);
+        int n = sz(s), k = 0, a, b;
+        vi x(all(s)), y(n), ws(max(n, lim));
+        sa = lcp = y, iota(all(sa), 0);
+        for (int j = 0, p = 0; p < n; j = max(1, j * 2), lim = p) {
+            p = j, iota(all(y), n - j);
+            rep(i, 0, n) if (sa[i] >= j) y[p++] = sa[i] - j;
+            fill(all(ws), 0);
+            rep(i, 0, n) ws[x[i]]++;
+            rep(i, 1, lim) ws[i] += ws[i - 1];
+            for (int i = n; i--;) sa[--ws[x[y[i]]]] = y[i];
+            swap(x, y), p = 1, x[sa[0]] = 0;
+            rep(i, 1, n) a = sa[i - 1], b = sa[i], x[b] =
+                        (y[a] == y[b] && y[a + j] == y[b + j]) ? p - 1 : p++;
+        }
+        for (int i = 0, j; i < n - 1; lcp[x[i++]] = k)
+            for (k &&k--, j = sa[x[i] - 1];
+                    s[i + k] == s[j + k];
+        k++);
     }
-    cout << lo;
+};
+
+inline void solve() {
+    int m;
+    string s;
+    while (cin >> m >> s) {
+        if (!m)break;
+        if (m == 1) {
+            pr(sz(s), 0);
+            continue;
+        }
+        SuffixArray sa(s);
+        multiset<int> a, b;
+        int mx = 0, r = 0;
+        b.insert(sa.sa[1]);
+        rep(i, 2, m)a.insert(sa.lcp[i]), b.insert(sa.sa[i]);
+        rep(i, m, sz(s) + 1) {
+            a.insert(sa.lcp[i]);
+            b.insert(sa.sa[i]);
+            if (*a.begin() > mx)mx = *a.begin(), r = *b.rbegin();
+            else if (*a.begin() == mx)r = max(r, *b.rbegin());
+            a.erase(a.find(sa.lcp[i - m + 2]));
+            b.erase(b.find(sa.sa[i - m + 1]));
+        }
+        if (mx == 0)pnl("none");
+        else pr(mx, r);
+    }
 }
 
 int32_t main() {
@@ -234,6 +275,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

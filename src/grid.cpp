@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +214,34 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, m;
+    cin >> n >> m;
+    string s;
+    vvi a(n);
+    rep(i, 0, n) {
+        cin >> s;
+        for (const char &c: s)a[i].pb(c - '0');
     }
-    cout << lo;
+    queue<pii> q({{0, 0}});
+    vvb vis(n, vb(m));
+    int cur = 0;
+    while (!q.empty()) {
+        int size = sz(q);
+        while (size--) {
+            auto [i, j] = q.front();
+            q.pop();
+            if (i == n - 1 && j == m - 1) {
+                cout << cur;
+                return;
+            }
+            if (i + a[i][j] < n && !vis[i + a[i][j]][j])vis[i + a[i][j]][j] = 1, q.emplace(i + a[i][j], j);
+            if (i - a[i][j] >= 0 && !vis[i - a[i][j]][j])vis[i - a[i][j]][j] = 1, q.emplace(i - a[i][j], j);
+            if (j + a[i][j] < m && !vis[i][j + a[i][j]])vis[i][j + a[i][j]] = 1, q.emplace(i, j + a[i][j]);
+            if (j - a[i][j] >= 0 && !vis[i][j - a[i][j]])vis[i][j - a[i][j]] = 1, q.emplace(i, j - a[i][j]);
+        }
+        cur++;
+    }
+    cout << -1;
 }
 
 int32_t main() {
@@ -234,6 +251,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

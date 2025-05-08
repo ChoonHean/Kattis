@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,25 +214,98 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+template<typename T>
+inline pair<T, vpii> kruskal(vector<tuple<T, int, int>> edges, int n) {
+    struct UFDS {
+        vi p;
+
+        UFDS(int n) {
+            p.resize(n);
+            iota(p.begin(), p.end(), 0);
+        }
+
+        int find(int n) {
+            if (n == p[n])return n;
+            return p[n] = find(p[n]);
+        }
+
+        inline bool sameset(int x, int y) { return find(x) == find(y); }
+
+        inline void unionset(int x, int y) {
+            x = find(x);
+            y = find(y);
+            p[y] = x;
+        }
+    };
+    UFDS uf(n);
+    sort(all(edges));
+    T res = T();
+    vpii connections;
+    for (const auto &[w, i, j]: edges) {
+        if (uf.sameset(i, j))continue;
+        uf.unionset(i, j);
+        res += w;
+        n--;
+        connections.eb(i, j);
     }
-    cout << lo;
+    return {n != 1 ? -1 : res, connections};
+}
+
+struct UFDS {
+    vi p;
+
+    UFDS(int n) {
+        p.resize(n);
+        iota(p.begin(), p.end(), 0);
+    }
+
+    int find(int n) {
+        if (n == p[n])return n;
+        return p[n] = find(p[n]);
+    }
+
+    inline bool sameset(int x, int y) { return find(x) == find(y); }
+
+    inline void unionset(int x, int y) {
+        x = find(x);
+        y = find(y);
+        p[y] = x;
+    }
+};
+
+inline void solve() {
+    int n, m, x;
+    hmap<int, int> mp;
+    cin >> n;
+    UFDS uf(n);
+    vti res;
+    int merge = 0;
+    rep(i, 0, n) {
+        cin >> m;
+        while (m--) {
+            cin >> x;
+            if (mp.contains(x)) {
+                int u = mp[x];
+                if (!uf.sameset(u, i)) {
+                    uf.unionset(u, i);
+                    merge++;
+                    res.eb(u, i, x);
+                }
+            } else mp[x] = i;
+        }
+    }
+    if (merge != n - 1)cout << "impossible";
+    else for (const auto &[a, b, c]: res)pr(a + 1, b + 1, c);
+
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

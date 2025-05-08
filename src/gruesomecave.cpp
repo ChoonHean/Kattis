@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -36,7 +34,6 @@ typedef vector<vpil> vvpil;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
-typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
@@ -44,7 +41,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -108,6 +105,9 @@ inline void pr(const tuple<Args...> &tup) {
 }
 
 template<typename T>
+void pr(const PQ<T, vector<T>, greater<>> &v);
+
+template<typename T>
 inline void pr(const vector<T> &v) {
     for (const auto &i: v) pr(i);
     cout << nl;
@@ -126,13 +126,7 @@ inline void pr(const multiset<T> &s) {
 }
 
 template<typename T>
-inline void pr(const ordered_set &s) {
-    for (const auto &t: s)pr(t);
-    cout << nl;
-}
-
-template<typename T, typename H>
-inline void pr(const unordered_set<T, H> &s) {
+inline void pr(const unordered_set<T> &s) {
     for (const auto &t: s)pr(t);
     cout << nl;
 }
@@ -215,16 +209,73 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+template<typename T>
+inline vector<T> dijkstra(const vector<vector<pair<int, T>>> &adj, int s) {
+    int n = sz(adj);
+    vector<T> dist(n, numeric_limits<T>::max());
+    dist[s] = T();
+    set<pair<T, int>> pq;
+    pq.emplace(T(), s);
+//    vi p(n, -1);
+    while (!pq.empty()) {
+        auto [d, u] = *pq.begin();
+        pq.erase(pq.begin());
+        for (const auto &[v, w]: adj[u]) {
+            T next = d + w;
+            if (next < dist[v]) {
+                pq.erase({dist[v], v});
+                pq.emplace(dist[v] = next, v);
+//                p[v] = u;
+            }
+        }
     }
-    cout << lo;
+//    return p;
+    return dist;
+}
+
+inline void solve() {
+    int n, m;
+    cin >> n >> m;
+    vs a;
+    string s;
+    getline(cin, s);
+    rep(i, 0, n) {
+        getline(cin, s);
+        a.pb(s);
+    }
+    int cnt = 0;
+    vvi b(n, vi(m));
+    rep(i, 0, n)
+        rep(j, 0, m)
+            if (a[i][j] == ' ') {
+                if (i && a[i - 1][j] == ' ')b[i][j]++, cnt++;
+                if (i < n - 1 && a[i + 1][j] == ' ')b[i][j]++, cnt++;
+                if (j && a[i][j - 1] == ' ')b[i][j]++, cnt++;
+                if (j < m - 1 && a[i][j + 1] == ' ')b[i][j]++, cnt++;
+            }
+    vvpii adj(n * m);
+    int x1, y1, x2, y2;
+    rep(i, 0, n)
+        rep(j, 0, m) {
+            if (a[i][j] == ' ') {
+                if (i && (a[i - 1][j] == ' ' || a[i - 1][j] == 'D'))adj[i * m + j].eb((i - 1) * m + j, b[i - 1][j]);
+                if (i < n - 1 && (a[i + 1][j] == ' ' || a[i + 1][j] == 'D'))
+                    adj[i * m + j].eb((i + 1) * m + j, b[i + 1][j]);
+                if (j && (a[i][j - 1] == ' ' || a[i][j - 1] == 'D'))adj[i * m + j].eb(i * m + j - 1, b[i][j - 1]);
+                if (j < m - 1 && (a[i][j + 1] == ' ' || a[i][j + 1] == 'D'))
+                    adj[i * m + j].eb(i * m + j + 1, b[i][j + 1]);
+            } else if (a[i][j] == 'E') {
+                x1 = i, y1 = j;
+                if (i && (a[i - 1][j] == ' ' || a[i - 1][j] == 'D'))adj[i * m + j].eb((i - 1) * m + j, b[i - 1][j]);
+                if (i < n - 1 && (a[i + 1][j] == ' ' || a[i + 1][j] == 'D'))
+                    adj[i * m + j].eb((i + 1) * m + j, b[i + 1][j]);
+                if (j && (a[i][j - 1] == ' ' || a[i][j - 1] == 'D'))adj[i * m + j].eb(i * m + j - 1, b[i][j - 1]);
+                if (j < m - 1 && (a[i][j + 1] == ' ' || a[i][j + 1] == 'D'))
+                    adj[i * m + j].eb(i * m + j + 1, b[i][j + 1]);
+            } else if (a[i][j] == 'D')x2 = i, y2 = j;
+        }
+    double res = dijkstra(adj, x1 * m + y1)[x2 * m + y2];
+    cout << res / cnt;
 }
 
 int32_t main() {
@@ -234,6 +285,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

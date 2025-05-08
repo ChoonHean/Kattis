@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -79,6 +78,10 @@ inline bool chmax(T &a, T &b) {
         swap(a, b);
         return true;
     } else return false;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -216,15 +219,31 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    ll r, c, f, s, g, k, x, y, d, t;
+    cin >> r >> c >> f >> s >> g;
+    vector<vpll> cells(f);
+    rep(i, 0, f) {
+        cin >> k;
+        while (k--)cin >> x >> y, cells[i].eb(x, y);
     }
-    cout << lo;
+    vector<vector<pair<ll, pll>>> students(f);
+    rep(i, 0, s) {
+        cin >> x >> y >> d >> r;
+        students[r - 1].eb(d, pair(x, y));
+    }
+    vl a;
+    rep(i, 0, f) {
+        sort(all(cells[i]));
+        sort(all(students[i]));
+        vl cur;
+        rep(j, 0, sz(students[i]))cur.pb(abs(students[i][j].second.first - cells[i][j].first) +
+                                         abs(students[i][j].second.second - cells[i][j].second));
+        sort(all(cur));
+        cin >> t;
+        a.pb(accumulate(cur.begin(), cur.begin() + t, 0LL));
+    }
+    sort(all(a));
+    cout << accumulate(a.begin(), a.begin() + g, 0LL);
 }
 
 int32_t main() {

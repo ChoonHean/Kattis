@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-
+#include <cmath>
 
 using namespace std;
 using namespace __gnu_pbds;
@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,13 +216,29 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    const int N = 2.5e5 + 1;
+    vector<ld> res{DBL_MIN};
+    rep(i, 1, N)res.pb(res.back() + log(i));
+    string s;
+    cin >> s;
+    int n = sz(s);
+    if (n < 15) {
+        ll a = stoll(s), f = 1;
+        rep(i, 1, 20) {
+            f *= i;
+            if (f == a) {
+                cout << i;
+                return;
+            }
+        }
+    }
+    int lo = 1, hi = N;
+    while (lo < hi) {
+        int mid = lo + hi >> 1;
+        int cur = ceil(res[mid] / log(10));
+        if (cur == n)lo = hi = mid;
+        else if (cur < n)lo = mid + 1;
+        else hi = mid - 1;
     }
     cout << lo;
 }

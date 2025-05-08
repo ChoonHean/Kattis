@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +214,36 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n;
+    const int k = 6;
+    string s;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    vvi a(k);
+    rep(i, 0, n) {
+        cin >> s;
+        if (s[0] == 'B')a[0].pb(i);
+        else if (s[0] == 'O')a[1].pb(i);
+        else if (s[0] == 'P')a[2].pb(i);
+        else if (s[0] == 'G')a[3].pb(i);
+        else if (s[0] == 'R')a[4].pb(i);
+        else a[5].pb(i);
     }
-    cout << lo;
+    vi dp(n, inf);
+    dp.back() = 0;
+    repr(i, n - 2, 0) {
+        rep(j, 0, k) {
+            auto it = ub(all(a[j]), i);
+            if (it == a[j].end())continue;
+            dp[i] = min(dp[i], dp[*it] + 1);
+        }
+    }
+    int res = inf;
+    rep(j, 0, k) {
+        auto it = ub(all(a[j]), -1);
+        if (it == a[j].end())continue;
+        res = min(res, dp[*it] + 1);
+    }
+    cout << res;
 }
 
 int32_t main() {
@@ -234,6 +253,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -36,7 +34,6 @@ typedef vector<vpil> vvpil;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
-typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
@@ -44,7 +41,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -108,6 +105,9 @@ inline void pr(const tuple<Args...> &tup) {
 }
 
 template<typename T>
+void pr(const PQ<T, vector<T>, greater<>> &v);
+
+template<typename T>
 inline void pr(const vector<T> &v) {
     for (const auto &i: v) pr(i);
     cout << nl;
@@ -126,13 +126,7 @@ inline void pr(const multiset<T> &s) {
 }
 
 template<typename T>
-inline void pr(const ordered_set &s) {
-    for (const auto &t: s)pr(t);
-    cout << nl;
-}
-
-template<typename T, typename H>
-inline void pr(const unordered_set<T, H> &s) {
+inline void pr(const unordered_set<T> &s) {
     for (const auto &t: s)pr(t);
     cout << nl;
 }
@@ -215,16 +209,82 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+template<typename T>
+inline vector<T> dijkstra(const vector<vector<pair<int, T>>> &adj, int s) {
+    int n = sz(adj);
+    vector<T> dist(n, numeric_limits<T>::max());
+    dist[s] = T();
+    set<pair<T, int>> pq;
+    pq.emplace(T(), s);
+//    vi p(n, -1);
+    while (!pq.empty()) {
+        auto [d, u] = *pq.begin();
+        pq.erase(pq.begin());
+        for (const auto &[v, w]: adj[u]) {
+            T next = d + w;
+            if (next < dist[v]) {
+                pq.erase({dist[v], v});
+                pq.emplace(dist[v] = next, v);
+//                p[v] = u;
+            }
+        }
     }
-    cout << lo;
+//    return p;
+    return dist;
+}
+
+inline void solve() {
+    int n, m, u, v;
+    string s;
+    cin >> n >> m;
+    vvd adj(n, vd(n, inf));
+    vector<ti> a(n);
+    vvi p(n, vi(n));
+    readtup(a);
+    rep(i, 0, m) {
+        cin >> u >> v >> s;
+        if (s[0] == 'w' || s[0] == 's') {
+            const auto &[x, y, z] = a[u];
+            const auto &[b, c, d] = a[v];
+            adj[u][v] = min(adj[u][v], hypot(5 * (x - b), y - c, z - d));
+            adj[v][u] = min(adj[v][u], hypot(5 * (x - b), y - c, z - d));
+            p[u][v] = u;
+            p[v][u] = v;
+        } else if (s[0] == 'l') {
+            adj[u][v] = adj[v][u] = 1;
+            p[u][v] = u;
+            p[v][u] = v;
+        } else {
+            const auto &[x, y, z] = a[u];
+            const auto &[b, c, d] = a[v];
+            adj[u][v] = 1;
+            adj[v][u] = min(adj[v][u], hypot(5 * (x - b), y - c, z - d) * 3);
+            p[u][v] = u;
+            p[v][u] = v;
+        }
+    }
+    rep(i, 0, n)p[i][i] = i;
+    rep(k, 0, n)
+        rep(i, 0, n)
+            rep(j, 0, n) {
+                if (adj[i][k] + adj[k][j] < adj[i][j]) {
+                    adj[i][j] = adj[i][k] + adj[k][j];
+                    p[i][j] = p[k][j];
+                }
+            }
+    int q;
+    cin >> q;
+    while (q--) {
+        cin >> u >> v;
+        vi res;
+        while (v != u) {
+            res.pb(v);
+            v = p[u][v];
+        }
+        pr(u);
+        reverse(all(res));
+        pr(res);
+    }
 }
 
 int32_t main() {
@@ -234,6 +294,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

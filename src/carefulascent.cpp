@@ -216,15 +216,14 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int x, n, l, u;
+    double y, f;
+    cin >> x >> y >> n;
+    rep(i, 0, n) {
+        cin >> l >> u >> f;
+        y += (f - 1) * (u - l);
     }
-    cout << lo;
+    cout << x / y;
 }
 
 int32_t main() {

@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,20 +22,13 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
-typedef vector<pid> vpid;
-typedef vector<vpid> vvpid;
 typedef pair<string, int> psi;
-typedef pair<int, ll> pil;
-typedef vector<pil> vpil;
-typedef vector<vpil> vvpil;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
-typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
@@ -44,7 +36,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -108,6 +100,9 @@ inline void pr(const tuple<Args...> &tup) {
 }
 
 template<typename T>
+void pr(const PQ<T, vector<T>, greater<>> &v);
+
+template<typename T>
 inline void pr(const vector<T> &v) {
     for (const auto &i: v) pr(i);
     cout << nl;
@@ -126,13 +121,7 @@ inline void pr(const multiset<T> &s) {
 }
 
 template<typename T>
-inline void pr(const ordered_set &s) {
-    for (const auto &t: s)pr(t);
-    cout << nl;
-}
-
-template<typename T, typename H>
-inline void pr(const unordered_set<T, H> &s) {
+inline void pr(const unordered_set<T> &s) {
     for (const auto &t: s)pr(t);
     cout << nl;
 }
@@ -215,16 +204,51 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+template<typename T, typename U>
+inline vector<int> dijkstra(const vector<vector<pair<T, U>>> &adj, int s) {
+    int n = sz(adj);
+    vector<U> dist(adj.size(), is_same<U, ll>() ? llinf : inf);
+    dist[s] = 0;
+    set<pair<U, int>> pq;
+    pq.emplace(0, s);
+    vi p(n, -1);
+    while (!pq.empty()) {
+        auto [d, u] = *pq.begin();
+        pq.erase(pq.begin());
+        for (const auto &[v, w]: adj[u]) {
+            U next = d + w;
+            if (next < dist[v]) {
+                pq.erase({dist[v], v});
+                pq.emplace(dist[v] = next, v);
+                p[v] = u;
+            }
+        }
     }
-    cout << lo;
+    return p;
+//    return dist;
+}
+
+inline void solve() {
+    int n, x, y;
+    cin >> n;
+    n += 2;
+    vector<vector<pair<int, ll>>> adj(n);
+    vpii a;
+    auto d = [](int a, int b) { return a * a + b * b; };
+    rep(i, 0, n) {
+        cin >> x >> y;
+        a.eb(x, y);
+        rep(j, 0, i)adj[j].eb(i, d(x - a[j].first, y - a[j].second)), adj[i].eb(j, adj[j].back().second);
+    }
+    vi p = dijkstra(adj, n - 2);
+    vi res;
+    int cur = p[n - 1];
+    while (cur != n - 2) {
+        res.pb(cur);
+        cur = p[cur];
+    }
+    if (sz(res))reverse(all(res)), pr(res);
+    else cout << '-';
 }
 
 int32_t main() {
@@ -234,6 +258,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

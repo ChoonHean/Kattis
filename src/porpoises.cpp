@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -215,16 +218,38 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+inline vvl matmul(int n, vvl &a, vvl &b, int m) {
+    vvl res(n, vl(n));
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int k = 0; k < n; k++) {
+                res[i][j] = (res[i][j] + a[i][k] * b[k][j]) % m;
+            }
+        }
     }
-    cout << lo;
+    return res;
+}
+
+inline vvl matpow(int n, vvl &a, ll p, int m) {
+    vvl res(n, vl(n));
+    for (int i = 0; i < n; i++)res[i][i] = 1;
+    vvl b(a);
+    while (p) {
+        if (p & 1)res = matmul(n, res, b, m);
+        b = matmul(n, b, b, m);
+        p >>= 1;
+    }
+    return res;
+}
+
+inline void solve() {
+    int k;
+    ll n;
+    cin >> k >> n;
+    vvl a{{1, 1},
+          {1, 0}};
+    vvl res = matpow(2, a, n - 1, inf);
+    pr(k, res[0][0]);
 }
 
 int32_t main() {
@@ -233,7 +258,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--)solve();
     return 0;
 }

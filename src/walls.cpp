@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,24 +216,54 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int l, w, n, r, x, y;
+    cin >> l >> w >> n >> r;
+    vb a(n), b(n), c(n), d(n);
+    rep(i, 0, n) {
+        cin >> x >> y;
+        if (hypot(x - l / 2.0, y) <= r)a[i] = 1;
+        if (hypot(x + l / 2.0, y) <= r)b[i] = 1;
+        if (hypot(x, y - w / 2.0) <= r)c[i] = 1;
+        if (hypot(x, y + w / 2.0) <= r)d[i] = 1;
     }
-    cout << lo;
+    rep(i, 0, n)
+        if (a[i] && b[i] && c[i] && d[i]) {
+            cout << 1;
+            return;
+        }
+    rep(i, 0, n)
+        rep(j, i + 1, n)
+            if ((a[i] || a[j]) && (b[i] || b[j]) && (c[i] || c[j]) && (d[i] || d[j])) {
+                cout << 2;
+                return;
+            }
+    rep(i, 0, n)
+        rep(j, i + 1, n)
+            rep(k, j + 1, n)
+                if ((a[i] || a[j] || a[k]) && (b[i] || b[j] || b[k]) && (c[i] || c[j] || c[k]) &&
+                    (d[i] || d[j] || d[k])) {
+                    cout << 3;
+                    return;
+                }
+    rep(i, 0, n)
+        rep(j, i + 1, n)
+            rep(k, j + 1, n)
+                rep(l, k + 1, n)
+                    if ((a[i] || a[j] || a[k] || a[l]) && (b[i] || b[j] || b[k] || b[l]) &&
+                        (c[i] || c[j] || c[k] || c[l]) && (d[i] || d[j] || d[k] || d[l])) {
+                        cout << 4;
+                        return;
+                    }
+    cout << "Impossible";
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

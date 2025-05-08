@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -191,6 +194,18 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
+template<typename T>
+inline void pr(const PQ<T> &pq1) {
+    auto copy(pq1);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
 template<typename T, typename C>
 inline void pr(const PQ<T, vector<T>, C> &pq1) {
     auto copy(pq1);
@@ -216,15 +231,42 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    string s;
+    vpii a(n);
+    rep(i, 0, n) {
+        cin >> s;
+        if (s[0] == 'A')a[i].first = 12;
+        else if (s[0] == 'K')a[i].first = 11;
+        else if (s[0] == 'Q')a[i].first = 10;
+        else if (s[0] == 'J')a[i].first = 9;
+        else if (s[0] == 'T')a[i].first = 8;
+        else a[i].first = s[0] - '0' - 2;
+        if (s[1] == 'c')a[i].second = 0;
+        else if (s[1] == 'd')a[i].second = 1;
+        else if (s[1] == 'h')a[i].second = 2;
+        else a[i].second = 3;
     }
-    cout << lo;
+    int res = n;
+    rep(i, 0, 1 << 4) {
+        vi p{0, 1, 2, 3};
+        do {
+            vi c;
+            for (const auto &[x, y]: a) {
+                if ((i >> y) & 1)c.pb(p[y] * 13 + x);
+                else c.pb(p[y] * 13 + 12 - x);
+            }
+            vi lis;
+            for (const int &x: c) {
+                auto it = lower_bound(all(lis), x);
+                if (it == lis.end())lis.eb(x);
+                else *it = x;
+            }
+            res = min(res, n - sz(lis));
+        } while (next_permutation(all(p)));
+    }
+    cout << res;
 }
 
 int32_t main() {

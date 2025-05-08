@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +215,26 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    read(n);
+    if (n == 1) {
+        pnl("arithmetic");
+        return;
     }
-    cout << lo;
+    bool ok = 1;
+    int d = a[1] - a[0];
+    rep(i, 2, n)if (a[i] - a[i - 1] != d)ok = 0;
+    if (ok) {
+        pnl("arithmetic");
+        return;
+    }
+    sort(all(a));
+    d = a[1] - a[0];
+    ok = 1;
+    rep(i, 2, n)if (a[i] - a[i - 1] != d)ok = 0;
+    if (ok)pnl("permuted arithmetic");
+    else pnl("non-arithmetic");
 }
 
 int32_t main() {
@@ -233,7 +243,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--)solve();
     return 0;
 }

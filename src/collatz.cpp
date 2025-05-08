@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +215,27 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, m;
+    while (cin >> n >> m) {
+        if (!n)break;
+        vl a, b;
+        ll x = n;
+        rep(_, 0, 2) {
+            while (x != 1) {
+                a.pb(x);
+                if (x & 1)x = 3 * x + 1;
+                else x >>= 1;
+            }
+            x = m;
+            swap(a, b);
+        }
+        a.pb(1);
+        b.pb(1);
+        int i = 1;
+        while (i <= sz(a) && i <= sz(b) && a[sz(a) - i] == b[(sz(b) - i)])i++;
+        i--;
+        printf("%d needs %d steps, %d needs %d steps, they meet at %lld\n", n, sz(a) - i, m, sz(b) - i, a[sz(a) - i]);
     }
-    cout << lo;
 }
 
 int32_t main() {

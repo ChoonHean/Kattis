@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +214,26 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int f, s, g, u, d;
+    cin >> f >> s >> g >> u >> d;
+    vb vis(f + 1, false);
+    queue<int> q({s});
+    int cur = 0;
+    while (!q.empty()) {
+        int size = sz(q);
+        while (size--) {
+            int i = q.front();
+            q.pop();
+            if (i == g) {
+                cout << cur;
+                return;
+            }
+            if (i + u <= g && !vis[i + u])vis[i + u] = 1, q.push(i + u);
+            if (i - d >= 1 && !vis[i - d])vis[i - d] = 1, q.push(i - d);
+        }
+        cur++;
     }
-    cout << lo;
+    cout << "use the stairs";
 }
 
 int32_t main() {
@@ -234,6 +243,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

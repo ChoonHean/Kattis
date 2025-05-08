@@ -216,22 +216,27 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    read(n);
+    ll res = 0;
+    repr(i, n - 2, 0) {
+        if (a[i + 1] == 0) {
+            cout << 1;
+            return;
+        }
+        if (a[i] < a[i + 1])continue;
+        res += a[i] - (a[i + 1] - 1);
+        a[i] = a[i + 1] - 1;
     }
-    cout << lo;
+    cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(0);
     int cases = 1;
 //    cin >> cases;
     while (cases--)solve();

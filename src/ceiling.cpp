@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +215,42 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, k;
+    cin >> n >> k;
+    struct node {
+        node *l, *r;
+        int x;
+
+        node(int _x) : x(_x), l(nullptr), r(nullptr) {}
+
+        void ins(node *n) {
+            if (n->x < x) {
+                if (l == nullptr)l = n;
+                else l->ins(n);
+            } else {
+                if (r == nullptr)r = n;
+                else r->ins(n);
+            }
+        }
+    };
+    set<vi> res;
+    rep(_, 0, n) {
+        read(k);
+        vi b(a);
+        sort(all(b));
+        rep(i, 0, k)a[i] = lb(all(b), a[i]) - b.begin();
+        node *root = new node(a[0]);
+        rep(i, 1, k)root->ins(new node(a[i]));
+        vi cur;
+        auto inord = [&](auto &self, node *n) -> void {
+            cur.pb(n->x);
+            if (n->l)self(self, n->l);
+            if (n->r)self(self, n->r);
+        };
+        inord(inord, root);
+        res.insert(cur);
     }
-    cout << lo;
+    cout << sz(res);
 }
 
 int32_t main() {

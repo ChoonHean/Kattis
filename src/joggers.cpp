@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -191,6 +194,18 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
+template<typename T>
+inline void pr(const PQ<T> &pq1) {
+    auto copy(pq1);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
 template<typename T, typename C>
 inline void pr(const PQ<T, vector<T>, C> &pq1) {
     auto copy(pq1);
@@ -216,15 +231,38 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, s, u, v, w, l;
+    cin >> n >> s;
+    vvpii adj(n);
+    rep(i, 1, n) {
+        cin >> u >> v >> w;
+        adj[--u].eb(--v, w);
+        adj[v].eb(u, w);
     }
-    cout << lo;
+    cin >> l;
+    vb lamp(n);
+    rep(i, 0, l)cin >> u, lamp[u - 1] = 1;
+    vvi dp(n, vi(2));
+    auto f = [&](auto &self, int i, int p, int d) -> void {
+        if (d << 1 >= s) {
+            dp[i][1] = 1 - lamp[i];
+            return;
+        }
+        for (const auto &[j, w]: adj[i]) {
+            if (j == p)continue;
+            self(self, j, i, d + w);
+        }
+        int a = 0, b = 1 - lamp[i];
+        for (const auto &[j, w]: adj[i]) {
+            if (j == p)continue;
+            a += dp[j][1];
+            b += min(dp[j][0], dp[j][1]);
+        }
+        dp[i][0] = a;
+        dp[i][1] = b;
+    };
+    f(f, 0, -1, 0);
+    cout << min(dp[0][0], dp[0][1]);
 }
 
 int32_t main() {

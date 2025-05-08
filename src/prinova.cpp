@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,24 +216,57 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n, l, r;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    read(n);
+    cin >> l >> r;
+    sort(all(a));
+    int res = 0, mx = -1;
+    if (l & 1) {
+        int mn = inf;
+        rep(i, 0, n)mn = min(mn, abs(a[i] - l));
+        mx = mn;
+        res = l;
+    } else {
+        int mn = inf;
+        rep(i, 0, n)mn = min(mn, abs(a[i] - l - 1));
+        mx = mn;
+        res = l + 1;
     }
-    cout << lo;
+    if (r & 1) {
+        int mn = inf;
+        rep(i, 0, n)mn = min(mn, abs(a[i] - r));
+        if (mn > mx)mx = mn, res = r;
+    } else {
+        int mn = inf;
+        rep(i, 0, n)mn = min(mn, abs(a[i] - r + 1));
+        if (mn > mx)mx = mn, res = r - 1;
+    }
+    rep(i, 1, n) {
+        if (a[i] + a[i - 1] >> 1 & 1) {
+            int j = a[i] + a[i - 1] >> 1;
+            if (j < l || j > r)continue;
+            if (a[i] - j > mx)mx = a[i] - j, res = j;
+        } else {
+            int j = (a[i] + a[i - 1] >> 1) - 1;
+            if (l <= j && j <= r) {
+                if (j - a[i - 1] > mx)mx = l - a[i - 1], res = j;
+            }
+            j += 2;
+            if (j < l || j > r)continue;
+            if (a[i] - j > mx)mx = a[i] - j, res = j;
+        }
+    }
+    cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

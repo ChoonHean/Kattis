@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -215,16 +218,49 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+inline vi toposort(const vector<vector<pair<int, pii>>> &adj, vi &deg) {
+    int n = sz(deg);
+    vi res;
+    queue<int> q;
+    rep(i, 0, n)if (!deg[i])q.push(i);
+    while (!q.empty()) {
+        res.pb(q.front());
+        for (const auto &[j, _]: adj[q.front()])if (!--deg[j])q.push(j);
+        q.pop();
     }
-    cout << lo;
+    return res;
+}
+
+inline void solve() {
+    int n, q, u, v, w1, w2;
+    string s;
+    hmap<string, int> mp;
+    cin >> n;
+    vector<vector<pair<int, pii>>> adj;
+    vi deg;
+    vs a;
+    rep(i, 0, n) {
+        cin >> s >> w1 >> s >> q;
+        if (mp.contains(s))u = mp[s];
+        else u = mp[s] = sz(mp), adj.eb(), deg.eb(), a.pb(s);
+        while (q--) {
+            cin >> w2 >> s;
+            if (mp.contains(s))v = mp[s];
+            else v = mp[s] = sz(mp), adj.eb(), deg.eb(), a.pb(s);
+            adj[u].eb(v, pair(w1, w2));
+            deg[v]++;
+        }
+    }
+    cin >> s >> q;
+    n = sz(mp);
+    vi dp(n), ord = toposort(adj, deg);
+    while (q--) {
+        cin >> w1 >> s;
+        if (mp.contains(s))dp[mp[s]] += w1;
+        else pr(w1, s);
+    }
+    for (const int &i: ord)for (const auto &[j, p]: adj[i])dp[j] += ceildiv(dp[i], p.first) * p.second;
+    rep(i, 0, n)if (adj[i].empty() && dp[i])pr(dp[i], a[i]);
 }
 
 int32_t main() {

@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -215,16 +218,74 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+int solveLinear(vector<vd> &A, vd &b, vd &x) {
+    int n = sz(A), m = sz(x), rank = 0, br, bc;
+    if (n) assert(sz(A[0]) == m);
+    vi col(m);
+    iota(all(col), 0);
+
+    rep(i, 0, n) {
+        double v, bv = 0;
+        rep(r, i, n) rep(c, i, m)if ((v = fabs(A[r][c])) > bv)
+                    br = r, bc = c, bv = v;
+        if (bv <= eps) {
+            rep(j, i, n) if (fabs(b[j]) > eps) return -1;
+            break;
+        }
+        swap(A[i], A[br]);
+        swap(b[i], b[br]);
+        swap(col[i], col[bc]);
+        rep(j, 0, n) swap(A[j][i], A[j][bc]);
+        bv = 1 / A[i][i];
+        rep(j, i + 1, n) {
+            double fac = A[j][i] * bv;
+            b[j] -= fac * b[i];
+            rep(k, i + 1, m) A[j][k] -= fac * A[i][k];
+        }
+        rank++;
     }
-    cout << lo;
+
+    x.assign(m, 0);
+    for (int i = rank; i--;) {
+        b[i] /= A[i][i];
+        x[col[i]] = b[i];
+        rep(j, 0, i) b[j] -= A[j][i] * b[i];
+    }
+    return rank; // (multiple solutions if rank < m)
+}
+
+inline void solve() {
+    int n, m;
+    cin >> n >> m;
+    vs a(n);
+    reada(a);
+    const int N = n * m;
+    vvd A(N, vd(N));
+    vd b(N);
+    rep(i, 0, n)
+        rep(j, 0, m) {
+            if (a[i][j] == '.') {
+                int c = 1;
+                if (i && a[i - 1][j] != '#')c++;
+                if (i < n - 1 && a[i + 1][j] != '#')c++;
+                if (j && a[i][j - 1] != '#')c++;
+                if (j < m - 1 && a[i][j + 1] != '#')c++;
+                if (i && a[i - 1][j] != '#')A[i * m + j][(i - 1) * m + j] -= 1.0 / c;
+                if (i < n - 1 && a[i + 1][j] != '#')A[i * m + j][(i + 1) * m + j] -= 1.0 / c;
+                if (j && a[i][j - 1] != '#')A[i * m + j][i * m + j - 1] -= 1.0 / c;
+                if (j < m - 1 && a[i][j + 1] != '#')A[i * m + j][i * m + j + 1] -= 1.0 / c;
+                A[i * m + j][i * m + j] = 1 - 1.0 / c;
+                b[i * m + j] = 1;
+            } else if (a[i][j] == 'O') {
+                A[i * m + j][i * m + j] = 1;
+            }
+        }
+    vd x(N);
+    solveLinear(A, b, x);
+    int cnt = 0;
+    double res = 0;
+    rep(i, 0, n)rep(j, 0, m)if (a[i][j] == '.')res += x[i * m + j], cnt++;
+    cout << res / cnt;
 }
 
 int32_t main() {

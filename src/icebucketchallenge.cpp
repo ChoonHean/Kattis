@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -216,15 +219,43 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, m, d, x, y;
+    cin >> n >> m >> d >> x >> y;
+    vvi a(n, vi(m));
+    read2d(a);
+    vvi res(n, vi(m));
+    vector<queue<pii>> qs(21);
+    x--;
+    y--;
+    qs[a[x][y]].emplace(x, y);
+    res[x][y] = d;
+    auto enq = [&](int c, int x, int y, int i, int j) {
+        if (x >= 0 && x < n && y >= 0 && y < m) {
+            if (a[x][y] == a[i][j]) {
+                if (c - 1 > res[x][y]) {
+                    res[x][y] = c - 1;
+                    qs[a[x][y]].emplace(x, y);
+                }
+            } else if (a[x][y] < a[i][j]) {
+                if (d > res[x][y] && c > 1) {
+                    res[x][y] = d;
+                    qs[a[x][y]].emplace(x, y);
+                }
+            }
+        }
+    };
+    repr(k, 20, 0) {
+        auto &q = qs[k];
+        while (!q.empty()) {
+            auto [i, j] = q.front();
+            q.pop();
+            enq(res[i][j], i - 1, j, i, j);
+            enq(res[i][j], i + 1, j, i, j);
+            enq(res[i][j], i, j - 1, i, j);
+            enq(res[i][j], i, j + 1, i, j);
+        }
     }
-    cout << lo;
+    pr(res);
 }
 
 int32_t main() {

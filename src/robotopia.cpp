@@ -216,24 +216,27 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int l1, a1, l2, a2, lt, at;
+    cin >> l1 >> a1 >> l2 >> a2 >> lt >> at;
+    vpii res;
+    rep(i, 0, lt + 1) {
+        int leg = lt - i * l1;
+        if (leg < 0)break;
+        if (leg % l2)continue;
+        int j = leg / l2;
+        if (i * a1 + j * a2 == at && i > 0 && j > 0)res.eb(i, j);
     }
-    cout << lo;
+    if (sz(res) == 1)pr(res[0].first, res[0].second);
+    else pnl('?');
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(0);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--)solve();
     return 0;
 }

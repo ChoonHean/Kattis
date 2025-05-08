@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +214,67 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int e, f, n, m;
+    cin >> e >> f >> n >> m;
+    vs a(n);
+    reada(a);
+    vpii b;
+    int x1, y1, x2, y2;
+    rep(i, 0, n)
+        rep(j, 0, m) {
+            if (a[i][j] == 'S')x1 = i, y1 = j;
+            else if (a[i][j] == 'G')x2 = i, y2 = j, b.eb(i, j);
+            else if (a[i][j] == 'W')b.eb(i, j);
+        }
+    vvb vis(n, vb(m));
+    int r1 = 0, r2 = 0;
+    queue<pii> q({{x1, y1}});
+    while (!q.empty()) {
+        int size = sz(q);
+        while (size-- && !q.empty()) {
+            auto [x, y] = q.front();
+            q.pop();
+            for (const auto &[i, j]: b) {
+                if (vis[i][j])continue;
+                if (hypot(i - x, j - y) > e)continue;
+                vis[i][j] = 1;
+                if (i == x2 && j == y2) {
+                    while (!q.empty())q.pop();
+                    break;
+                }
+                q.emplace(i, j);
+            }
+        }
+        r1++;
     }
-    cout << lo;
+    bool reach = vis[x2][y2];
+    vis.assign(n, vb(m, 0));
+    q.push({x1, y1});
+    while (!q.empty()) {
+        int size = sz(q);
+        while (size-- && !q.empty()) {
+            auto [x, y] = q.front();
+            q.pop();
+            for (const auto &[i, j]: b) {
+                if (vis[i][j])continue;
+                if (x != i && y != j)continue;
+                if (abs(i - x) + abs(j - y) > f)continue;
+                vis[i][j] = 1;
+                if (i == x2 && j == y2) {
+                    while (!q.empty())q.pop();
+                    break;
+                }
+                q.emplace(i, j);
+            }
+        }
+        r2++;
+    }
+    if (!reach)r1 = inf;
+    if (!vis[x2][y2])r2 = inf;
+    if (!reach && !vis[x2][y2])cout << "NO WAY";
+    else if (r1 == r2)cout << "SUCCESS";
+    else if (r1 < r2)cout << "GO FOR IT";
+    else cout << "NO CHANCE";
 }
 
 int32_t main() {
@@ -234,6 +284,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

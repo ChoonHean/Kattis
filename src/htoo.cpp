@@ -216,15 +216,39 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    string s, t;
+    int k;
+    cin >> s >> k >> t;
+    vl cnt(26);
+    int prev = 0;
+    int n = sz(s);
+    rep(i, 1, n) {
+        if (isalpha(s[i])) {
+            if (prev == i - 1)cnt[s[prev] - 'A']++;
+            else cnt[s[prev] - 'A'] += stoll(s.substr(prev + 1, i - prev - 1));
+            prev = i;
+        }
     }
-    cout << lo;
+    if (prev == n - 1)cnt[s.back() - 'A']++;
+    else cnt[s[prev] - 'A'] += stoll(s.substr(prev + 1, n - prev - 1));
+    vl need(26);
+    prev = 0;
+    int m = sz(t);
+    rep(i, 1, m) {
+        if (isalpha(t[i])) {
+            if (prev == i - 1)need[t[prev] - 'A']++;
+            else need[t[prev] - 'A'] += stoll(t.substr(prev + 1, i - prev - 1));
+            prev = i;
+        }
+    }
+    if (prev == m - 1)need[t.back() - 'A']++;
+    else need[t[prev] - 'A'] += stoll(t.substr(prev + 1, m - prev - 1));
+    ll res = LLONG_MAX;
+    rep(i, 0, 26) {
+        if (need[i] == 0)continue;
+        res = min(res, cnt[i] * k / need[i]);
+    }
+    cout << res;
 }
 
 int32_t main() {

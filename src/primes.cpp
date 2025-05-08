@@ -216,15 +216,36 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n;
+    ll x, y;
+    while (cin >> n) {
+        if (!n)break;
+        read(n);
+        cin >> x >> y;
+        vector<hset<int>> dp(n);
+        auto f = [&](auto &self, int i, ll x) -> void {
+            if (i == n)return;
+            if (x > y)return;
+            if (!dp[i].insert(x).second)return;
+            self(self, i, x * a[i]);
+            self(self, i + 1, x);
+        };
+        f(f, 0, 1);
+        vl res;
+        for (const auto &h: dp)for (const int &i: h)res.pb(i);
+        sort(all(res));
+        auto end = unique(all(res));
+        auto start = lb(res.begin(), end, x);
+        end = ub(start, end, y);
+        if (end <= start)pnl("none");
+        else {
+            cout << *start++;
+            while (start != end) {
+                cout << ',' << *start++;
+            }
+            cout << nl;
+        }
     }
-    cout << lo;
 }
 
 int32_t main() {

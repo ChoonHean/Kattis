@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -191,6 +194,18 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
+template<typename T>
+inline void pr(const PQ<T> &pq1) {
+    auto copy(pq1);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
 template<typename T, typename C>
 inline void pr(const PQ<T, vector<T>, C> &pq1) {
     auto copy(pq1);
@@ -215,23 +230,85 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+struct H {
+    ull x;
+
+    H(ull x = 0) : x(x) {}
+
+    H operator+(H o) { return x + o.x + (x + o.x < x); }
+
+    H operator-(H o) { return *this + ~o.x; }
+
+    H operator*(H o) {
+        auto m = (__uint128_t) x * o.x;
+        return H((ull) m) + (ull) (m >> 64);
     }
-    cout << lo;
+
+    ull get() const { return x + !~x; }
+
+    bool operator==(H o) const { return get() == o.get(); }
+
+    bool operator<(H o) const { return get() < o.get(); }
+
+    friend ostream &operator<<(ostream &os, const H &h) {
+        return os << h.get();
+    }
+};
+
+static const H C = (ll) 1e11 + 3;
+
+struct Hash {
+    size_t operator()(const vi &v) const {
+        H h{};
+        for (const int &i: v)h = h * C + i;
+        return h.get();
+    }
+};
+
+inline void solve() {
+    int w, l, n;
+    cin >> w >> l >> n;
+    int l2 = l << 1;
+    hset<vi, Hash> h;
+    int res = n;
+    rep(i, 0, n) {
+        read(l2);
+        vi b;
+        rep(j, 0, l)b.pb(w - a[j] - a[j + l]);
+        int mn = *min_element(a.begin(), a.begin() + l);
+        rep(j, 0, l)b.pb(a[j] - mn);
+        if (h.contains(b)) {
+            res--;
+            continue;
+        }
+        reverse(b.begin(), b.begin() + l);
+        reverse(b.begin() + l, b.end());
+        if (h.contains(b)) {
+            res--;
+            continue;
+        }
+        mn = *min_element(a.begin() + l, a.end());
+        rep(j, 0, l)b[l2 - 1 - j] = a[j + l] - mn;
+        if (h.contains(b)) {
+            res--;
+            continue;
+        }
+        reverse(b.begin(), b.begin() + l);
+        reverse(b.begin() + l, b.end());
+        if (h.contains(b)) {
+            res--;
+            continue;
+        }
+        h.insert(b);
+    }
+    cout << res;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(1);
     int cases = 1;
 //    cin >> cases;
     while (cases--)solve();

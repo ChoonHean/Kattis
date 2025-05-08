@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-
+#include <cmath>
 
 using namespace std;
 using namespace __gnu_pbds;
@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +215,35 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+
+const int N = 2e4;
+bitset<N + 1> prime;
+vi primes{0};
+
+void sieve() {
+    prime.set();
+    for (ll i = 2; i <= N; i++) {
+        if (prime[i]) {
+            for (ll j = i * i; j <= N; j += i) prime[j] = 0;
+            primes.pb(i);
+        }
     }
-    cout << lo;
+}
+
+inline void solve() {
+    int n;
+    double d;
+    cin >> n >> d;
+    vpii a(n);
+    readpair(a);
+    int res = 1;
+    d -= hypot(a[0].first, a[0].second);
+    rep(i, 1, n) {
+        d -= hypot(a[i].first - a[i - 1].first, a[i].second - a[i - 1].second);
+        if (d < 0)break;
+        res++;
+    }
+    pnl(*--ub(all(primes), res));
 }
 
 int32_t main() {
@@ -233,7 +252,8 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    sieve();
+    cin >> cases;
     while (cases--)solve();
     return 0;
 }

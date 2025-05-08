@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,24 +215,36 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n, x, y;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    vpll st{{0, 0}};
+    ll res = 0;
+    rep(i, 0, n) {
+        cin >> x >> y;
+        ll last = st.back().second;
+        while (st.back().first > x) {
+            ll h = st.back().first;
+            st.pop_back();
+            res = max(res, h * (last - st.back().second));
+        }
+        st.eb(x, last + y);
     }
-    cout << lo;
+    ll last = st.back().second;
+    while (sz(st) > 1) {
+        ll h = st.back().first;
+        st.pop_back();
+        res = max(res, h * (last - st.back().second));
+    }
+    cout << res * 50;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

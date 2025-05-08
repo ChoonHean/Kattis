@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
-
+#include <cmath>
 
 using namespace std;
 using namespace __gnu_pbds;
@@ -39,12 +39,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +215,40 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+const int N = 31624;
+vl primes;
+vi minPrimeFac(N + 1);
+
+
+void linSieve() {
+    for (int i = 2; i <= N; i++) {
+        if (minPrimeFac[i] == 0) {
+            minPrimeFac[i] = i;
+            primes.pb(i);
+        }
+        for (int j = 0; i * primes[j] <= N; j++) {
+            minPrimeFac[i * primes[j]] = primes[j];
+            if (primes[j] == minPrimeFac[i])break;
+        }
     }
-    cout << lo;
+}
+
+hmap<int, int> primeFactors(ll n) {
+    hmap<int, int> factors;
+    for (ll div: primes) {
+        while (n % div == 0)n /= div, factors[div]++;
+        if (div * div > n)break;
+    }
+    if (n != 1)factors[n]++;
+    return factors;
+}
+
+inline void solve() {
+    linSieve();
+    int n;
+    cin >> n;
+    hmap<int, int> mp = primeFactors(n);
+    cout << (sz(mp) == 1 ? "yes" : "no");
 }
 
 int32_t main() {

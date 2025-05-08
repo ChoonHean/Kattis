@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,24 +216,30 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
-    }
-    cout << lo;
+    const int n = 12;
+    vs a(n);
+    reada(a);
+    auto f = [](string a, string b, string c) {
+        rep(i, 0, 4) {
+            if (a[i] == b[i] && a[i] == c[i] && a[i])continue;
+            if (a[i] != b[i] && b[i] != c[i] && a[i] != c[i])continue;
+            return false;
+        }
+        return true;
+    };
+    vti res;
+    rep(i, 0, n)rep(j, i + 1, n)rep(k, j + 1, n)if (f(a[i], a[j], a[k]))res.eb(i, j, k);
+    if (sz(res))for (const auto &[x, y, z]: res)pr(x + 1, y + 1, z + 1);
+    else cout << "no sets";
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

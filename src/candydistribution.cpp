@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -215,16 +218,36 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+inline int euclid(int a, int b, int &x, int &y) { // pass x and y by ref
+    int xx = y = 0;
+    int yy = x = 1;
+    while (b) {                                    // repeats until b == 0
+        int q = a / b;
+        tie(a, b) = tuple(b, a % b);
+        tie(x, xx) = tuple(xx, x - q * xx);
+        tie(y, yy) = tuple(yy, y - q * yy);
     }
-    cout << lo;
+    return a; // returns gcd(a, b)
+}
+
+inline void solve() {
+    int k, c, x, y;
+    cin >> k >> c;
+    if (c == 1) {
+        cout << k + 1 << nl;
+        return;
+    }
+    if (k == 1) {
+        cout << 1 << nl;
+        return;
+    }
+    int g = euclid(k, c, x, y);
+    if (g != 1) {
+        cout << "IMPOSSIBLE" << nl;
+        return;
+    }
+    while (y < 0)y += k;
+    cout << y % k << nl;
 }
 
 int32_t main() {
@@ -233,7 +256,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--)solve();
     return 0;
 }

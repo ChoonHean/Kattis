@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -191,6 +194,18 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
+template<typename T>
+inline void pr(const PQ<T> &pq1) {
+    auto copy(pq1);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
 template<typename T, typename C>
 inline void pr(const PQ<T, vector<T>, C> &pq1) {
     auto copy(pq1);
@@ -215,25 +230,74 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+const int N = 1e6 + 1;
+vl primes;
+vi minPrimeFac(N + 1);
+
+void linSieve() {
+    for (int i = 2; i <= N; i++) {
+        if (minPrimeFac[i] == 0) {
+            minPrimeFac[i] = i;
+            primes.pb(i);
+        }
+        for (int j = 0; i * primes[j] <= N; j++) {
+            minPrimeFac[i * primes[j]] = primes[j];
+            if (primes[j] == minPrimeFac[i])break;
+        }
     }
-    cout << lo;
+}
+
+struct UFDS {
+    vi p;
+    int sets;
+
+    UFDS(int n) {
+        p.resize(n);
+        sets = n;
+        iota(p.begin(), p.end(), 0);
+    }
+
+    int find(int n) {
+        if (n == p[n])return n;
+        return p[n] = find(p[n]);
+    }
+
+    inline bool sameset(int x, int y) { return find(x) == find(y); }
+
+    inline void unionset(int x, int y) {
+        x = find(x);
+        y = find(y);
+        if (x == y)return;
+        sets--;
+        p[y] = x;
+    }
+};
+
+int tc = 1;
+
+inline void solve() {
+    ll a, b, p;
+    cin >> a >> b >> p;
+    UFDS uf(b - a + 1);
+    for (int i = lb(all(primes), p) - primes.begin(); i < sz(primes); i++) {
+        for (ll j = ceildiv(a, primes[i]) * primes[i];;) {
+            ll k = j + primes[i];
+            if (k > b)break;
+            uf.unionset(j - a, k - a);
+            j = k;
+        }
+    }
+    printf("Case #%d: %d\n", tc++, uf.sets);
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(1);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
+    linSieve();
     while (cases--)solve();
     return 0;
 }

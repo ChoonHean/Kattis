@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +213,50 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+template<typename T>
+inline vector<T> dijkstra(const vector<vector<pair<int, T>>> &adj, int s, int t) {
+    int n = sz(adj);
+    vector<T> dist(n, numeric_limits<T>::max());
+    dist[s] = T();
+    set<pair<T, int>> pq;
+    pq.emplace(T(), s);
+//    vi p(n, -1);
+    while (!pq.empty()) {
+        auto [d, u] = *pq.begin();
+        if (u == t) break;
+        pq.erase(pq.begin());
+        for (const auto &[v, w]: adj[u]) {
+            T next = d + w;
+            if (next < dist[v]) {
+                pq.erase({dist[v], v});
+                pq.emplace(dist[v] = next, v);
+//                p[v] = u;
+            }
+        }
     }
-    cout << lo;
+//    return p;
+    return dist;
+}
+
+inline void solve() {
+    int n, m;
+    cin >> n >> m;
+    vs a(n);
+    reada(a);
+    vvpii adj(n * m);
+    const vi dx{-1, -1, 0, 1, 1, 1, 0, -1}, dy{0, 1, 1, 1, 0, -1, -1, -1};
+    rep(i, 0, n)
+        rep(j, 0, m)
+            rep(k, 0, 8) {
+                int x = i + dx[k], y = j + dy[k];
+                if (x >= 0 && x < n && y >= 0 && y < m)adj[i * m + j].eb(x * m + y, a[i][j] - '0' != k);
+            }
+    int q, x1, y1, x2, y2;
+    cin >> q;
+    while (q--) {
+        cin >> x1 >> y1 >> x2 >> y2;
+        pnl(dijkstra(adj, (x1 - 1) * m + y1 - 1, (x2 - 1) * m + y2 - 1)[(x2 - 1) * m + y2 - 1]);;
+    }
 }
 
 int32_t main() {
@@ -234,6 +266,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

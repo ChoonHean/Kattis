@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,25 +215,43 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
     }
-    cout << lo;
+    return res;
+}
+
+inline void solve() {
+    string s;
+    cin >> s;
+    vs a = split(s, '+');
+    const int n = sz(a), N = 1 << n - 1;
+    hset<ll> res;
+    rep(i, 0, N) {
+        ll t = 0;
+        string prev = a[0];
+        rep(j, 0, n - 1) {
+            if ((i >> j) & 1)prev += a[j + 1];
+            else t += stoll(prev), prev = a[j + 1];
+        }
+        res.insert(t + stoll(prev));
+    }
+    cout << sz(res);
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(2);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

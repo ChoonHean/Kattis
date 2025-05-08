@@ -215,16 +215,24 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
+inline ll nextp(ll n) {
+    ll t = n | (n - 1);
+    return (t + 1) | (((~t & -~t) - 1) >> (countr_zero((ull) n) + 1));
+}
+
 inline void solve() {
-    ll n;
+    int n;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    read(n);
+    ll res = 0;
+    rep(l, 1, 4) {
+        for (ll i = (1 << l) - 1; i < 1LL << n; i = nextp(i)) {
+            int cur = 0;
+            for (ull j = i; j; j -= lsb(j))cur += a[countr_zero(j)];
+            if (cur < 200)res -= cur;
+        }
     }
-    cout << lo;
+    cout << res + accumulate(all(a), 0LL) * (1LL << n - 1);
 }
 
 int32_t main() {

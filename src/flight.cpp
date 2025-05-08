@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -36,7 +34,6 @@ typedef vector<vpil> vvpil;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
-typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
@@ -44,7 +41,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -108,6 +105,9 @@ inline void pr(const tuple<Args...> &tup) {
 }
 
 template<typename T>
+void pr(const PQ<T, vector<T>, greater<>> &v);
+
+template<typename T>
 inline void pr(const vector<T> &v) {
     for (const auto &i: v) pr(i);
     cout << nl;
@@ -131,8 +131,8 @@ inline void pr(const ordered_set &s) {
     cout << nl;
 }
 
-template<typename T, typename H>
-inline void pr(const unordered_set<T, H> &s) {
+template<typename T>
+inline void pr(const unordered_set<T> &s) {
     for (const auto &t: s)pr(t);
     cout << nl;
 }
@@ -216,15 +216,66 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n, u, v;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    vvi adj(n);
+    vpii pairs;
+    rep(i, 1, n)cin >> u >> v, adj[--u].pb(--v), adj[v].pb(u), pairs.eb(u, v);
+    int mn = inf, r1, r2, r3, r4;
+    for (const auto &[i, j]: pairs) {
+        adj[i].erase(find(all(adj[i]), j));
+        adj[j].erase(find(all(adj[j]), i));
+        vb vis(n);
+        queue<int> q({i});
+        vis[i] = 1;
+        int a, b;
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            a = u;
+            for (const int &v: adj[u])if (!vis[v])q.push(v), vis[v] = 1;
+        }
+        vis.assign(n, 0);
+        q.push(a);
+        vi dist(n), p(n);
+        while (!q.empty()) {
+            u = q.front();
+            q.pop();
+            b = u;
+            for (const int &v: adj[u])if (!vis[v])q.push(v), vis[v] = 1, dist[v] = dist[u] + 1, p[v] = u;;
+        }
+        int dia1 = dist[b];
+        q.push(j);
+        vis[j] = 1;
+        int c, d;
+        while (!q.empty()) {
+            u = q.front();
+            q.pop();
+            c = u;
+            for (const int &v: adj[u])if (!vis[v])q.push(v), vis[v] = 1;
+        }
+        vis.assign(n, 0);
+        q.push(c);
+        while (!q.empty()) {
+            u = q.front();
+            q.pop();
+            d = u;
+            for (const int &v: adj[u])if (!vis[v])q.push(v), vis[v] = 1, dist[v] = dist[u] + 1, p[v] = u;
+        }
+        adj[i].pb(j);
+        adj[j].pb(i);
+        int dia2 = dist[d];
+        int dia = max((dia1 + 1) / 2 + (dia2 + 1) / 2 + 1, max(dia1, dia2));
+        if (dia < mn) {
+            mn = dia;
+            rep(k, 0, dia1 / 2)b = p[b];
+            rep(k, 0, dia2 / 2)d = p[d];
+            r1 = i, r2 = j, r3 = b, r4 = d;
+        }
     }
-    cout << lo;
+    pnl(mn);
+    pr(r1 + 1, r2 + 1);
+    pr(r3 + 1, r4 + 1);
 }
 
 int32_t main() {
@@ -234,6 +285,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

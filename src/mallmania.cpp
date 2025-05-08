@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +214,41 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, m, x, y;
+    const vi dx{0, 0, 1, -1}, dy{1, -1, 0, 0};
+    while (cin >> n) {
+        if (!n)break;
+        int mnx = inf, mny = inf, mxx = 0, mxy = 0;
+        vvi d(2001, vi(2001, -1));
+        rep(i, 0, n)
+            cin >> x >> y, d[x][y] = 1, mxy = max(mxy, y), mxx = max(mxx, x), mnx = min(mnx, x), mny = min(mny, y);
+        queue<pii> q;
+        cin >> m;
+        rep(i, 0, m)
+            cin >> x >> y, q.emplace(x, y), d[x][y] = 0, mxy = max(mxy, y), mxx = max(mxx, x), mnx = min(mnx,
+                                                                                                         x), mny = min(
+                    mny, y);
+        int res = 0;
+        while (!q.empty()) {
+            int size = sz(q);
+            while (size-- && !q.empty()) {
+                auto [i, j] = q.front();
+                q.pop();
+                rep(k, 0, 4) {
+                    x = i + dx[k];
+                    y = j + dy[k];
+                    if (x < mnx || x > mxx | y < mny || y > mxy)continue;
+                    if (d[x][y] == 1) {
+                        while (!q.empty())q.pop();
+                        break;
+                    }
+                    if (d[x][y] == -1)d[x][y] = 0, q.emplace(x, y);
+                }
+            }
+            res++;
+        }
+        pnl(res);
     }
-    cout << lo;
 }
 
 int32_t main() {
@@ -234,6 +258,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

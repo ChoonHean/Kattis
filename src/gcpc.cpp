@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,28 +22,21 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
-typedef vector<pid> vpid;
-typedef vector<vpid> vvpid;
 typedef pair<string, int> psi;
-typedef pair<int, ll> pil;
-typedef vector<pil> vpil;
-typedef vector<vpil> vvpil;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
-typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<ti, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -108,6 +100,9 @@ inline void pr(const tuple<Args...> &tup) {
 }
 
 template<typename T>
+void pr(const PQ<T, vector<T>, greater<>> &v);
+
+template<typename T>
 inline void pr(const vector<T> &v) {
     for (const auto &i: v) pr(i);
     cout << nl;
@@ -126,19 +121,13 @@ inline void pr(const multiset<T> &s) {
 }
 
 template<typename T>
-inline void pr(const ordered_set &s) {
+inline void pr(const unordered_set<T> &s) {
     for (const auto &t: s)pr(t);
     cout << nl;
 }
 
-template<typename T, typename H>
-inline void pr(const unordered_set<T, H> &s) {
-    for (const auto &t: s)pr(t);
-    cout << nl;
-}
-
-template<typename T, typename U, typename H>
-inline void pr(const map<T, U, H> &m) {
+template<typename T, typename U>
+inline void pr(const map<T, U> &m) {
     for (const auto &[t, u]: m) {
         cout << '(';
         pr(t);
@@ -149,8 +138,8 @@ inline void pr(const map<T, U, H> &m) {
     cout << nl;
 }
 
-template<typename T, typename U, typename H>
-inline void pr(const unordered_map<T, U, H> &m) {
+template<typename T, typename U>
+inline void pr(const unordered_map<T, U> &m) {
     for (const auto &[t, u]: m) {
         cout << '(';
         pr(t);
@@ -162,8 +151,8 @@ inline void pr(const unordered_map<T, U, H> &m) {
 }
 
 template<typename T>
-inline void pr(const queue<T> &q1) {
-    queue<T> copy(q1);
+inline void pr(const queue<T> &q) {
+    queue<T> copy(q);
     while (!copy.empty()) {
         pr(copy.front());
         copy.pop();
@@ -182,8 +171,8 @@ inline void pr(const stack<T> &s) {
 }
 
 template<typename T>
-inline void pr(const deque<T> &q1) {
-    deque<T> copy(q1);
+inline void pr(const deque<T> &q) {
+    deque<T> copy(q);
     while (!copy.empty()) {
         pr(copy.top());
         copy.pop();
@@ -191,9 +180,21 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
-template<typename T, typename C>
-inline void pr(const PQ<T, vector<T>, C> &pq1) {
-    auto copy(pq1);
+template<typename T>
+inline void pr(const PQ<T> &pq) {
+    PQ<T> copy(pq);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
+template<typename T>
+inline void pr(const PQ<T, vector<T>, greater<>> &pq) {
+    auto copy(pq);
     vector<T> arr;
     while (!copy.empty()) {
         arr.pb(copy.top());
@@ -216,15 +217,20 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, m, t, p;
+    ordered_set tree;
+    cin >> n >> m;
+    vector<ti> a(n + 1);
+    rep(i, 1, n + 1)get<2>(a[i]) = i;
+    rep(i, 1, n + 1)tree.insert({0, 0, i});
+    while (m--) {
+        cin >> t >> p;
+        tree.erase(a[t]);
+        get<0>(a[t])--;
+        get<1>(a[t]) += p;
+        tree.insert(a[t]);
+        pnl(tree.order_of_key(a[1]) + 1);
     }
-    cout << lo;
 }
 
 int32_t main() {
@@ -234,6 +240,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

@@ -44,7 +44,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +215,37 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
     }
-    cout << lo;
+    return res;
+}
+
+inline void solve() {
+    int l, m;
+    cin >> l >> m;
+    vs res;
+    int mn = inf;
+    string s;
+    getline(cin, s);
+    rep(i, 0, m) {
+        getline(cin, s);
+        vs cur = split(s, ',');
+        double x = 10080.0 * stoi(cur[2]) * stoi(cur[3]) / (stoi(cur[3]) + stoi(cur[4]));
+        if (x >= l) {
+            int p = stoi(cur[1]);
+            if (p < mn)mn = p, res = {cur[0]};
+            else if (p == mn)res.pb(cur[0]);
+        }
+    }
+    if (sz(res))pr(res);
+    else cout << "no such mower";
 }
 
 int32_t main() {

@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -39,12 +38,12 @@ typedef vector<vpii> vvpii;
 typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
-typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
+typedef tree<int, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
         ordered_set;
-const int inf = 1e8;
+const int inf = 1e9;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -84,6 +83,10 @@ inline bool chmax(T &a, T &b) {
 template<typename T>
 inline T ceildiv(T a, T b) {
     return (a + b - 1) / b;
+}
+
+inline void YN(const bool &b) {
+    cout << (b ? "YES" : "NO") << nl;
 }
 
 template<typename T>
@@ -191,6 +194,18 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
+template<typename T>
+inline void pr(const PQ<T> &pq1) {
+    auto copy(pq1);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
 template<typename T, typename C>
 inline void pr(const PQ<T, vector<T>, C> &pq1) {
     auto copy(pq1);
@@ -215,25 +230,49 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
+int tc = 1;
+
 inline void solve() {
-    ll n;
+    int n;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    string s;
+    getline(cin, s);
+    hmap<string, int> mp;
+    vector<hset<string>> a(n);
+    rep(i, 0, n) {
+        getline(cin, s);
+        for (char &c: s)c = toupper(c);
+        auto &set = a[i];
+        rep(j, 0, sz(s))rep(k, j, sz(s))set.insert(s.substr(j, k - j + 1));
+        for (const string &t: set)mp[t]++;
     }
-    cout << lo;
+    cout << "Case #" << tc++ << ": \n";
+    if (n == 1) {
+        cout << "\"\"\n";
+        return;
+    }
+    rep(i, 0, n) {
+        string res;
+        int mn = inf;
+        for (const string &t: a[i])
+            if (mp[t] == 1) {
+                if (sz(t) < mn) {
+                    mn = sz(t);
+                    res = t;
+                } else if (sz(t) == mn)res = min(res, t);
+            }
+        if (mn == inf)cout << ":(" << nl;
+        else cout << "\"" << res << "\"\n";
+    }
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(1);
     int cases = 1;
-//    cin >> cases;
+    cin >> cases;
     while (cases--)solve();
     return 0;
 }

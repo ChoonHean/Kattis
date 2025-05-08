@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +215,27 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
+    int n, x;
     cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    hmap<string, vi> mp;
+    string s, t;
+    rep(i, 0, n) {
+        cin >> s >> t >> x;
+        if (!mp.contains(s))mp[s] = vi(3);
+        if (t[0] == 'a')mp[s][0] += x;
+        else if (t[0] == 'l')mp[s][1] += x;
+        else mp[s][2] += x;
     }
-    cout << lo;
+    bool ok = 0;
+    int res = 0;
+    for (const auto &[a, b]: mp) {
+        if (b[0] >= 2)ok = 1;
+        else if (b[1] && b[2])ok = 1;
+        if (b[1] || b[2])res += max(b[1], b[2]);
+        else res++;
+    }
+    if (ok)cout << res + 1;
+    else cout << "impossible";
 }
 
 int32_t main() {

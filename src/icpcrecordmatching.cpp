@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,20 +22,13 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
-typedef vector<pid> vpid;
-typedef vector<vpid> vvpid;
 typedef pair<string, int> psi;
-typedef pair<int, ll> pil;
-typedef vector<pil> vpil;
-typedef vector<vpil> vvpil;
 typedef pair<ll, ll> pll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
-typedef vector<vvpii> vvvpii;
 typedef vector<pll> vpll;
 typedef vector<pdd> vpdd;
 typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_update>
@@ -44,7 +36,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -108,6 +100,9 @@ inline void pr(const tuple<Args...> &tup) {
 }
 
 template<typename T>
+void pr(const PQ<T, vector<T>, greater<>> &v);
+
+template<typename T>
 inline void pr(const vector<T> &v) {
     for (const auto &i: v) pr(i);
     cout << nl;
@@ -126,19 +121,13 @@ inline void pr(const multiset<T> &s) {
 }
 
 template<typename T>
-inline void pr(const ordered_set &s) {
+inline void pr(const unordered_set<T> &s) {
     for (const auto &t: s)pr(t);
     cout << nl;
 }
 
-template<typename T, typename H>
-inline void pr(const unordered_set<T, H> &s) {
-    for (const auto &t: s)pr(t);
-    cout << nl;
-}
-
-template<typename T, typename U, typename H>
-inline void pr(const map<T, U, H> &m) {
+template<typename T, typename U>
+inline void pr(const map<T, U> &m) {
     for (const auto &[t, u]: m) {
         cout << '(';
         pr(t);
@@ -149,8 +138,8 @@ inline void pr(const map<T, U, H> &m) {
     cout << nl;
 }
 
-template<typename T, typename U, typename H>
-inline void pr(const unordered_map<T, U, H> &m) {
+template<typename T, typename U>
+inline void pr(const unordered_map<T, U> &m) {
     for (const auto &[t, u]: m) {
         cout << '(';
         pr(t);
@@ -162,8 +151,8 @@ inline void pr(const unordered_map<T, U, H> &m) {
 }
 
 template<typename T>
-inline void pr(const queue<T> &q1) {
-    queue<T> copy(q1);
+inline void pr(const queue<T> &q) {
+    queue<T> copy(q);
     while (!copy.empty()) {
         pr(copy.front());
         copy.pop();
@@ -182,8 +171,8 @@ inline void pr(const stack<T> &s) {
 }
 
 template<typename T>
-inline void pr(const deque<T> &q1) {
-    deque<T> copy(q1);
+inline void pr(const deque<T> &q) {
+    deque<T> copy(q);
     while (!copy.empty()) {
         pr(copy.top());
         copy.pop();
@@ -191,9 +180,21 @@ inline void pr(const deque<T> &q1) {
     cout << nl;
 }
 
-template<typename T, typename C>
-inline void pr(const PQ<T, vector<T>, C> &pq1) {
-    auto copy(pq1);
+template<typename T>
+inline void pr(const PQ<T> &pq) {
+    PQ<T> copy(pq);
+    vector<T> arr;
+    while (!copy.empty()) {
+        arr.pb(copy.top());
+        copy.pop();
+    }
+    pr(arr);
+    cout << nl;
+}
+
+template<typename T>
+inline void pr(const PQ<T, vector<T>, greater<>> &pq) {
+    auto copy(pq);
     vector<T> arr;
     while (!copy.empty()) {
         arr.pb(copy.top());
@@ -215,16 +216,60 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+vs split(string s, char delim) {
+    vs res;
+    int pos = 0, prev = 0;
+    while (true) {
+        pos = s.find(delim, prev);
+        res.pb(s.substr(prev, pos - prev));
+        if (pos == string::npos)break;
+        prev = pos + 1;
     }
-    cout << lo;
+    return res;
+}
+
+inline void solve() {
+    string s;
+    vector<pair<string, string>> a, b, i, o;
+    hset<string> name, email;
+    while (getline(cin, s)) {
+        if (s.empty())break;
+        auto v = split(s, '\t');
+        string t1, t2;
+        for (char c: v[0])t1.pb(tolower(c));
+        for (char c: v[1])t1.pb(tolower(c));
+        for (char c: v[2])t2.pb(tolower(c));
+        a.eb(t1, t2);
+        i.eb(v[2], v[1] + " " + v[0]);
+    }
+    while (getline(cin, s)) {
+        auto v = split(s, '\t');
+        string t1, t2;
+        for (char c: v[0])t1.pb(tolower(c));
+        for (char c: v[1])t1.pb(tolower(c));
+        for (char c: v[2])t2.pb(tolower(c));
+        o.eb(v[2], v[1] + " " + v[0]);
+        b.eb(t1, t2);
+        name.insert(t1);
+        email.insert(t2);
+    }
+    vi ans1, ans2;
+    rep(j, 0, sz(a))if (!name.contains(a[j].first) && !email.contains(a[j].second))ans1.pb(j);
+    name.clear();
+    email.clear();
+    for (auto &[x, y]: a)name.insert(x), email.insert(y);
+    rep(j, 0, sz(b))if (!name.contains(b[j].first) && !email.contains(b[j].second))ans2.pb(j);
+    if (ans1.empty() && ans2.empty())cout << "No mismatches.";
+    else {
+        sort(all(ans1), [&](int i, int j) {
+            return a[i].second < a[j].second;
+        });
+        sort(all(ans2), [&](int i, int j) {
+            return b[i].second < b[j].second;
+        });
+        for (const auto &j: ans1)pr('I', i[j].first, i[j].second);
+        for (const auto &j: ans2)pr('O', o[j].first, o[j].second);
+    }
 }
 
 int32_t main() {
@@ -234,6 +279,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

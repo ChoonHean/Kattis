@@ -216,22 +216,67 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    const int n = 200;
+    set<int> s;
+    s.insert(200);
+    vvb dp(10, vb(200));
+    auto f = [&](auto &self, int i, int x) -> void {
+        if (x >= 200)return;
+        if (dp[i][x])return;
+        dp[i][x] = 1;
+        s.insert(x);
+        if (i == 1) {
+            self(self, 1, x * 10 + 1);
+            self(self, 2, x);
+            self(self, 4, x);
+        } else if (i == 2) {
+            self(self, 2, x * 10 + 2);
+            self(self, 3, x);
+            self(self, 5, x);
+        } else if (i == 3) {
+            self(self, 3, x * 10 + 3);
+            self(self, 6, x);
+        } else if (i == 4) {
+            self(self, 4, x * 10 + 4);
+            self(self, 5, x);
+            self(self, 7, x);
+        } else if (i == 5) {
+            self(self, 5, x * 10 + 5);
+            self(self, 6, x);
+            self(self, 8, x);
+        } else if (i == 6) {
+            self(self, 6, x * 10 + 6);
+            self(self, 9, x);
+        } else if (i == 7) {
+            self(self, 7, x * 10 + 7);
+            self(self, 8, x);
+        } else if (i == 8) {
+            self(self, 8, x * 10 + 8);
+            self(self, 9, x);
+            self(self, 0, x);
+        } else if (i == 9) {
+            self(self, 9, x * 10 + 9);
+        } else if (i == 0) {
+            self(self, 0, x * 10);
+        }
+    };
+    f(f, 1, 0);
+    int q, x;
+    cin >> q;
+    while (q--) {
+        cin >> x;
+        auto it = s.lower_bound(x);
+        int a = *it, b = *--it;
+        if (a - x <= x - b)pnl(a);
+        else pnl(b);
     }
-    cout << lo;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
-    cout << fixed << setprecision(10);
+    cout << fixed << setprecision(0);
     int cases = 1;
 //    cin >> cases;
     while (cases--)solve();

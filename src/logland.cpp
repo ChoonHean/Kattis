@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +214,85 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+struct mint {
+    static constexpr int m = mod;
+    int x;
+
+    mint() : x(0) {}
+
+    mint(long long x_) : x(x_ % m) { if (x < 0) x += m; }
+
+    int val() { return x; }
+
+    mint &operator+=(mint b) {
+        if ((x += b.x) >= m) x -= m;
+        return *this;
     }
-    cout << lo;
+
+    mint &operator-=(mint b) {
+        if ((x -= b.x) < 0) x += m;
+        return *this;
+    }
+
+    mint &operator*=(mint b) {
+        x = (long long) (x) * b.x % m;
+        return *this;
+    }
+
+    mint pow(long long e) const {
+        mint r = 1, b = *this;
+        while (e) {
+            if (e & 1) r *= b;
+            b *= b;
+            e >>= 1;
+        }
+        return r;
+    }
+
+    mint inv() { return pow(m - 2); }
+
+    mint &operator/=(mint b) { return *this *= b.pow(m - 2); }
+
+    friend mint operator+(mint a, mint b) { return a += b; }
+
+    friend mint operator-(mint a, mint b) { return a -= b; }
+
+    friend mint operator/(mint a, mint b) { return a /= b; }
+
+    friend mint operator*(mint a, mint b) { return a *= b; }
+
+    friend bool operator==(mint a, mint b) { return a.x == b.x; }
+
+    friend bool operator!=(mint a, mint b) { return a.x != b.x; }
+
+    friend ostream &operator<<(ostream &os, const mint &a) {
+        os << a.x;
+        return os;
+    }
+};
+
+inline void solve() {
+    int n;
+    cin >> n;
+    read(n);
+    mint res;
+    vl dp(n);
+    dp[1] = a[0] / 2;
+    rep(i, 2, n)dp[i] = (dp[i - 1] + a[i - 1]) / 2;
+    ll cur = 0;
+    repr(i, n - 1, 0) {
+        cur -= a[i];
+        if (cur < 0) {
+            a[i] = -cur;
+            cur = 0;
+            if (a[i] & 1) {
+                if (dp[i] == 0)res += mint(2).pow(i);
+                else cur = 1;
+            }
+        }
+        cur <<= 1;
+    }
+    cout << res;
 }
 
 int32_t main() {

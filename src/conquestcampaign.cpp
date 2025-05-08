@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +214,29 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n, m, k, x, y;
+    cin >> n >> m >> k;
+    vvb vis(n, vb(m));
+    queue<pii> q;
+    while (k--) {
+        cin >> x >> y;
+        q.emplace(--x, --y);
+        vis[x][y] = 1;
     }
-    cout << lo;
+    int res = 0;
+    while (!q.empty()) {
+        int size = sz(q);
+        while (size--) {
+            auto [i, j] = q.front();
+            q.pop();
+            if (i && !vis[i - 1][j])q.emplace(i - 1, j), vis[i - 1][j] = 1;
+            if (i < n - 1 && !vis[i + 1][j])q.emplace(i + 1, j), vis[i + 1][j] = 1;
+            if (j && !vis[i][j - 1])q.emplace(i, j - 1), vis[i][j - 1] = 1;
+            if (j < m - 1 && !vis[i][j + 1])q.emplace(i, j + 1), vis[i][j + 1] = 1;
+        }
+        res++;
+    }
+    cout << res;
 }
 
 int32_t main() {
@@ -234,6 +246,6 @@ int32_t main() {
     cout << fixed << setprecision(10);
     int cases = 1;
 //    cin >> cases;
-    while (cases--)solve();
+    while (cases--) solve();
     return 0;
 }

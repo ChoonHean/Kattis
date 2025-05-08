@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -23,7 +22,6 @@ typedef vector<vl> vvl;
 typedef vector<vvl> vvvl;
 typedef pair<int, int> pii;
 typedef tuple<int, int, int> ti;
-typedef vector<ti> vti;
 typedef pair<double, double> pdd;
 typedef pair<double, int> pdi;
 typedef pair<int, double> pid;
@@ -44,7 +42,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -215,16 +213,51 @@ void pr(const Args &... args) {
     cout << nl;
 }
 
-inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+template<typename T>
+inline int dijkstra(const vector<vector<pair<int, T>>> &adj, int s) {
+    int n = sz(adj);
+    vector<T> dist(n, numeric_limits<T>::max());
+    dist[s] = T();
+    set<pair<T, int>> pq;
+    pq.emplace(T(), s);
+//    vi p(n, -1);
+    while (!pq.empty()) {
+        auto [d, u] = *pq.begin();
+        if (d > 6) return 1;
+        pq.erase(pq.begin());
+        for (const auto &[v, w]: adj[u]) {
+            T next = d + w;
+            if (next < dist[v]) {
+                pq.erase({dist[v], v});
+                pq.emplace(dist[v] = next, v);
+//                p[v] = u;
+            }
+        }
     }
-    cout << lo;
+//    return p;
+    return 0;
+}
+
+inline void solve() {
+    string s;
+    int m, u, v;
+    hmap<string, int> mp;
+    cin >> m;
+    vvpii adj;
+    rep(i, 0, m) {
+        cin >> s;
+        if (mp.contains(s))u = mp[s];
+        else u = mp[s] = sz(mp), adj.eb();
+        cin >> s;
+        if (mp.contains(s))v = mp[s];
+        else v = mp[s] = sz(mp), adj.eb();
+        adj[u].eb(v, 1);
+        adj[v].eb(u, 1);
+    }
+    int res = 0, n = sz(mp);
+    rep(i, 0, n)res += dijkstra(adj, i);
+    if (res <= n * 0.05)pnl("YES");
+    else pnl("NO");
 }
 
 int32_t main() {
@@ -233,7 +266,7 @@ int32_t main() {
     cout.tie(nullptr);
     cout << fixed << setprecision(10);
     int cases = 1;
-//    cin >> cases;
-    while (cases--)solve();
+    cin >> cases;
+    while (cases--) solve();
     return 0;
 }

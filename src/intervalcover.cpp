@@ -2,7 +2,6 @@
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
 
-
 using namespace std;
 using namespace __gnu_pbds;
 typedef unsigned int uint;
@@ -44,7 +43,7 @@ typedef tree<pii, null_type, less<>, rb_tree_tag, tree_order_statistics_node_upd
 const int inf = 1e8;
 const ll llinf = 4e18;
 const int mod = 1e9 + 7;
-const double eps = 1e-15;
+const double eps = 1e-9;
 #define all(a) a.begin(),a.end()
 #define read(n) vi a(n);for(int&_:a)cin>>_
 #define reada(arr) for(auto&_:arr)cin>>_
@@ -216,15 +215,42 @@ void pr(const Args &... args) {
 }
 
 inline void solve() {
-    ll n;
-    cin >> n;
-    double lo = 1, hi = 10;
-    while (fabs(hi - lo) > 1e-6) {
-        double mid = (lo + hi) / 2;
-        if (pow(mid, mid) >= n)hi = mid;
-        else lo = mid;
+    int n;
+    double a, b;
+    while (cin >> a >> b >> n) {
+        vector<tuple<double, double, int>> arr(n);
+        rep(i, 0, n)cin >> get<0>(arr[i]) >> get<1>(arr[i]), get<2>(arr[i]) = i;
+        if (a == b) {
+            int res = -1;
+            for (const auto &[s, e, i]: arr) {
+                if (s <= a && a <= e) {
+                    res = i;
+                    break;
+                }
+            }
+            if (res == -1)pnl("impossible");
+            else pnl(1), pnl(res);
+            continue;
+        }
+        sort(all(arr));
+        vi res;
+        PQ<pair<double, int>> pq;
+        for (const auto &[s, e, i]: arr) {
+            if (a >= b)break;
+            if (s <= a) {
+                pq.emplace(e, i);
+                continue;
+            }
+            if (pq.empty())break;
+            a = pq.top().first;
+            res.pb(pq.top().second);
+            pq = {};
+            if (s <= a)pq.emplace(e, i);
+        }
+        if (a < b && sz(pq) && pq.top().first >= b)a = b, res.pb(pq.top().second);
+        if (a >= b)pnl(sz(res)), pr(res);
+        else pnl("impossible");
     }
-    cout << lo;
 }
 
 int32_t main() {
