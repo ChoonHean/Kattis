@@ -19,6 +19,7 @@ public:
     int V;
     vector<edge> EL;
     vector<vi> AL;
+    //vector<hmap<int,int>>AL;
     vi d, last;
     vector<pii> p;
 
@@ -32,6 +33,7 @@ public:
             q.pop();
             if (u == t) break;                         // stop as sink t reached
             for (auto &idx: AL[u]) {                  // explore neighbors of u
+                //for (auto &[to,idx]:AL[u]) {
                 auto &[v, cap, flow] = EL[idx];          // stored in EL[idx]
                 if ((cap - flow > 0) && (d[v] == -1))      // positive residual edge
                     d[v] = d[u] + 1, q.push(v), p[v] = {u, idx}; // 3 lines in one!
@@ -68,7 +70,7 @@ public:
 
     max_flow(int initialV) : V(initialV) {
         EL.clear();
-        AL.assign(V, vi());
+        AL.resize(V);
     }
 
     // if you are adding a bidirectional edge u<->v with weight w into your
@@ -77,8 +79,10 @@ public:
         if (u == v) return;                          // safeguard: no self loop
         EL.emplace_back(v, w, 0);                    // u->v, cap w, flow 0
         AL[u].push_back(EL.size() - 1);                // remember this index
+        //AL[u][v]=EL.size()-1;
         EL.emplace_back(u, directed ? 0 : w, 0);     // back edge
         AL[v].push_back(EL.size() - 1);                // remember this index
+        //AL[v][u]=EL.size()-1;
     }
 
     ll edmonds_karp(int s, int t) {
@@ -101,10 +105,37 @@ public:
         return mf;
     }
 
+    vpii min_cut(int s, int t) { //call dinic first
+        hset<int> set;
+        set.insert(s);
+        queue<int> q({s});
+        while (!q.empty()) {
+            for (int &idx: AL[q.front()]) {
+                auto &[j, cap, flow] = EL[idx];
+                if (cap - flow > 0 && set.insert(j).second) {
+                    q.push(j);
+                }
+            }
+            q.pop();
+        }
+        vpii res;
+        rep(i, 0, V)
+        {
+            for (int &idx: AL[i]) {
+                auto &[j, cap, flow] = EL[idx];
+                if (flow > 0 && (set.contains(i) ^ set.contains(j))) {
+                    res.pb({i, j});
+                }
+            }
+        }
+        return res;
+    }
+
     void print() {
         for (int i = 0; i < V; i++) {
             cout << i << ' ';
             for (int &j: AL[i])if (!(j & 1))pr(EL[j]);
+            //for(auto&[j,idx]:AL[i])if(!(idx&1))pr(EL[j]);
             cout << nl;
         }
     }
@@ -185,6 +216,14 @@ struct min_cost_max_flow {
         }
         return {mf, total_cost};
     }
+
+    void print() {
+        for (int i = 0; i < V; i++) {
+            cout << i << ':';
+            for (int j: AL[i])if (!(j & 1))pr(EL[j]);
+            cout << nl;
+        }
+    }
 };
 
 /**
@@ -206,7 +245,8 @@ pair<int, vi> hungarian(const vector<vi> &a) {
     if (a.empty()) return {0, {}};
     int n = sz(a) + 1, m = sz(a[0]) + 1;
     vi u(n), v(m), p(m), ans(n - 1);
-    rep(i,1,n) {
+    rep(i, 1, n)
+    {
         p[0] = i;
         int j0 = 0; // add "dummy" worker 0
         vi dist(m, INT_MAX), pre(m, -1);
@@ -214,12 +254,14 @@ pair<int, vi> hungarian(const vector<vi> &a) {
         do { // dijkstra
             done[j0] = true;
             int i0 = p[j0], j1, delta = INT_MAX;
-            rep(j,1,m) if (!done[j]) {
+            rep(j, 1, m)
+            if (!done[j]) {
                 auto cur = a[i0 - 1][j - 1] - u[i0] - v[j];
                 if (cur < dist[j]) dist[j] = cur, pre[j] = j0;
                 if (dist[j] < delta) delta = dist[j], j1 = j;
             }
-            rep(j,0,m) {
+            rep(j, 0, m)
+            {
                 if (done[j]) u[p[j]] += delta, v[j] -= delta;
                 else dist[j] -= delta;
             }
@@ -230,7 +272,8 @@ pair<int, vi> hungarian(const vector<vi> &a) {
             p[j0] = p[j1], j0 = j1;
         }
     }
-    rep(j,1,m) if (p[j]) ans[p[j] - 1] = j - 1;
+    rep(j, 1, m)
+    if (p[j]) ans[p[j] - 1] = j - 1;
     return {-v[0], ans}; // min cost
 }
 
@@ -249,10 +292,11 @@ pair<int, vi> hungarian(const vector<vi> &a) {
  * Status: stress-tested by MinimumVertexCover, and tested on oldkattis.adkbipmatch and SPOJ:MATCHING
  */
 
-bool dfs(int a, int L, vector<vi>& g, vi& btoa, vi& A, vi& B) {
+bool dfs(int a, int L, vector<vi> &g, vi &btoa, vi &A, vi &B) {
     if (A[a] != L) return 0;
     A[a] = -1;
-    for (int b : g[a]) if (B[b] == L + 1) {
+    for (int b: g[a])
+        if (B[b] == L + 1) {
             B[b] = 0;
             if (btoa[b] == -1 || dfs(btoa[b], L + 1, g, btoa, A, B))
                 return btoa[b] = a, 1;
@@ -260,7 +304,7 @@ bool dfs(int a, int L, vector<vi>& g, vi& btoa, vi& A, vi& B) {
     return 0;
 }
 
-int hopcroftKarp(vector<vi>& g, vi& btoa) {
+int hopcroftKarp(vector<vi> &g, vi &btoa) {
     int res = 0;
     vi A(g.size()), B(btoa.size()), cur, next;
     for (;;) {
@@ -268,29 +312,30 @@ int hopcroftKarp(vector<vi>& g, vi& btoa) {
         fill(all(B), 0);
         /// Find the starting nodes for BFS (i.e. layer 0).
         cur.clear();
-        for (int a : btoa) if(a != -1) A[a] = -1;
-        rep(a,0,sz(g)) if(A[a] == 0) cur.push_back(a);
+        for (int a: btoa) if (a != -1) A[a] = -1;
+        rep(a, 0, sz(g))
+        if (A[a] == 0) cur.push_back(a);
         /// Find all layers using bfs.
         for (int lay = 1;; lay++) {
             bool islast = 0;
             next.clear();
-            for (int a : cur) for (int b : g[a]) {
+            for (int a: cur)
+                for (int b: g[a]) {
                     if (btoa[b] == -1) {
                         B[b] = lay;
                         islast = 1;
-                    }
-                    else if (btoa[b] != a && !B[b]) {
+                    } else if (btoa[b] != a && !B[b]) {
                         B[b] = lay;
                         next.push_back(btoa[b]);
                     }
                 }
             if (islast) break;
             if (next.empty()) return res;
-            for (int a : next) A[a] = lay;
+            for (int a: next) A[a] = lay;
             cur.swap(next);
         }
         /// Use DFS to scan for augmenting paths.
-        rep(a,0,sz(g))
+        rep(a, 0, sz(g))
         res += dfs(a, 0, g, btoa, A, B);
     }
 }
