@@ -1,8 +1,0 @@
-1.in
-CMakeLists.txt
-cmake-build-debug/
-.idea/
-main.cpp
-perfectskyline.cpp
-dysoncircle.cpp
-joinstrings.cpp
